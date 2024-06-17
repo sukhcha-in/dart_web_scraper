@@ -1,7 +1,11 @@
-## 0.0.3
+## 0.0.5
 
-- First version of the package.
+- Add badges to the README.md file.
 
 ## 0.0.4
 
 - The package description was too short.
+
+## 0.0.3
+
+- First version of the package.

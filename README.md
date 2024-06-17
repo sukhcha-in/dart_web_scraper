@@ -1,4 +1,12 @@
-An easy to use and reusable web scraper and parser.
+[![Pub version](https://img.shields.io/pub/v/dart_web_scraper?logo=dart&style=plastic)](https://pub.dev/packages/dart_web_scraper)
+[![Pub Likes](https://img.shields.io/pub/likes/dart_web_scraper)](https://pub.dev/packages/dart_web_scraper)
+[![Pub Points](https://img.shields.io/pub/points/dart_web_scraper)](https://pub.dev/packages/dart_web_scraper)
+[![Pub Popularity](https://img.shields.io/pub/popularity/dart_web_scraper)](https://pub.dev/packages/dart_web_scraper)
+<!-- [![Pub Publisher](https://img.shields.io/pub/publisher/dart_web_scraper)](https://pub.dev/packages/dart_web_scraper) -->
+
+
+
+Easy-to-use, reusable web scraper. Extracts and cleans HTML/JSON, providing structured data results.
 
 ## Note
 This package is still in development and not ready for production use. Contributions are welcome.
