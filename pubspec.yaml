@@ -1,6 +1,6 @@
 name: dart_web_scraper
 description: An easy to use and reusable web scraper and parser.
-version: 0.0.1
+version: 0.0.3
 repository: https://github.com/sukhcha-in/dart_web_scraper
 
 environment:
