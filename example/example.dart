@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 import 'configs.dart';
 
@@ -13,5 +15,5 @@ void main() async {
     debug: true,
   );
 
-  print(result);
+  print(jsonEncode(result));
 }

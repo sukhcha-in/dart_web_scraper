@@ -35,7 +35,7 @@ class WebParser {
     UrlTarget? target = fetchTarget(config.urlTargets, scrapedData.url);
     if (target == null) {
       printLog('Parser: Target not found!', debug, color: LogColor.red);
-      throw SpiderError('Unsupported URL');
+      throw WebScraperError('Unsupported URL');
     } else {
       printLog('Parser: Target found!', debug, color: LogColor.green);
     }

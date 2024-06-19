@@ -21,7 +21,7 @@ class Scraper {
     UrlTarget? target = fetchTarget(config.urlTargets, url);
     if (target == null) {
       printLog('Scraper: Target not found!', debug, color: LogColor.red);
-      throw SpiderError('Unsupported URL');
+      throw WebScraperError('Unsupported URL');
     } else {
       printLog('Scraper: Target found!', debug, color: LogColor.green);
     }
@@ -123,7 +123,7 @@ class Scraper {
           debug,
           color: LogColor.red,
         );
-        throw SpiderError('Unable to fetch data!');
+        throw WebScraperError('Unable to fetch data!');
       }
     } else {
       printLog(

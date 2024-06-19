@@ -1,8 +1,8 @@
-/// Spider Error Exception.
-class SpiderError implements Exception {
+/// WebScraperError Error Exception.
+class WebScraperError implements Exception {
   final String message;
 
-  SpiderError(this.message);
+  WebScraperError(this.message);
 
   @override
   String toString() {

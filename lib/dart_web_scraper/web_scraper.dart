@@ -22,7 +22,7 @@ class WebScraper {
       urlTarget = fetchTarget(config.urlTargets, url);
     }
     if (config == null || urlTarget == null) {
-      throw SpiderError('Unsupported URL');
+      throw WebScraperError('Unsupported URL');
     }
 
     /// Scrape the URL
