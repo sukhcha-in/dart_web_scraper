@@ -1,3 +1,7 @@
+## 0.0.7
+
+- Update Readme.md file.
+
 ## 0.0.6
 
 - Rename Spider to WebScraper.
