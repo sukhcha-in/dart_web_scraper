@@ -10,20 +10,20 @@ enum UserAgentDevice { mobile, desktop }
 /// Parser Types
 enum ParserType {
   element,
+  attribute,
   text,
   image,
-  attribute,
-  json,
   url,
-  http,
-  strBetween,
-  jsonld,
+  urlParam,
   table,
   sibling,
-  urlParam,
+  strBetween,
+  http,
+  json,
+  jsonld,
   jsonTable,
-  staticVal,
   json5decode,
+  staticVal,
   returnUrlParser,
 }
 

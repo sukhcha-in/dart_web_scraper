@@ -99,10 +99,6 @@ class AbstractOptional {
   /// JSON Table values path.
   String? values;
 
-  /// JSON Table whitelist values.
-  /// Stll Pending.
-  List<String>? whitelist;
-
   ///* [ParserType.staticVal].
   String? strVal;
   Map<String, Object>? mapVal;
@@ -137,7 +133,6 @@ class AbstractOptional {
     this.siblingDirection,
     this.keys,
     this.values,
-    this.whitelist,
     this.strVal,
     this.mapVal,
   });
@@ -194,7 +189,6 @@ class TableOptional extends AbstractOptional {
   TableOptional({
     super.keys,
     super.values,
-    super.whitelist,
   });
 }
 
