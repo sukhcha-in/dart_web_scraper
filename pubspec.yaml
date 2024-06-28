@@ -1,6 +1,6 @@
 name: dart_web_scraper
 description: Easy-to-use, reusable web scraper. Extracts and cleans HTML/JSON, providing structured data results.
-version: 0.0.9
+version: 0.0.10
 repository: https://github.com/sukhcha-in/dart_web_scraper
 
 environment:
