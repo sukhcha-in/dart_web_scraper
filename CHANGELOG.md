@@ -1,14 +1,18 @@
+## 0.0.8
+
+- POST requests can now use `proxyUrl`
+
 ## 0.0.7
 
-- Update Readme.md file.
+- Update `Readme.md` file.
 
 ## 0.0.6
 
-- Rename Spider to WebScraper.
+- Rename `Spider` to `WebScraper`.
 
 ## 0.0.5
 
-- Add badges to the README.md file.
+- Add badges to the `README.md` file.
 
 ## 0.0.4
 

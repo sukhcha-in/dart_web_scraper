@@ -46,9 +46,12 @@ Future<String?> postRequest(
   Uri? proxyUrl,
   bool? cacheResponse,
 }) async {
+  printLog("HTTP POST: $url", debug, color: LogColor.yellow);
   if (proxyUrl != null) {
-    throw UnimplementedError("Proxy URL not supported for POST requests.");
+    printLog("Prepending proxy URL...", debug, color: LogColor.yellow);
+    url = Uri.parse(proxyUrl.toString() + Uri.encodeComponent(url.toString()));
   }
+  printLog("POST URL: $url", debug, color: LogColor.yellow);
   try {
     var html = await http
         .post(
