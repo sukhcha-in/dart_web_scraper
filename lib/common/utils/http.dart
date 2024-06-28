@@ -13,6 +13,16 @@ Future<String?> getRequest(
 }) async {
   printLog("HTTP GET: $url", debug, color: LogColor.yellow);
   if (proxyUrl != null) {
+    if (headers.isNotEmpty && proxyUrl.host.contains("scrapingbee")) {
+      proxyUrl.queryParameters.addAll({
+        "forward_headers_pure": "true",
+      });
+      Map<String, String> newHeaders = {};
+      headers.forEach((name, val) {
+        newHeaders["Spb-$name"] = val;
+      });
+      headers = newHeaders;
+    }
     printLog("Prepending proxy URL...", debug, color: LogColor.yellow);
     url = Uri.parse(proxyUrl.toString() + Uri.encodeComponent(url.toString()));
   }
@@ -48,6 +58,16 @@ Future<String?> postRequest(
 }) async {
   printLog("HTTP POST: $url", debug, color: LogColor.yellow);
   if (proxyUrl != null) {
+    if (headers.isNotEmpty && proxyUrl.host.contains("scrapingbee")) {
+      proxyUrl.queryParameters.addAll({
+        "forward_headers_pure": "true",
+      });
+      Map<String, String> newHeaders = {};
+      headers.forEach((name, val) {
+        newHeaders["Spb-$name"] = val;
+      });
+      headers = newHeaders;
+    }
     printLog("Prepending proxy URL...", debug, color: LogColor.yellow);
     url = Uri.parse(proxyUrl.toString() + Uri.encodeComponent(url.toString()));
   }
