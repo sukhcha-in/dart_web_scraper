@@ -1,3 +1,7 @@
+## 0.0.9
+
+- Support header forwarding for ScrapingBee requests.
+
 ## 0.0.8
 
 - POST requests can now use `proxyUrl`
