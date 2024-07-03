@@ -8,7 +8,11 @@ Data? urlParamParser(
   bool debug,
 ) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
-  printLog("Starting URL Parameter Parser...", debug, color: LogColor.cyan);
+  printLog(
+    "ID: ${parser.id} Parser: URL Parameter",
+    debug,
+    color: LogColor.cyan,
+  );
   String document = getStringObject(parentData);
   try {
     Uri uri = Uri.parse(document);

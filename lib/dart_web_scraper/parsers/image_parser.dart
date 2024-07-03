@@ -9,7 +9,7 @@ Data? imageParser(
   bool debug,
 ) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
-  printLog("Starting Image Parser...", debug, color: LogColor.cyan);
+  printLog("ID: ${parser.id} Parser: Image", debug, color: LogColor.cyan);
   List<Element>? element = getElementObject(parentData);
   if (element == null || element.isEmpty) {
     printLog(

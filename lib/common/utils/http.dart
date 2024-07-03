@@ -14,9 +14,7 @@ Future<String?> getRequest(
   printLog("HTTP GET: $url", debug, color: LogColor.yellow);
   if (proxyUrl != null) {
     if (headers.isNotEmpty && proxyUrl.host.contains("scrapingbee")) {
-      proxyUrl.queryParameters.addAll({
-        "forward_headers_pure": "true",
-      });
+      proxyUrl = addQueryParamToProxy(proxyUrl, "forward_headers_pure", "true");
       Map<String, String> newHeaders = {};
       headers.forEach((name, val) {
         newHeaders["Spb-$name"] = val;
@@ -24,7 +22,7 @@ Future<String?> getRequest(
       headers = newHeaders;
     }
     printLog("Prepending proxy URL...", debug, color: LogColor.yellow);
-    url = Uri.parse(proxyUrl.toString() + Uri.encodeComponent(url.toString()));
+    url = Uri.parse("$proxyUrl=${Uri.encodeComponent(url.toString())}");
   }
   printLog("GET URL: $url", debug, color: LogColor.yellow);
   try {
@@ -59,9 +57,7 @@ Future<String?> postRequest(
   printLog("HTTP POST: $url", debug, color: LogColor.yellow);
   if (proxyUrl != null) {
     if (headers.isNotEmpty && proxyUrl.host.contains("scrapingbee")) {
-      proxyUrl.queryParameters.addAll({
-        "forward_headers_pure": "true",
-      });
+      proxyUrl = addQueryParamToProxy(proxyUrl, "forward_headers_pure", "true");
       Map<String, String> newHeaders = {};
       headers.forEach((name, val) {
         newHeaders["Spb-$name"] = val;
@@ -69,7 +65,7 @@ Future<String?> postRequest(
       headers = newHeaders;
     }
     printLog("Prepending proxy URL...", debug, color: LogColor.yellow);
-    url = Uri.parse(proxyUrl.toString() + Uri.encodeComponent(url.toString()));
+    url = Uri.parse("$proxyUrl=${Uri.encodeComponent(url.toString())}");
   }
   printLog("POST URL: $url", debug, color: LogColor.yellow);
   try {
@@ -86,4 +82,13 @@ Future<String?> postRequest(
   } catch (e) {
     return null;
   }
+}
+
+Uri addQueryParamToProxy(Uri uri, String key, String value) {
+  var qP = Map<String, String>.from(uri.queryParameters);
+  qP.remove("url");
+  qP[key] = value;
+  qP["url"] = "";
+  uri = uri.replace(queryParameters: qP);
+  return uri;
 }

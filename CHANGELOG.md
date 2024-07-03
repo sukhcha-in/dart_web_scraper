@@ -1,3 +1,11 @@
+## 0.0.11
+
+- Print parser debug information with `Parser.id`.
+
+## 0.0.10
+
+- Fix `queryParameters` bug.
+
 ## 0.0.9
 
 - Support header forwarding for ScrapingBee requests.

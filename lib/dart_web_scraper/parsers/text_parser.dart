@@ -10,7 +10,7 @@ Data? textParser(
   bool debug,
 ) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
-  printLog("Starting Text Parser...", debug, color: LogColor.cyan);
+  printLog("ID: ${parser.id} Parser: Text", debug, color: LogColor.cyan);
   List<Element>? element = getElementObject(parentData);
   if (element == null || element.isEmpty) {
     printLog(

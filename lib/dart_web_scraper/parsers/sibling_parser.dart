@@ -9,7 +9,7 @@ Data? siblingParser(
   bool debug,
 ) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
-  printLog("Starting Sibling Parser...", debug, color: LogColor.cyan);
+  printLog("ID: ${parser.id} Parser: Sibling", debug, color: LogColor.cyan);
   List<Element>? element = getElementObject(parentData);
   if (element == null || element.isEmpty) {
     printLog(

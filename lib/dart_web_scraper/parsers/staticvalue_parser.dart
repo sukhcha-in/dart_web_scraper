@@ -6,7 +6,11 @@ Data? staticValueParser(
   bool debug,
 ) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
-  printLog("Starting Static Value Parser...", debug, color: LogColor.cyan);
+  printLog(
+    "ID: ${parser.id} Parser: Static Value",
+    debug,
+    color: LogColor.cyan,
+  );
   if (parser.optional?.strVal != null) {
     return Data(parentData.url, parser.optional!.strVal!);
   } else if (parser.optional?.mapVal != null) {

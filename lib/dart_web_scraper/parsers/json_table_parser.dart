@@ -9,7 +9,7 @@ Data? jsonTableParser(
   bool debug,
 ) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
-  printLog("Starting JSON Table Parser...", debug, color: LogColor.cyan);
+  printLog("ID: ${parser.id} Parser: JSON Table", debug, color: LogColor.cyan);
   Object? json = getJsonObject(parentData, debug);
   json ??= getStringObject(parentData);
 
