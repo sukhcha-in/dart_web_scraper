@@ -9,11 +9,11 @@ Future<Data?> httpParser(
   Parser parser,
   Data parentData,
   Map<String, Object> allData,
-  bool debug,
   Uri? proxyUrl,
+  bool debug,
 ) async {
   printLog("----------------------------------", debug, color: LogColor.yellow);
-  printLog("HTTP Parser Start...", debug, color: LogColor.cyan);
+  printLog("ID: ${parser.id} Parser: HTTP", debug, color: LogColor.cyan);
   String url;
   HttpMethod method = HttpMethod.get;
   Object? payLoad;

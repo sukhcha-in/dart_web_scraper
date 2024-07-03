@@ -8,7 +8,11 @@ Data? stringBetweenParser(
   bool debug,
 ) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
-  printLog("Starting StringBetween Parser...", debug, color: LogColor.cyan);
+  printLog(
+    "ID: ${parser.id} Parser: String Between",
+    debug,
+    color: LogColor.cyan,
+  );
   List<Element>? element = getElementObject(parentData);
   if (element == null || element.isEmpty) {
     printLog(

@@ -9,7 +9,7 @@ Data? urlParser(
   bool debug,
 ) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
-  printLog("Starting URL Parser...", debug, color: LogColor.cyan);
+  printLog("ID: ${parser.id} Parser: URL", debug, color: LogColor.cyan);
 
   List<Element>? element = getElementObject(parentData);
   if (element == null || element.isEmpty) {

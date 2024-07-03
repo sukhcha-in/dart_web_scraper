@@ -269,8 +269,8 @@ class WebParser {
           parser,
           parentData,
           extractedData,
-          debug,
           proxyUrl,
+          debug,
         );
       case ParserType.strBetween:
         return stringBetweenParser(parser, parentData, debug);
@@ -289,7 +289,7 @@ class WebParser {
       case ParserType.json5decode:
         return json5DecodeParser(parser, parentData, debug);
       case ParserType.returnUrlParser:
-        return returnUrlParser(parser, parentData);
+        return returnUrlParser(parser, parentData, debug);
       default:
         return null;
     }

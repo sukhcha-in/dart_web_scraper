@@ -10,7 +10,7 @@ Data? jsonParser(
   bool debug,
 ) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
-  printLog("Starting JSON Parser...", debug, color: LogColor.cyan);
+  printLog("ID: ${parser.id} Parser: JSON", debug, color: LogColor.cyan);
   if (parser.selector.isEmpty) {
     printLog("No Selector! Decoding JSON...", debug, color: LogColor.cyan);
     Object? json = getJsonObject(parentData, debug);

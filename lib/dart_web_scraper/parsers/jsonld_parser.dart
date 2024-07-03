@@ -9,7 +9,7 @@ Data? jsonLdParser(
   bool debug,
 ) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
-  printLog("Starting JSON+LD Parser...", debug, color: LogColor.cyan);
+  printLog("ID: ${parser.id} Parser: JSON+LD", debug, color: LogColor.cyan);
   List<Element>? element = getElementObject(parentData);
   if (element == null || element.isEmpty) {
     printLog(

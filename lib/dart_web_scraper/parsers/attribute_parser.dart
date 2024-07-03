@@ -9,7 +9,7 @@ Data? attributeParser(
   bool debug,
 ) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
-  printLog("Starting Attribute Parser...", debug, color: LogColor.cyan);
+  printLog("ID: ${parser.id} Parser: Attribute", debug, color: LogColor.cyan);
   List<Element>? element = getElementObject(parentData);
   if (element == null || element.isEmpty) {
     printLog(

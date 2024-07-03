@@ -7,7 +7,11 @@ Data? json5DecodeParser(
   bool debug,
 ) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
-  printLog("Starting JSON5Decode Parser...", debug, color: LogColor.cyan);
+  printLog(
+    "ID: ${parser.id} Parser: JSON 5 Decode",
+    debug,
+    color: LogColor.cyan,
+  );
   try {
     return Data(parentData.url, JSON5.parse(parentData.obj as String));
   } catch (e) {
