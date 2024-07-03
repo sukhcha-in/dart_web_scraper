@@ -1,3 +1,7 @@
+## 0.0.12
+
+- Update `README.md` file.
+
 ## 0.0.11
 
 - Print parser debug information with `Parser.id`.

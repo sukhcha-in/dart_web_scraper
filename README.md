@@ -13,11 +13,60 @@ This package is still in development and not ready for production use. Please co
 #### Why need this package?
 I was tired of writing the parsing logic from scratch every time I needed to scrape a new website. Debugging and testing the parsing logic was a nightmare. This package is an attempt to solve this problem. It provides a simple and reusable way to scrape data from the web.
 
-## Getting started
-Please refer to the [example](https://pub.dev/packages/dart_web_scraper/example) to check how it works.
-Example config can be found [here](https://github.com/sukhcha-in/dart_web_scraper/blob/main/example/configs.dart).
+## Getting Started
+Add `dart_web_scraper` as dependencies in your `pubspec.yaml`:
+```yaml
+dependencies:
+  dart_web_scraper:
+```
+Import the package:
+```dart
+import 'package:dart_web_scraper/dart_web_scraper.dart';
+```
 
-### Config
+## Usage
+```dart
+/// Initialize WebScraper
+WebScraper webScraper = WebScraper();
+
+/// Scrape website based on configMap
+Map<String, Object> result = await webScraper.scrape(
+  url: Uri.parse("https://quotes.toscrape.com"),
+  configMap: configMap,
+  configIndex: 0,
+  debug: true,
+);
+
+print(jsonEncode(result));
+```
+Example `configMap` for `quotes.toscrape.com` can be found [here](https://github.com/sukhcha-in/dart_web_scraper/blob/main/example/configs.dart).
+
+
+### Structure
+This is the basic structure for `configMap`:
+```dart
+  configMap // Map<String, List<Config>>
+  ├── quotes.toscrape.com // String
+  │   ├── Config
+  │   │   ├── parsers // Map<String, List<Parser>>
+  │   │   │   └── urltarget.name // String. Name of your UrlTarget
+  │   │   │       ├── Parser
+  │   │   │       │   ├── id // String. Add _root as entrypoint id
+  │   │   │       │   ├── parent // List<String>
+  │   │   │       │   ├── type // ParserType
+  │   │   │       └── Parser // Another Parser for same UrlTarget
+  │   │   └── urlTargets // List<UrlTarget>
+  │   │       ├── UrlTarget
+  │   │       │   ├── name // String
+  │   │       │   └── where // List<String>
+  │   │       └── UrlTarget // Another UrlTarget for a Config
+  │   └── Config // Another Config for same domain
+  └── example.com // Another domain in configMap
+```
+
+## Classes and Methods
+
+### Config `class`
 Config for a domain.
 ```dart
 Config Config({
@@ -38,7 +87,7 @@ Config Config({
 })
 ```
 ---
-### UrlTarget
+### UrlTarget `class`
 It is used to target different sections of a website. For example you can have different set of `parsers` in a config object for `/products/foo` and `/search?q=foo`
 ```dart
 UrlTarget UrlTarget({
@@ -53,7 +102,7 @@ UrlTarget UrlTarget({
 })
 ```
 
-#### UrlCleaner
+#### UrlCleaner `class`
 Clean the URL before it's passed to a scraper.
 ```dart
 UrlCleaner UrlCleaner({
@@ -65,7 +114,7 @@ UrlCleaner UrlCleaner({
 })
 ```
 ---
-### Parser
+### Parser `class`
 Easy to use and reusable parser class :)
 ```dart
 Parser Parser({
@@ -138,7 +187,8 @@ Parser(
 
 ### Optional Parameters
 
-> `Optional`  
+> `Optional` `class`
+
 Can be used with any parser.
 ```dart
 Optional Optional({
@@ -170,7 +220,8 @@ Optional Optional({
   String? splitBy,
 })
 ```
-> `HttpOptional`  
+> `HttpOptional` `class` 
+
 **Required** with `ParserType.http`
 ```dart
 HttpOptional HttpOptional({
@@ -194,7 +245,8 @@ HttpOptional HttpOptional({
   bool cacheResponse = false,
 })
 ```
-> `StrBtwOptional` 
+> `StrBtwOptional` `class`
+
 **Required** with `ParserType.strBetween`
 ```dart
 StrBtwOptional StrBtwOptional({
@@ -204,7 +256,8 @@ StrBtwOptional StrBtwOptional({
   String? end
 })
 ```
-> `SiblingOptional`
+> `SiblingOptional` `class`
+
 Used with `ParserType.sibling`
 ```dart
 SiblingOptional SiblingOptional({
@@ -214,7 +267,8 @@ SiblingOptional SiblingOptional({
   List<String>? where
 })
 ```
-> `TableOptional`
+> `TableOptional` `class`
+
 Used with  `ParserType.table` 
 **Required** with `ParserType.jsonTable`
 ```dart
@@ -228,7 +282,8 @@ TableOptional TableOptional({
 })
 ```
 
-> `StaticOptional`
+> `StaticOptional` `class`
+
 **Required** with `ParserType.staticVal`
 ```dart
 StaticOptional StaticOptional({
