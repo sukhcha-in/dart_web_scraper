@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
 /// Fetches config based on URL
@@ -103,4 +102,14 @@ String inject(String name, Object data, Object input) {
     printLog("Injection Error: $e", true, color: LogColor.red);
   }
   return result;
+}
+
+extension IterableExtension<T> on Iterable<T> {
+  T? firstWhereIndexedOrNull(bool Function(int index, T element) test) {
+    var index = 0;
+    for (var element in this) {
+      if (test(index++, element)) return element;
+    }
+    return null;
+  }
 }
