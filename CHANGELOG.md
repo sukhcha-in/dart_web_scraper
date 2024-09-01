@@ -1,3 +1,7 @@
+## 0.0.13
+
+- Remove dependency on `collection` package.
+
 ## 0.0.12
 
 - Update `README.md` file.
