@@ -13,6 +13,7 @@ void main() async {
     configMap: configMap,
     configIndex: 0,
     debug: true,
+    concurrentParsing: false,
   );
 
   print(jsonEncode(result));

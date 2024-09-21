@@ -30,6 +30,7 @@ class WebScraper {
     Uri? proxyUrl,
     bool debug = false,
     Document? html,
+    bool concurrentParsing = false,
   }) async {
     /// Fetch config and target
     Config? config = getConfig(
@@ -62,6 +63,7 @@ class WebScraper {
       config: config,
       proxyUrl: proxyUrl,
       debug: debug,
+      concurrentParsing: concurrentParsing,
     );
 
     return parsedData;

@@ -12,6 +12,7 @@ class WebParser {
     required Config config,
     Uri? proxyUrl,
     bool debug = false,
+    bool concurrentParsing = false,
   }) async {
     /// Root parsers
     List<Parser> rootParsers = [];
@@ -37,27 +38,119 @@ class WebParser {
 
     extractedData.addAll({"url": scrapedData.url});
 
+    /// Check speed of parsing
+    Stopwatch stopwatch = Stopwatch();
+    stopwatch.start();
+
     /// Start parsing
     Map<String, Object> parsedData = await distributeParsers(
       allParsers: allParsers,
-      rootParsers: rootParsers,
+      parsers: rootParsers,
       parentData: scrapedData,
       proxyUrl: proxyUrl,
       debug: debug,
+      concurrent: concurrentParsing,
     );
     if (!parsedData.containsKey('url')) {
       parsedData.addAll({'url': scrapedData.url.toString()});
     }
+
+    /// Stop stopwatch
+    stopwatch.stop();
+
+    printLog(
+      'Parsing took ${stopwatch.elapsedMilliseconds} ms.',
+      debug,
+      color: LogColor.green,
+    );
+
     return parsedData;
   }
 
-  /// Helper function to distribute parsers
+  // /// Helper function to distribute parsers
+  // Future<Map<String, Object>> distributeParsers({
+  //   required List<Parser> allParsers,
+  //   required List<Parser> rootParsers,
+  //   required Data parentData,
+  //   required Uri? proxyUrl,
+  //   required bool debug,
+  // }) async {
+
+  //   /// Ids used for internal functionality, no need to return it to user
+  //   List<String> privateIds = [];
+
+  //   /// Final data parsed
+  //   Map<String, Object> parsedData = {};
+
+  //   for (final parser in rootParsers) {
+  //     String id = parser.id;
+
+  //     /// Skip other parsers with same id because we already got data
+  //     if (parsedData.containsKey(id) && id != "url") {
+  //       continue;
+  //     }
+
+  //     Data? data = await runParserAndExecuteOptional(
+  //       parser: parser,
+  //       parentData: parentData,
+  //       proxyUrl: proxyUrl,
+  //       debug: debug,
+  //     );
+  //     Object? obj = data?.obj;
+  //     if (obj != null) {
+  //       if (parser.isPrivate) {
+  //         privateIds.add(id);
+  //       }
+  //       parsedData.addAll({id: obj});
+  //       List<Parser> childParsers = childFinder(id, allParsers);
+  //       if (childParsers.isNotEmpty) {
+  //         if (obj is Iterable && parser.multiple) {
+  //           /// Run child parsers for each data entry
+  //           /// Add parent id to public data as empty list
+  //           parsedData.addAll({id: []});
+  //           for (final singleData in obj) {
+  //             var childrenResults = await distributeParsers(
+  //               allParsers: allParsers,
+  //               rootParsers: childParsers,
+  //               parentData: Data(Uri.base, singleData),
+  //               proxyUrl: proxyUrl,
+  //               debug: debug,
+  //             );
+
+  //             if (childrenResults.isNotEmpty) {
+  //               (parsedData[id] as List).add(childrenResults);
+  //             }
+  //           }
+  //         } else {
+  //           /// Run child parsers for data
+  //           Map<String, Object> childResult = await distributeParsers(
+  //             allParsers: allParsers,
+  //             rootParsers: childParsers,
+  //             parentData: data!,
+  //             proxyUrl: proxyUrl,
+  //             debug: debug,
+  //           );
+  //           if (childResult.isNotEmpty) {
+  //             parsedData.addAll(childResult);
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //   for (String id in privateIds) {
+  //     parsedData.remove(id);
+  //   }
+  //   return parsedData;
+  // }
+
+  /// Helper function to distribute parsers, with option to run concurrently
   Future<Map<String, Object>> distributeParsers({
     required List<Parser> allParsers,
-    required List<Parser> rootParsers,
+    required List<Parser> parsers,
     required Data parentData,
     required Uri? proxyUrl,
     required bool debug,
+    required bool concurrent,
   }) async {
     /// Ids used for internal functionality, no need to return it to user
     List<String> privateIds = [];
@@ -65,7 +158,11 @@ class WebParser {
     /// Final data parsed
     Map<String, Object> parsedData = {};
 
-    for (final parser in rootParsers) {
+    /// List of futures if we run parsers concurrently
+    List<Future<void>> parserFutures = [];
+
+    /// Iterate over root parsers
+    for (final parser in parsers) {
       String id = parser.id;
 
       /// Skip other parsers with same id because we already got data
@@ -73,56 +170,95 @@ class WebParser {
         continue;
       }
 
-      Data? data = await runParserAndExecuteOptional(
-        parser: parser,
-        parentData: parentData,
-        proxyUrl: proxyUrl,
-        debug: debug,
-      );
-      Object? obj = data?.obj;
-      if (obj != null) {
-        if (parser.isPrivate) {
-          privateIds.add(id);
-        }
-        parsedData.addAll({id: obj});
-        List<Parser> childParsers = childFinder(id, allParsers);
-        if (childParsers.isNotEmpty) {
-          if (obj is Iterable && parser.multiple) {
-            /// Run child parsers for each data entry
-            /// Add parent id to public data as empty list
-            parsedData.addAll({id: []});
-            for (final singleData in obj) {
-              var childrenResults = await distributeParsers(
+      /// Define the logic for running a single parser
+      Future<void> parserTask() async {
+        Data? data = await runParserAndExecuteOptional(
+          parser: parser,
+          parentData: parentData,
+          proxyUrl: proxyUrl,
+          debug: debug,
+        );
+        Object? obj = data?.obj;
+
+        if (obj != null) {
+          if (parser.isPrivate) {
+            privateIds.add(id);
+          }
+
+          parsedData[id] = obj;
+
+          List<Parser> childParsers = childFinder(id, allParsers);
+
+          if (childParsers.isNotEmpty) {
+            /// Check if data is iterable and parser is multiple
+            if (obj is Iterable && parser.multiple) {
+              /// Run child parsers for each data entry (sequential or concurrent)
+              List<Future<void>> childFutures = [];
+              parsedData[id] = [];
+
+              for (final singleData in obj) {
+                Future<void> childTask() async {
+                  var childrenResults = await distributeParsers(
+                    allParsers: allParsers,
+                    parsers: childParsers,
+                    parentData: Data(Uri.base, singleData),
+                    proxyUrl: proxyUrl,
+                    debug: debug,
+                    concurrent: concurrent,
+                  );
+
+                  if (childrenResults.isNotEmpty) {
+                    (parsedData[id] as List).add(childrenResults);
+                  }
+                }
+
+                if (concurrent) {
+                  childFutures.add(childTask());
+                } else {
+                  await childTask();
+                }
+              }
+
+              if (concurrent && childFutures.isNotEmpty) {
+                await Future.wait(childFutures);
+              }
+            } else {
+              /// Else run child parsers for data (sequential or concurrent)
+              Map<String, Object> childResult = await distributeParsers(
                 allParsers: allParsers,
-                rootParsers: childParsers,
-                parentData: Data(Uri.base, singleData),
+                parsers: childParsers,
+                parentData: data!,
                 proxyUrl: proxyUrl,
                 debug: debug,
+                concurrent: concurrent,
               );
-
-              if (childrenResults.isNotEmpty) {
-                (parsedData[id] as List).add(childrenResults);
+              if (childResult.isNotEmpty) {
+                parsedData.addAll(childResult);
               }
-            }
-          } else {
-            /// Run child parsers for data
-            Map<String, Object> childResult = await distributeParsers(
-              allParsers: allParsers,
-              rootParsers: childParsers,
-              parentData: data!,
-              proxyUrl: proxyUrl,
-              debug: debug,
-            );
-            if (childResult.isNotEmpty) {
-              parsedData.addAll(childResult);
             }
           }
         }
       }
+
+      if (concurrent) {
+        /// Add the parser task to the list of futures to run concurrently
+        parserFutures.add(parserTask());
+      } else {
+        /// Run the parser task sequentially
+        await parserTask();
+      }
     }
+
+    if (concurrent && parserFutures.isNotEmpty) {
+      /// Wait for all parser futures
+      await Future.wait(parserFutures);
+    }
+
+    /// Remove private ids from parsedData
     for (String id in privateIds) {
       parsedData.remove(id);
     }
+
     return parsedData;
   }
 
