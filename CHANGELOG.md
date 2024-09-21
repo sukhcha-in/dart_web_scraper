@@ -1,3 +1,7 @@
+## 0.0.15
+
+- Added `concurrentParsing` variable to `WebParser.parse` and `WebScraper.scrape`.
+
 ## 0.0.14
 
 - Add `isUrlSupported` method to `WebScraper`.
