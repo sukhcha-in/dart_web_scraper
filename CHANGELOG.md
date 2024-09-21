@@ -1,3 +1,7 @@
+## 0.0.14
+
+- Add `isUrlSupported` method to `WebScraper`.
+
 ## 0.0.13
 
 - Remove dependency on `collection` package.

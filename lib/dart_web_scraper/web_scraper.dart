@@ -3,6 +3,26 @@ import 'package:html/dom.dart';
 
 /// Combines scraping and parsing
 class WebScraper {
+  bool isUrlSupported({
+    required Uri url,
+    required Map<String, List<Config>> configMap,
+    int configIndex = 0,
+  }) {
+    Config? config = getConfig(
+      url,
+      configs: configMap,
+      configIndex: configIndex,
+    );
+    UrlTarget? urlTarget;
+    if (config != null) {
+      urlTarget = fetchTarget(config.urlTargets, url);
+    }
+    if (config == null || urlTarget == null) {
+      return false;
+    }
+    return true;
+  }
+
   Future<Map<String, Object>> scrape({
     required Uri url,
     required Map<String, List<Config>> configMap,
