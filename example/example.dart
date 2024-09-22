@@ -12,6 +12,9 @@ void main() async {
     url: Uri.parse("https://quotes.toscrape.com"),
     configMap: configMap,
     configIndex: 0,
+    cookies: {
+      "foo": "bar",
+    },
     debug: true,
     concurrentParsing: false,
   );

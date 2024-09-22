@@ -1,12 +1,12 @@
 import 'package:dart_web_scraper/common/utils/data_extraction.dart';
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
-Data? urlParamParser(
-  Parser parser,
-  Data parentData,
-  Map<String, Object> allData,
-  bool debug,
-) {
+Data? urlParamParser({
+  required Parser parser,
+  required Data parentData,
+  required Map<String, Object> allData,
+  required bool debug,
+}) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog(
     "ID: ${parser.id} Parser: URL Parameter",

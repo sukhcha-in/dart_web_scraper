@@ -1,11 +1,11 @@
 import 'package:json5/json5.dart';
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
-Data? json5DecodeParser(
-  Parser parser,
-  Data parentData,
-  bool debug,
-) {
+Data? json5DecodeParser({
+  required Parser parser,
+  required Data parentData,
+  required bool debug,
+}) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog(
     "ID: ${parser.id} Parser: JSON 5 Decode",

@@ -1,3 +1,9 @@
+## 0.1.0
+
+- Breaking changes to Optional parameters.
+- Replaced AbstractOptional with Optional with named constructors.
+- Now you can pass cookies to `WebScraper.scrape`, `WebParser.parse` and `Scraper.scrape`, this removes predefined cookies in your config.
+
 ## 0.0.15
 
 - Added `concurrentParsing` variable to `WebParser.parse` and `WebScraper.scrape`.

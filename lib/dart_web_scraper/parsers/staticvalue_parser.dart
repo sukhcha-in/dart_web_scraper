@@ -1,10 +1,10 @@
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
-Data? staticValueParser(
-  Parser parser,
-  Data parentData,
-  bool debug,
-) {
+Data? staticValueParser({
+  required Parser parser,
+  required Data parentData,
+  required bool debug,
+}) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog(
     "ID: ${parser.id} Parser: Static Value",

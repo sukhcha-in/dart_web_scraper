@@ -1,109 +1,72 @@
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
-class AbstractOptional {
-  /// Apply different functions to result.
-  ApplyMethod? apply;
+enum TransformationType {
+  nth,
+  splitBy,
+  apply,
+  replace,
+  regexReplace,
+  regexMatch,
+  cropStart,
+  cropEnd,
+  prepend,
+  append,
+  match,
+}
 
-  /// Regex pattern.
-  String? regex;
+class Optional {
+  // Common optional fields
+  final ApplyMethod? apply;
+  final String? regex;
+  final int? regexGroup;
+  final String? regexReplace;
+  final String? regexReplaceWith;
+  final Map<String, String>? replaceFirst;
+  final Map<String, String>? replaceAll;
+  final int? cropStart;
+  final int? cropEnd;
+  final String? prepend;
+  final String? append;
+  final List<Object>? match;
+  final int? nth;
+  final String? splitBy;
 
-  /// Match to group.
-  int? regexGroup;
+  // HTTP-specific fields
+  final String? url;
+  final HttpMethod? method;
+  final Map<String, Object>? headers;
+  final UserAgentDevice? userAgent;
+  final HttpResponseType? responseType;
+  final Object? payLoad;
+  final HttpPayload? payloadType;
+  final bool usePassedProxy;
+  final bool cacheResponse;
 
-  /// Regex Replace pattern.
-  String? regexReplace;
+  // StrBetween-specific fields
+  final String? start;
+  final String? end;
 
-  /// Replace with selected pattern.
-  String? regexReplaceWith;
+  // Sibling-specific fields
+  final List<String>? where;
+  final SiblingDirection? siblingDirection;
 
-  /// Map to find keys and replace them with values.
-  Map<String, String>? replaceFirst;
+  // Table-specific fields
+  final String? keys;
+  final String? values;
 
-  /// Map to find keys and replace all of them with values.
-  Map<String, String>? replaceAll;
+  // Static-specific fields
+  final String? strVal;
+  final Map<String, Object>? mapVal;
 
-  /// Crop result from start.
-  int? cropStart;
+  /// The order in which transformations should be applied
+  final List<TransformationType>? transformationOrder;
 
-  /// Crop result from end.
-  int? cropEnd;
+  // Precompiled RegExp for performance
+  RegExp? _regex;
+  RegExp? _regexReplaceRegExp;
 
-  /// Prepend string to result.
-  String? prepend;
-
-  /// Append string to result.
-  String? append;
-
-  /// Checks if result has match in predefined list.
-  List<Object>? match;
-
-  /// Select nth result from list.
-  int? nth;
-
-  /// Select nth result from list.
-  String? splitBy;
-
-  ///
-  /// Based on ParserType.
-  ///
-
-  ///? [ParserType.http].
-  /// Target URL.
-  /// URLs can have [<slot></slot>] where parent value will be inserted.
-  String? url;
-
-  /// HttpMethod as GET/POST.
-  HttpMethod? method;
-
-  /// Add Custom Headers.
-  Map<String, Object>? headers;
-
-  /// Custom User Agent.
-  UserAgentDevice? userAgent;
-
-  /// responseType defines what to do once we grab data from URL.
-  /// if [HttpResponseType.html] then result will be converted to element.
-  /// if [HttpResponseType.json] then result will be decoded from JSON.
-  HttpResponseType? responseType;
-
-  /// For POST requests you can add custom payLoad.
-  Object? payLoad;
-
-  /// payLoad can be String or JSON.
-  HttpPayload? payloadType;
-
-  /// Use passed proxy.
-  bool usePassedProxy;
-
-  /// Cache response?
-  bool cacheResponse;
-
-  ///* [ParserType.strBetween].
-  /// Start of a string.
-  String? start;
-
-  /// End of a string.
-  String? end;
-
-  ///* [ParserType.sibling].
-  /// If where is passed, value of selector is matched, result is sibling of an element where match was found.
-  List<String>? where;
-
-  /// Sibling direction [previous] or [next]
-  SiblingDirection? siblingDirection;
-
-  ///* [ParserType.json].
-  /// JSON Table keys path.
-  String? keys;
-
-  /// JSON Table values path.
-  String? values;
-
-  ///* [ParserType.staticVal].
-  String? strVal;
-  Map<String, Object>? mapVal;
-
-  AbstractOptional({
+  // Private constructor to enforce the use of named constructors
+  Optional._({
     this.apply,
     this.regex,
     this.regexGroup,
@@ -135,66 +98,565 @@ class AbstractOptional {
     this.values,
     this.strVal,
     this.mapVal,
-  });
-}
+    this.transformationOrder,
+  }) {
+    // Precompile regex patterns if they exist
+    if (regex != null) {
+      _regex = RegExp(regex!);
+    }
+    if (regexReplace != null) {
+      _regexReplaceRegExp = RegExp(regexReplace!);
+    }
+  }
 
-class Optional extends AbstractOptional {
-  Optional({
-    super.apply,
-    super.regex,
-    super.regexGroup,
-    super.regexReplace,
-    super.regexReplaceWith,
-    super.replaceFirst,
-    super.replaceAll,
-    super.cropStart,
-    super.cropEnd,
-    super.prepend,
-    super.append,
-    super.match,
-    super.nth,
-    super.splitBy,
-  });
-}
+  /// Named constructor for any optional parameters
+  factory Optional.any({
+    ApplyMethod? apply,
+    String? regex,
+    int? regexGroup,
+    String? regexReplace,
+    String? regexReplaceWith,
+    Map<String, String>? replaceFirst,
+    Map<String, String>? replaceAll,
+    int? cropStart,
+    int? cropEnd,
+    String? prepend,
+    String? append,
+    List<Object>? match,
+    int? nth,
+    String? splitBy,
+    List<TransformationType>? transformationOrder,
+  }) {
+    return Optional._(
+      apply: apply,
+      regex: regex,
+      regexGroup: regexGroup,
+      regexReplace: regexReplace,
+      regexReplaceWith: regexReplaceWith,
+      replaceFirst: replaceFirst,
+      replaceAll: replaceAll,
+      cropStart: cropStart,
+      cropEnd: cropEnd,
+      prepend: prepend,
+      append: append,
+      match: match,
+      nth: nth,
+      splitBy: splitBy,
+      transformationOrder: transformationOrder,
+    );
+  }
 
-class HttpOptional extends AbstractOptional {
-  HttpOptional({
-    super.url,
-    super.method,
-    super.headers,
-    super.userAgent,
-    super.responseType,
-    Object? payload,
-    super.usePassedProxy,
-    super.payloadType,
-    super.cacheResponse,
-  }) : super(payLoad: payload);
-}
+  /// Named constructor for HTTP-specific optional parameters
+  factory Optional.http({
+    required String url,
+    required HttpMethod method,
+    Map<String, Object>? headers,
+    UserAgentDevice? userAgent,
+    HttpResponseType? responseType,
+    Object? payLoad,
+    HttpPayload? payloadType,
+    bool usePassedProxy = false,
+    bool cacheResponse = false,
+    // Optional common fields
+    ApplyMethod? apply,
+    String? regex,
+    int? regexGroup,
+    String? regexReplace,
+    String? regexReplaceWith,
+    Map<String, String>? replaceFirst,
+    Map<String, String>? replaceAll,
+    int? cropStart,
+    int? cropEnd,
+    String? prepend,
+    String? append,
+    List<Object>? match,
+    int? nth,
+    String? splitBy,
+    List<TransformationType>? transformationOrder,
+  }) {
+    return Optional._(
+      url: url,
+      method: method,
+      headers: headers,
+      userAgent: userAgent,
+      responseType: responseType,
+      payLoad: payLoad,
+      payloadType: payloadType,
+      usePassedProxy: usePassedProxy,
+      cacheResponse: cacheResponse,
+      apply: apply,
+      regex: regex,
+      regexGroup: regexGroup,
+      regexReplace: regexReplace,
+      regexReplaceWith: regexReplaceWith,
+      replaceFirst: replaceFirst,
+      replaceAll: replaceAll,
+      cropStart: cropStart,
+      cropEnd: cropEnd,
+      prepend: prepend,
+      append: append,
+      match: match,
+      nth: nth,
+      splitBy: splitBy,
+      transformationOrder: transformationOrder,
+    );
+  }
 
-class StrBtwOptional extends AbstractOptional {
-  StrBtwOptional({
-    super.start,
-    super.end,
-  });
-}
+  /// Named constructor for StrBetween-specific optional parameters
+  factory Optional.strBetween({
+    required String start,
+    required String end,
+    // Optional common fields
+    ApplyMethod? apply,
+    String? regex,
+    int? regexGroup,
+    String? regexReplace,
+    String? regexReplaceWith,
+    Map<String, String>? replaceFirst,
+    Map<String, String>? replaceAll,
+    int? cropStart,
+    int? cropEnd,
+    String? prepend,
+    String? append,
+    List<Object>? match,
+    int? nth,
+    String? splitBy,
+    List<TransformationType>? transformationOrder,
+  }) {
+    return Optional._(
+      start: start,
+      end: end,
+      apply: apply,
+      regex: regex,
+      regexGroup: regexGroup,
+      regexReplace: regexReplace,
+      regexReplaceWith: regexReplaceWith,
+      replaceFirst: replaceFirst,
+      replaceAll: replaceAll,
+      cropStart: cropStart,
+      cropEnd: cropEnd,
+      prepend: prepend,
+      append: append,
+      match: match,
+      nth: nth,
+      splitBy: splitBy,
+      transformationOrder: transformationOrder,
+    );
+  }
 
-class SiblingOptional extends AbstractOptional {
-  SiblingOptional({
+  /// Named constructor for Sibling-specific optional parameters
+  factory Optional.sibling({
     required SiblingDirection direction,
-    super.where,
-  }) : super(siblingDirection: direction);
-}
+    List<String>? where,
+    // Optional common fields
+    ApplyMethod? apply,
+    String? regex,
+    int? regexGroup,
+    String? regexReplace,
+    String? regexReplaceWith,
+    Map<String, String>? replaceFirst,
+    Map<String, String>? replaceAll,
+    int? cropStart,
+    int? cropEnd,
+    String? prepend,
+    String? append,
+    List<Object>? match,
+    int? nth,
+    String? splitBy,
+    List<TransformationType>? transformationOrder,
+  }) {
+    return Optional._(
+      siblingDirection: direction,
+      where: where,
+      apply: apply,
+      regex: regex,
+      regexGroup: regexGroup,
+      regexReplace: regexReplace,
+      regexReplaceWith: regexReplaceWith,
+      replaceFirst: replaceFirst,
+      replaceAll: replaceAll,
+      cropStart: cropStart,
+      cropEnd: cropEnd,
+      prepend: prepend,
+      append: append,
+      match: match,
+      nth: nth,
+      splitBy: splitBy,
+      transformationOrder: transformationOrder,
+    );
+  }
 
-class TableOptional extends AbstractOptional {
-  TableOptional({
-    super.keys,
-    super.values,
-  });
-}
+  /// Named constructor for Table-specific optional parameters
+  factory Optional.table({
+    String? keys,
+    String? values,
+    // Optional common fields
+    ApplyMethod? apply,
+    String? regex,
+    int? regexGroup,
+    String? regexReplace,
+    String? regexReplaceWith,
+    Map<String, String>? replaceFirst,
+    Map<String, String>? replaceAll,
+    int? cropStart,
+    int? cropEnd,
+    String? prepend,
+    String? append,
+    List<Object>? match,
+    int? nth,
+    String? splitBy,
+    List<TransformationType>? transformationOrder,
+  }) {
+    return Optional._(
+      keys: keys,
+      values: values,
+      apply: apply,
+      regex: regex,
+      regexGroup: regexGroup,
+      regexReplace: regexReplace,
+      regexReplaceWith: regexReplaceWith,
+      replaceFirst: replaceFirst,
+      replaceAll: replaceAll,
+      cropStart: cropStart,
+      cropEnd: cropEnd,
+      prepend: prepend,
+      append: append,
+      match: match,
+      nth: nth,
+      splitBy: splitBy,
+      transformationOrder: transformationOrder,
+    );
+  }
 
-class StaticOptional extends AbstractOptional {
-  StaticOptional({
-    super.strVal,
-    super.mapVal,
-  });
+  /// Named constructor for StaticVal-specific optional parameters
+  factory Optional.staticVal({
+    String? strVal,
+    Map<String, Object>? mapVal,
+    // Optional common fields
+    ApplyMethod? apply,
+    String? regex,
+    int? regexGroup,
+    String? regexReplace,
+    String? regexReplaceWith,
+    Map<String, String>? replaceFirst,
+    Map<String, String>? replaceAll,
+    int? cropStart,
+    int? cropEnd,
+    String? prepend,
+    String? append,
+    List<Object>? match,
+    int? nth,
+    String? splitBy,
+    List<TransformationType>? transformationOrder,
+  }) {
+    return Optional._(
+      strVal: strVal,
+      mapVal: mapVal,
+      apply: apply,
+      regex: regex,
+      regexGroup: regexGroup,
+      regexReplace: regexReplace,
+      regexReplaceWith: regexReplaceWith,
+      replaceFirst: replaceFirst,
+      replaceAll: replaceAll,
+      cropStart: cropStart,
+      cropEnd: cropEnd,
+      prepend: prepend,
+      append: append,
+      match: match,
+      nth: nth,
+      splitBy: splitBy,
+      transformationOrder: transformationOrder,
+    );
+  }
+
+  /// Applies the relevant transformations based on the set fields and specified order
+  Object applyTransformations(Object data, bool debug) {
+    // Use specified transformation order or default order if not provided
+    final List<TransformationType> order = transformationOrder ??
+        [
+          if (nth != null) TransformationType.nth,
+          if (splitBy != null) TransformationType.splitBy,
+          if (apply != null) TransformationType.apply,
+          if (replaceFirst != null || replaceAll != null)
+            TransformationType.replace,
+          if (regexReplace != null || regexReplaceWith != null)
+            TransformationType.regexReplace,
+          if (regex != null || regexGroup != null)
+            TransformationType.regexMatch,
+          if (cropStart != null) TransformationType.cropStart,
+          if (cropEnd != null) TransformationType.cropEnd,
+          if (prepend != null) TransformationType.prepend,
+          if (append != null) TransformationType.append,
+          if (match != null) TransformationType.match,
+        ];
+
+    for (final TransformationType transformation in order) {
+      switch (transformation) {
+        case TransformationType.nth:
+          final result = _nth(data, debug);
+          if (result != null) {
+            data = result;
+          }
+          break;
+
+        case TransformationType.splitBy:
+          final result = _splitBy(data, debug);
+          if (result != null) {
+            data = result;
+          }
+          break;
+
+        case TransformationType.apply:
+          final result = _apply(data, debug);
+          if (result != null) {
+            data = result;
+          }
+          break;
+
+        case TransformationType.replace:
+          final result = _replace(data, debug);
+          if (result != null) {
+            data = result;
+          }
+          break;
+
+        case TransformationType.regexReplace:
+          final result = _regexReplace(data, debug);
+          if (result != null) {
+            data = result;
+          }
+          break;
+
+        case TransformationType.regexMatch:
+          final result = _regexMatch(data, debug);
+          if (result != null) {
+            data = result;
+          }
+          break;
+
+        case TransformationType.cropStart:
+          final result = _cropStart(data, debug);
+          if (result != null) {
+            data = result;
+          }
+          break;
+
+        case TransformationType.cropEnd:
+          final result = _cropEnd(data, debug);
+          if (result != null) {
+            data = result;
+          }
+          break;
+
+        case TransformationType.prepend:
+          final result = _prepend(data, debug);
+          if (result != null) {
+            data = result;
+          }
+          break;
+
+        case TransformationType.append:
+          final result = _append(data, debug);
+          if (result != null) {
+            data = result;
+          }
+          break;
+
+        case TransformationType.match:
+          final result = _match(data, debug);
+          if (result != null) {
+            data = result;
+          }
+          break;
+      }
+    }
+
+    return data;
+  }
+
+  /// Transformation: nth
+  Object? _nth(Object data, bool debug) {
+    if (nth == null || data is! List) return null;
+    if (nth! < 0 || nth! >= data.length) return null;
+    return data[nth!];
+  }
+
+  /// Transformation: splitBy
+  Object? _splitBy(Object data, bool debug) {
+    if (splitBy == null || data is! String) return null;
+    if (!data.contains(splitBy!)) return null;
+    return data.split(splitBy!);
+  }
+
+  /// Transformation: apply
+  Object? _apply(Object data, bool debug) {
+    if (apply == null) return null;
+
+    switch (apply!) {
+      case ApplyMethod.urldecode:
+        return Uri.decodeFull(data.toString());
+      case ApplyMethod.mapToList:
+        if (data is Map) {
+          return data.values.toList();
+        }
+        break;
+      // Add more ApplyMethod cases as needed
+      default:
+        break;
+    }
+    return null;
+  }
+
+  /// Transformation: replace
+  Object? _replace(Object data, bool debug) {
+    if ((replaceFirst == null && replaceAll == null) ||
+        data is! String && data is! List) return null;
+
+    if (data is String) {
+      return _replaceInString(data);
+    } else if (data is List) {
+      return _replaceInList(data);
+    }
+    return null;
+  }
+
+  /// Helper for replacing in strings
+  String _replaceInString(String data) {
+    String result = data;
+    if (replaceFirst != null) {
+      for (final entry in replaceFirst!.entries) {
+        result = result.replaceFirst(entry.key, entry.value);
+      }
+    }
+    if (replaceAll != null) {
+      for (final entry in replaceAll!.entries) {
+        result = result.replaceAll(entry.key, entry.value);
+      }
+    }
+    return result;
+  }
+
+  /// Helper for replacing in lists
+  List<String> _replaceInList(List data) {
+    final List<String> result = [];
+    for (final item in data) {
+      String temp = item.toString();
+      if (replaceFirst != null) {
+        for (final entry in replaceFirst!.entries) {
+          temp = temp.replaceFirst(entry.key, entry.value);
+        }
+      }
+      if (replaceAll != null) {
+        for (final entry in replaceAll!.entries) {
+          temp = temp.replaceAll(entry.key, entry.value);
+        }
+      }
+      result.add(temp);
+    }
+    return result;
+  }
+
+  /// Transformation: regexReplace
+  Object? _regexReplace(Object data, bool debug) {
+    if (_regexReplaceRegExp == null || data is! String && data is! List) {
+      return null;
+    }
+    final String replaceWith = regexReplaceWith ?? '';
+
+    if (data is String) {
+      final String sanitized =
+          data.replaceAll(_regexReplaceRegExp!, replaceWith).trim();
+      return sanitized.isNotEmpty ? sanitized : null;
+    } else if (data is List) {
+      final List<String> sanitizedList = [];
+      for (final item in data) {
+        final String sanitized = item
+            .toString()
+            .replaceAll(_regexReplaceRegExp!, replaceWith)
+            .trim();
+        if (sanitized.isNotEmpty) {
+          sanitizedList.add(sanitized);
+        }
+      }
+      return sanitizedList.isNotEmpty ? sanitizedList : null;
+    }
+    return null;
+  }
+
+  /// Transformation: regexMatch
+  Object? _regexMatch(Object data, bool debug) {
+    if (_regex == null || data is! String) return null;
+    return _regex!.hasMatch(data)
+        ? _regex!.firstMatch(data)!.group(regexGroup ?? 0)
+        : null;
+  }
+
+  /// Transformation: cropStart
+  Object? _cropStart(Object data, bool debug) {
+    if (cropStart == null) return null;
+
+    if (data is String) {
+      if (cropStart! <= data.length && cropStart! > 0) {
+        return data.substring(cropStart!).trim();
+      }
+    } else if (data is List) {
+      if (cropStart! <= data.length && cropStart! > 0) {
+        return data.sublist(cropStart!);
+      }
+    }
+    return null;
+  }
+
+  /// Transformation: cropEnd
+  Object? _cropEnd(Object data, bool debug) {
+    if (cropEnd == null) return null;
+
+    if (data is String) {
+      if (cropEnd! <= data.length && cropEnd! > 0) {
+        return data.substring(0, data.length - cropEnd!).trim();
+      }
+    } else if (data is List) {
+      if (cropEnd! <= data.length && cropEnd! > 0) {
+        return data.sublist(0, data.length - cropEnd!);
+      }
+    }
+    return null;
+  }
+
+  /// Transformation: prepend
+  Object? _prepend(Object data, bool debug) {
+    if (prepend == null) return null;
+
+    if (data is String) {
+      return prepend! + data;
+    } else if (data is List) {
+      return data.map((item) => prepend! + item.toString()).toList();
+    }
+    return null;
+  }
+
+  /// Transformation: append
+  Object? _append(Object data, bool debug) {
+    if (append == null) return null;
+
+    if (data is String) {
+      return data + append!;
+    } else if (data is List) {
+      return data.map((item) => item.toString() + append!).toList();
+    }
+    return null;
+  }
+
+  /// Transformation: match
+  Object? _match(Object data, bool debug) {
+    if (match == null || data is! String) return null;
+
+    for (final m in match!) {
+      if (data.trim().contains(m.toString().trim())) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

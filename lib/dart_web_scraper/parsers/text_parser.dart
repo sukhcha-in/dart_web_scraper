@@ -3,12 +3,12 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
-Data? textParser(
-  Parser parser,
-  Data parentData,
-  Map<String, Object> allData,
-  bool debug,
-) {
+Data? textParser({
+  required Parser parser,
+  required Data parentData,
+  required Map<String, Object> allData,
+  required bool debug,
+}) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog("ID: ${parser.id} Parser: Text", debug, color: LogColor.cyan);
   List<Element>? element = getElementObject(parentData);

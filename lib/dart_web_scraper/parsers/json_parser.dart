@@ -3,12 +3,12 @@ import 'package:dart_web_scraper/dart_web_scraper.dart';
 import 'package:json_path/json_path.dart';
 import 'package:json_path/fun_extra.dart';
 
-Data? jsonParser(
-  Parser parser,
-  Data parentData,
-  Map<String, Object> allData,
-  bool debug,
-) {
+Data? jsonParser({
+  required Parser parser,
+  required Data parentData,
+  required Map<String, Object> allData,
+  required bool debug,
+}) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog("ID: ${parser.id} Parser: JSON", debug, color: LogColor.cyan);
   if (parser.selector.isEmpty) {

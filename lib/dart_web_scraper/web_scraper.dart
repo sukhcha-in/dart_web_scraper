@@ -30,6 +30,7 @@ class WebScraper {
     Uri? proxyUrl,
     bool debug = false,
     Document? html,
+    Map<String, String>? cookies,
     bool concurrentParsing = false,
   }) async {
     /// Fetch config and target
@@ -53,6 +54,7 @@ class WebScraper {
       html: html,
       debug: debug,
       config: config,
+      cookies: cookies,
       proxyUrl: proxyUrl,
     );
 
@@ -62,6 +64,7 @@ class WebScraper {
       scrapedData: scrapedData,
       config: config,
       proxyUrl: proxyUrl,
+      cookies: cookies,
       debug: debug,
       concurrentParsing: concurrentParsing,
     );
