@@ -72,6 +72,11 @@ UrlTarget? fetchTarget(List<UrlTarget> targets, Uri url) {
         return t;
       } else if (url.path.contains(urlPart)) {
         return t;
+      } else {
+        final pattern = RegExp(urlPart);
+        if (pattern.hasMatch(url.toString())) {
+          return t;
+        }
       }
     }
   }

@@ -1,3 +1,7 @@
+## 0.1.1
+
+- Add Regex support for `UrlTarget`'s `where` property.
+
 ## 0.1.0
 
 - Breaking changes to Optional parameters.
