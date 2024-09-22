@@ -2,12 +2,12 @@ import 'package:dart_web_scraper/common/utils/data_extraction.dart';
 import 'package:html/dom.dart';
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
-Data? tableParser(
-  Parser parser,
-  Data parentData,
-  Map<String, Object> allData,
-  bool debug,
-) {
+Data? tableParser({
+  required Parser parser,
+  required Data parentData,
+  required Map<String, Object> allData,
+  required bool debug,
+}) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog("ID: ${parser.id} Parser: Table", debug, color: LogColor.cyan);
   List<Element>? element = getElementObject(parentData);

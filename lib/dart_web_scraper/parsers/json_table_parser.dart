@@ -2,12 +2,12 @@ import 'package:dart_web_scraper/common/utils/data_extraction.dart';
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 import 'package:dart_web_scraper/dart_web_scraper/parsers/json_parser.dart';
 
-Data? jsonTableParser(
-  Parser parser,
-  Data parentData,
-  Map<String, Object> allData,
-  bool debug,
-) {
+Data? jsonTableParser({
+  required Parser parser,
+  required Data parentData,
+  required Map<String, Object> allData,
+  required bool debug,
+}) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog("ID: ${parser.id} Parser: JSON Table", debug, color: LogColor.cyan);
   Object? json = getJsonObject(parentData, debug);
@@ -16,34 +16,34 @@ Data? jsonTableParser(
   // try {
   Map<String, Object> result = {};
   Data? parsed = jsonParser(
-    parser,
-    Data(parentData.url, json),
-    allData,
-    debug,
+    parser: parser,
+    parentData: Data(parentData.url, json),
+    allData: allData,
+    debug: debug,
   );
   if (parsed != null && parsed.obj is Iterable) {
     for (final p in parsed.obj as Iterable) {
       Data? keyData = jsonParser(
-        Parser(
+        parser: Parser(
           id: "key",
           parent: ["parent"],
           type: ParserType.json,
           selector: [parser.optional!.keys!],
         ),
-        Data(parentData.url, p),
-        allData,
-        debug,
+        parentData: Data(parentData.url, p),
+        allData: allData,
+        debug: debug,
       );
       Data? valData = jsonParser(
-        Parser(
+        parser: Parser(
           id: "val",
           parent: ["parent"],
           type: ParserType.json,
           selector: [parser.optional!.values!],
         ),
-        Data(parentData.url, p),
-        allData,
-        debug,
+        parentData: Data(parentData.url, p),
+        allData: allData,
+        debug: debug,
       );
       if (keyData != null && valData != null) {
         if (keyData.obj is String && valData.obj is String) {

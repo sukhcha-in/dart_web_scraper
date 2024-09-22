@@ -68,7 +68,7 @@ List<Config> quotesConfig = [
           ],
 
           /// Simple functions can be performed using optional parameters
-          optional: Optional(
+          optional: Optional.any(
             prepend: "https://quotes.toscrape.com",
           ),
 

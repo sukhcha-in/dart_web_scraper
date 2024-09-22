@@ -3,11 +3,11 @@ import 'package:dart_web_scraper/common/utils/data_extraction.dart';
 import 'package:html/dom.dart';
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
-Data? jsonLdParser(
-  Parser parser,
-  Data parentData,
-  bool debug,
-) {
+Data? jsonLdParser({
+  required Parser parser,
+  required Data parentData,
+  required bool debug,
+}) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog("ID: ${parser.id} Parser: JSON+LD", debug, color: LogColor.cyan);
   List<Element>? element = getElementObject(parentData);

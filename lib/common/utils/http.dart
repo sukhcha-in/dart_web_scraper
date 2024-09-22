@@ -54,8 +54,9 @@ Future<String?> postRequest(
   Uri? proxyUrl,
   bool? cacheResponse,
 }) async {
-  printLog("HTTP POST: $url", debug, color: LogColor.yellow);
+  printLog("HTTP POST URL: $url", debug, color: LogColor.magenta);
   if (proxyUrl != null) {
+    printLog("Using proxy", debug);
     if (headers.isNotEmpty && proxyUrl.host.contains("scrapingbee")) {
       proxyUrl = addQueryParamToProxy(proxyUrl, "forward_headers_pure", "true");
       Map<String, String> newHeaders = {};
@@ -67,7 +68,9 @@ Future<String?> postRequest(
     printLog("Prepending proxy URL...", debug, color: LogColor.yellow);
     url = Uri.parse("$proxyUrl=${Uri.encodeComponent(url.toString())}");
   }
-  printLog("POST URL: $url", debug, color: LogColor.yellow);
+
+  printLog("HTTP Parser Headers: $headers", debug, color: LogColor.magenta);
+  printLog("HTTP Parser Payload: $body", debug, color: LogColor.magenta);
   try {
     var html = await http
         .post(

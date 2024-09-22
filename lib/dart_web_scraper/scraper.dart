@@ -40,9 +40,7 @@ class Scraper {
         debug,
         color: LogColor.blue,
       );
-      headers.addAll({
-        HttpHeaders.userAgentHeader: userAgent,
-      });
+      headers[HttpHeaders.userAgentHeader] = userAgent;
     }
 
     /// If `userAgent` is not defined, let's generate one based on our config
@@ -52,23 +50,22 @@ class Scraper {
         debug,
         color: LogColor.blue,
       );
-      headers.addAll({
-        HttpHeaders.userAgentHeader: randomUserAgent(config.userAgent),
-      });
+      headers[HttpHeaders.userAgentHeader] = randomUserAgent(config.userAgent);
     }
 
     /// Cookie
-    /// If `cookies` variable is defined and config allows using custom cookies
-    if (cookies != null && config.usePassedCookies) {
+    /// If `cookies` variable is defined
+    if (cookies != null) {
       printLog(
         'Scraper: Using user-passed cookies...',
         debug,
         color: LogColor.blue,
       );
-      headers.addAll({
-        "cookie": mapToCookie(cookies),
-      });
+      headers[HttpHeaders.cookieHeader] = mapToCookie(cookies);
     }
+
+    /// Print headers
+    printLog('Scraper: Headers: $headers', debug, color: LogColor.blue);
 
     /// Clean the URL based on cleaner defined in config
     printLog('Scraper: Cleaning URL...', debug, color: LogColor.blue);

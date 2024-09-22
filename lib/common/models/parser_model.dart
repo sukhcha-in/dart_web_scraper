@@ -23,7 +23,7 @@ class Parser {
   bool multiple = false;
 
   /// Optional parameters.
-  AbstractOptional? optional;
+  Optional? optional;
 
   //Cleaner function called once data is scraped
   CleanerFunction? cleaner;

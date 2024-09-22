@@ -12,9 +12,6 @@ class Config {
   /// Allow custom user agent passed by user.
   bool usePassedUserAgent;
 
-  /// Allow custom cookies passed by user.
-  bool usePassedCookies;
-
   /// User Agent selections: [UserAgentDevice.desktop] or [UserAgentDevice.mobile]
   /// Defaults to [UserAgentDevice.mobile]
   UserAgentDevice userAgent;
@@ -31,7 +28,6 @@ class Config {
     this.userAgent = UserAgentDevice.mobile,
     this.usePassedHtml = true,
     this.usePassedUserAgent = false,
-    this.usePassedCookies = false,
     required this.parsers,
     required this.urlTargets,
   });

@@ -2,12 +2,12 @@ import 'package:dart_web_scraper/common/utils/data_extraction.dart';
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 import 'package:html/dom.dart';
 
-Data? siblingParser(
-  Parser parser,
-  Data parentData,
-  Map<String, Object> allData,
-  bool debug,
-) {
+Data? siblingParser({
+  required Parser parser,
+  required Data parentData,
+  required Map<String, Object> allData,
+  required bool debug,
+}) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog("ID: ${parser.id} Parser: Sibling", debug, color: LogColor.cyan);
   List<Element>? element = getElementObject(parentData);

@@ -1,17 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dart_web_scraper/common/utils/cookie_utils.dart';
 import 'package:dart_web_scraper/common/utils/http.dart';
 import 'package:dart_web_scraper/common/utils/random.dart';
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 import 'package:html/parser.dart';
 
-Future<Data?> httpParser(
-  Parser parser,
-  Data parentData,
-  Map<String, Object> allData,
-  Uri? proxyUrl,
-  bool debug,
-) async {
+Future<Data?> httpParser({
+  required Parser parser,
+  required Data parentData,
+  required Map<String, Object> allData,
+  required Uri? proxyUrl,
+  required Map<String, String>? cookies,
+  required bool debug,
+}) async {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog("ID: ${parser.id} Parser: HTTP", debug, color: LogColor.cyan);
   String url;
@@ -29,22 +31,18 @@ Future<Data?> httpParser(
     if (parser.optional!.method != null) {
       method = parser.optional!.method!;
     }
-    printLog("HTTP Parser URL: $url", debug, color: LogColor.magenta);
-    printLog("HTTP Parser method: $method", debug, color: LogColor.magenta);
 
-    //Set cookie headers
+    //Set optional headers
     if (parser.optional!.headers != null) {
       parser.optional!.headers!.forEach((k, v) {
-        headers.addAll({k.toString(): v.toString()});
+        headers[k.toString()] = v.toString();
       });
     }
 
     if (!headers.containsKey("user-agent") &&
         parser.optional!.userAgent != null) {
-      headers.addAll({
-        HttpHeaders.userAgentHeader:
-            randomUserAgent(parser.optional!.userAgent!),
-      });
+      headers[HttpHeaders.userAgentHeader] =
+          randomUserAgent(parser.optional!.userAgent!);
     }
 
     //Inject data to headers
@@ -53,8 +51,16 @@ Future<Data?> httpParser(
     Object decodedHeaders = jsonDecode(encodedHeaders);
     decodedHeaders = decodedHeaders as Map;
     decodedHeaders.forEach((key, value) {
-      headers.addAll({key: value.toString()});
+      headers[key] = value.toString();
     });
+
+    //Set optional cookies
+    if (cookies != null) {
+      headers[HttpHeaders.cookieHeader] = mapToCookie(cookies);
+    }
+    printLog("HTTP Parser URL: $url", debug, color: LogColor.magenta);
+    printLog("HTTP Parser Method: $method", debug, color: LogColor.magenta);
+    printLog("HTTP Parser Cookies: $cookies", debug, color: LogColor.magenta);
 
     //Set default payloadType
     if (parser.optional!.payloadType != null) {
@@ -83,8 +89,6 @@ Future<Data?> httpParser(
     debug,
     color: LogColor.magenta,
   );
-  printLog("HTTP Parser Headers: $headers", debug, color: LogColor.magenta);
-  printLog("HTTP Parser Payload: $payLoad", debug, color: LogColor.magenta);
 
   //Declare empty result
   Object? result;

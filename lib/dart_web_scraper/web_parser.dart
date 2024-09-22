@@ -1,25 +1,26 @@
 import 'package:dart_web_scraper/dart_web_scraper.dart';
-import 'package:dart_web_scraper/dart_web_scraper/optional/exports.dart';
 import 'package:dart_web_scraper/dart_web_scraper/parsers/exports.dart';
 
 /// Used for parsing data from scraped HTML.
 class WebParser {
-  Map<String, Object> extractedData = {};
+  final Map<String, Object> extractedData = {};
 
   /// Entrypoint
   Future<Map<String, Object>> parse({
     required Data scrapedData,
     required Config config,
     Uri? proxyUrl,
+    Map<String, String>? cookies,
     bool debug = false,
     bool concurrentParsing = false,
   }) async {
-    /// Root parsers
-    List<Parser> rootParsers = [];
+    /// Start the stopwatch
+    final Stopwatch stopwatch = Stopwatch()..start();
 
-    /// Find if target is available for specified URL
     printLog('Parser: Fetching target...', debug, color: LogColor.blue);
-    UrlTarget? target = fetchTarget(config.urlTargets, scrapedData.url);
+
+    /// Fetch target based on URL
+    final UrlTarget? target = fetchTarget(config.urlTargets, scrapedData.url);
     if (target == null) {
       printLog('Parser: Target not found!', debug, color: LogColor.red);
       throw WebScraperError('Unsupported URL');
@@ -27,37 +28,37 @@ class WebParser {
       printLog('Parser: Target found!', debug, color: LogColor.green);
     }
 
-    /// Set all parsers
-    List<Parser> allParsers = [];
-    for (final p in config.parsers[target.name]!) {
-      allParsers.add(p);
-    }
+    /// Retrieve all parsers for the target
+    final List<Parser> allParsers = config.parsers[target.name]?.toList() ?? [];
 
-    /// Set _root parsers
-    rootParsers = childFinder('_root', allParsers);
+    /// Build a parent-to-children map
+    final Map<String, List<Parser>> parentToChildren =
+        _buildParentToChildrenMap(allParsers);
 
-    extractedData.addAll({"url": scrapedData.url});
+    /// Identify root parsers (_root)
+    final List<Parser> rootParsers = parentToChildren['_root']?.toList() ?? [];
 
-    /// Check speed of parsing
-    Stopwatch stopwatch = Stopwatch();
-    stopwatch.start();
+    /// Initialize extractedData with the URL
+    extractedData['url'] = scrapedData.url;
 
     /// Start parsing
-    Map<String, Object> parsedData = await distributeParsers(
-      allParsers: allParsers,
+    final Map<String, Object> parsedData = await _distributeParsers(
+      parentToChildren: parentToChildren,
       parsers: rootParsers,
       parentData: scrapedData,
       proxyUrl: proxyUrl,
+      cookies: cookies,
       debug: debug,
       concurrent: concurrentParsing,
     );
-    if (!parsedData.containsKey('url')) {
-      parsedData.addAll({'url': scrapedData.url.toString()});
-    }
 
-    /// Stop stopwatch
+    // Ensure 'url' is present in parsedData
+    parsedData.putIfAbsent('url', () => scrapedData.url.toString());
+
+    // Stop the stopwatch
     stopwatch.stop();
 
+    // Log the parsing time
     printLog(
       'Parsing took ${stopwatch.elapsedMilliseconds} ms.',
       debug,
@@ -67,142 +68,83 @@ class WebParser {
     return parsedData;
   }
 
-  // /// Helper function to distribute parsers
-  // Future<Map<String, Object>> distributeParsers({
-  //   required List<Parser> allParsers,
-  //   required List<Parser> rootParsers,
-  //   required Data parentData,
-  //   required Uri? proxyUrl,
-  //   required bool debug,
-  // }) async {
+  /// Builds a map from parent IDs to their child parsers
+  Map<String, List<Parser>> _buildParentToChildrenMap(List<Parser> allParsers) {
+    final Map<String, List<Parser>> map = {};
+    for (final parser in allParsers) {
+      for (final parent in parser.parent) {
+        map.putIfAbsent(parent, () => []).add(parser);
+      }
+    }
+    return map;
+  }
 
-  //   /// Ids used for internal functionality, no need to return it to user
-  //   List<String> privateIds = [];
-
-  //   /// Final data parsed
-  //   Map<String, Object> parsedData = {};
-
-  //   for (final parser in rootParsers) {
-  //     String id = parser.id;
-
-  //     /// Skip other parsers with same id because we already got data
-  //     if (parsedData.containsKey(id) && id != "url") {
-  //       continue;
-  //     }
-
-  //     Data? data = await runParserAndExecuteOptional(
-  //       parser: parser,
-  //       parentData: parentData,
-  //       proxyUrl: proxyUrl,
-  //       debug: debug,
-  //     );
-  //     Object? obj = data?.obj;
-  //     if (obj != null) {
-  //       if (parser.isPrivate) {
-  //         privateIds.add(id);
-  //       }
-  //       parsedData.addAll({id: obj});
-  //       List<Parser> childParsers = childFinder(id, allParsers);
-  //       if (childParsers.isNotEmpty) {
-  //         if (obj is Iterable && parser.multiple) {
-  //           /// Run child parsers for each data entry
-  //           /// Add parent id to public data as empty list
-  //           parsedData.addAll({id: []});
-  //           for (final singleData in obj) {
-  //             var childrenResults = await distributeParsers(
-  //               allParsers: allParsers,
-  //               rootParsers: childParsers,
-  //               parentData: Data(Uri.base, singleData),
-  //               proxyUrl: proxyUrl,
-  //               debug: debug,
-  //             );
-
-  //             if (childrenResults.isNotEmpty) {
-  //               (parsedData[id] as List).add(childrenResults);
-  //             }
-  //           }
-  //         } else {
-  //           /// Run child parsers for data
-  //           Map<String, Object> childResult = await distributeParsers(
-  //             allParsers: allParsers,
-  //             rootParsers: childParsers,
-  //             parentData: data!,
-  //             proxyUrl: proxyUrl,
-  //             debug: debug,
-  //           );
-  //           if (childResult.isNotEmpty) {
-  //             parsedData.addAll(childResult);
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //   for (String id in privateIds) {
-  //     parsedData.remove(id);
-  //   }
-  //   return parsedData;
-  // }
-
-  /// Helper function to distribute parsers, with option to run concurrently
-  Future<Map<String, Object>> distributeParsers({
-    required List<Parser> allParsers,
+  /// Distributes parsers based on the parent-to-children map, with option to run concurrently
+  Future<Map<String, Object>> _distributeParsers({
+    required Map<String, List<Parser>> parentToChildren,
     required List<Parser> parsers,
     required Data parentData,
     required Uri? proxyUrl,
+    Map<String, String>? cookies,
     required bool debug,
     required bool concurrent,
   }) async {
-    /// Ids used for internal functionality, no need to return it to user
-    List<String> privateIds = [];
+    final Map<String, Object> parsedData = {};
+    final List<String> privateIds = [];
 
-    /// Final data parsed
-    Map<String, Object> parsedData = {};
+    // List to hold all concurrent parser futures
+    final List<Future<void>> parserFutures = [];
 
-    /// List of futures if we run parsers concurrently
-    List<Future<void>> parserFutures = [];
-
-    /// Iterate over root parsers
     for (final parser in parsers) {
-      String id = parser.id;
+      final String id = parser.id;
 
-      /// Skip other parsers with same id because we already got data
-      if (parsedData.containsKey(id) && id != "url") {
+      // Skip if data for this parser ID is already parsed (except 'url')
+      if (id != 'url' && parsedData.containsKey(id)) {
         continue;
       }
 
-      /// Define the logic for running a single parser
+      // Define the parser task
       Future<void> parserTask() async {
-        Data? data = await runParserAndExecuteOptional(
+        final Data? data = await _runParserAndExecuteOptional(
           parser: parser,
           parentData: parentData,
           proxyUrl: proxyUrl,
+          cookies: cookies,
           debug: debug,
         );
-        Object? obj = data?.obj;
 
-        if (obj != null) {
+        if (data != null) {
+          final Object obj = data.obj;
+
+          // Handle private parsers
           if (parser.isPrivate) {
             privateIds.add(id);
           }
 
+          // Add parsed data
           parsedData[id] = obj;
 
-          List<Parser> childParsers = childFinder(id, allParsers);
+          // Retrieve child parsers from the map
+          final List<Parser> childParsers =
+              parentToChildren[id]?.toList() ?? [];
 
           if (childParsers.isNotEmpty) {
-            /// Check if data is iterable and parser is multiple
             if (obj is Iterable && parser.multiple) {
-              /// Run child parsers for each data entry (sequential or concurrent)
-              List<Future<void>> childFutures = [];
+              // Handle multiple data entries
               parsedData[id] = [];
 
+              final List<Future<void>> childFutures = [];
+
               for (final singleData in obj) {
+                // Define child task
                 Future<void> childTask() async {
-                  var childrenResults = await distributeParsers(
-                    allParsers: allParsers,
+                  final Map<String, Object> childrenResults =
+                      await _distributeParsers(
+                    parentToChildren: parentToChildren,
                     parsers: childParsers,
-                    parentData: Data(Uri.base, singleData),
+                    parentData: Data(data.url, singleData),
                     proxyUrl: proxyUrl,
+                    cookies: cookies,
                     debug: debug,
                     concurrent: concurrent,
                   );
@@ -223,15 +165,17 @@ class WebParser {
                 await Future.wait(childFutures);
               }
             } else {
-              /// Else run child parsers for data (sequential or concurrent)
-              Map<String, Object> childResult = await distributeParsers(
-                allParsers: allParsers,
+              // Handle single data entry
+              final Map<String, Object> childResult = await _distributeParsers(
+                parentToChildren: parentToChildren,
                 parsers: childParsers,
-                parentData: data!,
+                parentData: data,
                 proxyUrl: proxyUrl,
+                cookies: cookies,
                 debug: debug,
                 concurrent: concurrent,
               );
+
               if (childResult.isNotEmpty) {
                 parsedData.addAll(childResult);
               }
@@ -241,122 +185,63 @@ class WebParser {
       }
 
       if (concurrent) {
-        /// Add the parser task to the list of futures to run concurrently
+        // Add parser task to the list for concurrent execution
         parserFutures.add(parserTask());
       } else {
-        /// Run the parser task sequentially
+        // Execute parser task sequentially
         await parserTask();
       }
     }
 
     if (concurrent && parserFutures.isNotEmpty) {
-      /// Wait for all parser futures
+      // Wait for all concurrent parser tasks to complete
       await Future.wait(parserFutures);
     }
 
-    /// Remove private ids from parsedData
-    for (String id in privateIds) {
+    // Remove private parser data
+    for (final String id in privateIds) {
       parsedData.remove(id);
     }
 
     return parsedData;
   }
 
-  /// Helper function to run parser and execute optional methods
-  Future<Data?> runParserAndExecuteOptional({
+  /// Runs the parser and executes optional transformations and cleaners
+  Future<Data?> _runParserAndExecuteOptional({
     required Parser parser,
     required Data parentData,
     required Uri? proxyUrl,
+    Map<String, String>? cookies,
     required bool debug,
   }) async {
-    Data? parsed = await runParser(
+    final Data? parsed = await _runParser(
       parser: parser,
       parentData: parentData,
       proxyUrl: proxyUrl,
+      cookies: cookies,
       debug: debug,
     );
+
     if (parsed != null) {
       Object data = parsed.obj;
+
+      // Apply optional transformations
       if (parser.optional != null) {
-        /// Select nth result
-        Object? nth = nthOptional(parser, data, debug);
-        if (nth != null) {
-          data = nth;
-        }
-
-        /// Split by string
-        Object? splitBy = splitByOptional(parser, data, debug);
-        if (splitBy != null) {
-          data = splitBy;
-        }
-
-        /// Apply methods
-        Object? applyMethod = applyOptional(parser, data, debug);
-        if (applyMethod != null) {
-          data = applyMethod;
-        }
-
-        /// Replace
-        Object? replace = replaceOptional(parser, data, debug);
-        if (replace != null) {
-          data = replace;
-        }
-
-        /// Regex replace
-        Object? regexReplace = regexReplaceOptional(parser, data, debug);
-        if (regexReplace != null) {
-          data = regexReplace;
-        }
-
-        /// Regex match
-        Object? regexMatch = regexMatchOptional(parser, data, debug);
-        if (regexMatch != null) {
-          data = regexMatch;
-        }
-
-        /// Crop Start
-        Object? cropStart = cropStartOptional(parser, data, debug);
-        if (cropStart != null) {
-          data = cropStart;
-        }
-
-        /// Crop End
-        Object? cropEnd = cropEndOptional(parser, data, debug);
-        if (cropEnd != null) {
-          data = cropEnd;
-        }
-
-        /// Prepend
-        Object? prepend = prependOptional(parser, data, debug);
-        if (prepend != null) {
-          data = prepend;
-        }
-
-        /// Append
-        Object? append = appendOptional(parser, data, debug);
-        if (append != null) {
-          data = append;
-        }
-
-        /// Match with list and convert to boolean
-        Object? match = matchOptional(parser, data, debug);
-        if (match != null) {
-          data = match;
-        }
+        data = parser.optional!.applyTransformations(data, debug);
       }
 
-      /// If custom cleaner is defined in Parser, clean the data.
+      // Apply cleaner if defined
       if (parser.cleaner != null) {
         printLog("Cleaning ${parser.id}...", debug, color: LogColor.green);
-        Function cleaner = parser.cleaner!;
-        Object? cleaned = cleaner(Data(parsed.url, data), debug);
+        final CleanerFunction cleaner = parser.cleaner!;
+        final Object? cleaned = cleaner(Data(parsed.url, data), debug);
         if (cleaned != null) {
           printLog(
             "Cleaning success for ${parser.id}.",
             debug,
             color: LogColor.green,
           );
-          extractedData.addAll({parser.id: cleaned});
+          extractedData[parser.id] = cleaned;
           data = cleaned;
         } else {
           printLog(
@@ -366,66 +251,133 @@ class WebParser {
           );
         }
       } else {
-        extractedData.addAll({parser.id: data});
+        extractedData[parser.id] = data;
       }
 
       return Data(parsed.url, data);
-    } else {
-      return null;
     }
+
+    return null;
   }
 
-  /// Find all children of parser
-  static List<Parser> childFinder(String parent, List<Parser> allParsers) {
-    return allParsers.where((p) => p.parent.contains(parent)).toList();
-  }
-
-  /// Run parser based on type
-  Future<Data?> runParser({
+  /// Runs the parser based on its type
+  Future<Data?> _runParser({
     required Parser parser,
     required Data parentData,
     required Uri? proxyUrl,
+    Map<String, String>? cookies,
     required bool debug,
   }) async {
     switch (parser.type) {
       case ParserType.element:
-        return elementParser(parser, parentData, extractedData, debug);
+        return elementParser(
+          parser: parser,
+          parentData: parentData,
+          allData: extractedData,
+          debug: debug,
+        );
       case ParserType.text:
-        return textParser(parser, parentData, extractedData, debug);
+        return textParser(
+          parser: parser,
+          parentData: parentData,
+          allData: extractedData,
+          debug: debug,
+        );
       case ParserType.image:
-        return imageParser(parser, parentData, extractedData, debug);
+        return imageParser(
+          parser: parser,
+          parentData: parentData,
+          allData: extractedData,
+          debug: debug,
+        );
       case ParserType.attribute:
-        return attributeParser(parser, parentData, extractedData, debug);
+        return attributeParser(
+          parser: parser,
+          parentData: parentData,
+          allData: extractedData,
+          debug: debug,
+        );
       case ParserType.json:
-        return jsonParser(parser, parentData, extractedData, debug);
+        return jsonParser(
+          parser: parser,
+          parentData: parentData,
+          allData: extractedData,
+          debug: debug,
+        );
       case ParserType.url:
-        return urlParser(parser, parentData, extractedData, debug);
+        return urlParser(
+          parser: parser,
+          parentData: parentData,
+          allData: extractedData,
+          debug: debug,
+        );
       case ParserType.http:
         return await httpParser(
-          parser,
-          parentData,
-          extractedData,
-          proxyUrl,
-          debug,
+          parser: parser,
+          parentData: parentData,
+          allData: extractedData,
+          proxyUrl: proxyUrl,
+          cookies: cookies,
+          debug: debug,
         );
       case ParserType.strBetween:
-        return stringBetweenParser(parser, parentData, debug);
+        return stringBetweenParser(
+          parser: parser,
+          parentData: parentData,
+          debug: debug,
+        );
       case ParserType.jsonld:
-        return jsonLdParser(parser, parentData, debug);
+        return jsonLdParser(
+          parser: parser,
+          parentData: parentData,
+          debug: debug,
+        );
       case ParserType.table:
-        return tableParser(parser, parentData, extractedData, debug);
+        return tableParser(
+          parser: parser,
+          parentData: parentData,
+          allData: extractedData,
+          debug: debug,
+        );
       case ParserType.sibling:
-        return siblingParser(parser, parentData, extractedData, debug);
+        return siblingParser(
+          parser: parser,
+          parentData: parentData,
+          allData: extractedData,
+          debug: debug,
+        );
       case ParserType.urlParam:
-        return urlParamParser(parser, parentData, extractedData, debug);
+        return urlParamParser(
+          parser: parser,
+          parentData: parentData,
+          allData: extractedData,
+          debug: debug,
+        );
       case ParserType.jsonTable:
-        return jsonTableParser(parser, parentData, extractedData, debug);
+        return jsonTableParser(
+          parser: parser,
+          parentData: parentData,
+          allData: extractedData,
+          debug: debug,
+        );
       case ParserType.staticVal:
-        return staticValueParser(parser, parentData, debug);
+        return staticValueParser(
+          parser: parser,
+          parentData: parentData,
+          debug: debug,
+        );
       case ParserType.json5decode:
-        return json5DecodeParser(parser, parentData, debug);
+        return json5DecodeParser(
+          parser: parser,
+          parentData: parentData,
+          debug: debug,
+        );
       case ParserType.returnUrlParser:
-        return returnUrlParser(parser, parentData, debug);
+        return returnUrlParser(
+          parser: parser,
+          parentData: parentData,
+          debug: debug,
+        );
       default:
         return null;
     }
