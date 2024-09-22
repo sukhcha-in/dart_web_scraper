@@ -3,15 +3,26 @@
 [![Pub Points](https://img.shields.io/pub/points/dart_web_scraper)](https://pub.dev/packages/dart_web_scraper)
 [![Pub Popularity](https://img.shields.io/pub/popularity/dart_web_scraper)](https://pub.dev/packages/dart_web_scraper)
 
-Easy-to-use, reusable web scraper. Extracts and cleans HTML/JSON, providing structured data results.
-
-#### Note
-
-This package is still in development and not ready for production use. Please contribute to help make it better.
+Config-based, reusable web scraper for web and API scraping. Scrape multiple pages or APIs without writing parsers or scraping logic, using simple configurations for efficient scraping.
 
 #### Why need this package?
 
-I was tired of writing the parsing logic from scratch every time I needed to scrape a new website. Debugging and testing the parsing logic was a nightmare. This package is an attempt to solve this problem. It provides a simple and reusable way to scrape data from the web.
+- **Built-in parsers**: This package have built-in parsers for most common scraping tasks.
+- **Config-based**: No need to write parsing logic from scratch for each page.
+- **Data cleaning**: Clean the data before it's added to the final result.
+- **Concurrency**: Parse multiple parsers concurrently using concurrency mode.
+- **CSS Selctors**: Use `CSS selectors` to extract data from HTML.
+- **API scraping**: Fetch data using `HTTP requests`.
+- **Pass cookies**: Pass `cookies` to the scraper or HTTP parsers.
+- **JSON parsing**: Decode `JSON` string or extract data using `Json path`.
+- **JSON-LD**: Extract all `ld+json` objects and places them into a list.
+- **JSON5**: Decode `JSON5` syntax.
+- **StrBetween**: Extracts the `string between` two strings.
+- **Sibling**: Used when target element doesn't have a valid selector but sibling does.
+- **Table**: Extracts data from HTML/JSON table as a `Map`.
+- **Attribute**: Extracts `attribute` value from an HTML element.
+- **Data Injection**: Inject previously parsed data by parser `selector` using `<slot>`.
+- **URL based proxy**: Use URL based proxy for HTTP requests.
 
 ## Getting Started
 
