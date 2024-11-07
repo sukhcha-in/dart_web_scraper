@@ -14,6 +14,7 @@ class Scraper {
     Document? html,
     Map<String, String>? cookies,
     String? userAgent,
+    Map<String, Object>? headers,
     Uri? proxyUrl,
     bool debug = false,
   }) async {
@@ -28,7 +29,7 @@ class Scraper {
 
     /// Build headers
     printLog('Scraper: Building headers...', debug, color: LogColor.blue);
-    Map<String, String> headers = {
+    Map<String, String> headersMerged = {
       "Accept-Language": "en-US,en",
     };
 
@@ -40,17 +41,17 @@ class Scraper {
         debug,
         color: LogColor.blue,
       );
-      headers[HttpHeaders.userAgentHeader] = userAgent;
+      headersMerged[HttpHeaders.userAgentHeader] = userAgent;
     }
 
     /// If `userAgent` is not defined, let's generate one based on our config
-    if (!headers.containsKey("user-agent")) {
+    if (!headersMerged.containsKey("user-agent")) {
       printLog(
         'Scraper: Generating random User-Agent...',
         debug,
         color: LogColor.blue,
       );
-      headers[HttpHeaders.userAgentHeader] = randomUserAgent(config.userAgent);
+      headersMerged[HttpHeaders.userAgentHeader] = randomUserAgent(config.userAgent);
     }
 
     /// Cookie
@@ -61,11 +62,17 @@ class Scraper {
         debug,
         color: LogColor.blue,
       );
-      headers[HttpHeaders.cookieHeader] = mapToCookie(cookies);
+      headersMerged[HttpHeaders.cookieHeader] = mapToCookie(cookies);
+    }
+
+    if (headers != null) {
+      headers.forEach((key, value) {
+        headersMerged[key] = value.toString();
+      });
     }
 
     /// Print headers
-    printLog('Scraper: Headers: $headers', debug, color: LogColor.blue);
+    printLog('Scraper: Headers: $headersMerged', debug, color: LogColor.blue);
 
     /// Clean the URL based on cleaner defined in config
     printLog('Scraper: Cleaning URL...', debug, color: LogColor.blue);
@@ -89,7 +96,7 @@ class Scraper {
         );
         requestData = await getRequest(
           url,
-          headers: headers,
+          headers: headersMerged,
           debug: debug,
           proxyUrl: proxyUrl,
         );
@@ -104,7 +111,7 @@ class Scraper {
         printLog('Scraper: Fetching html...', debug, color: LogColor.blue);
         requestData = await getRequest(
           url,
-          headers: headers,
+          headers: headersMerged,
           debug: debug,
           proxyUrl: proxyUrl,
         );
