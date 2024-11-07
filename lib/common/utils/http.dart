@@ -35,6 +35,9 @@ Future<String?> getRequest(
           Duration(seconds: 30),
         );
     String body = utf8.decode(html.bodyBytes);
+    printLog("HTTP Response: ${html.statusCode}", debug, color: LogColor.yellow);
+    printLog("HTTP Response body.length ${body.length}", debug, color: LogColor.yellow);
+    printLog("HTTP Response html.headers ${html.headers.toString()}", debug, color: LogColor.yellow);
     if (cacheResponse) {
       saveCacheLog(body, debug);
     }
