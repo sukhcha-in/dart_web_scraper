@@ -24,9 +24,9 @@ void printLog(String message, bool debug, {LogColor color = LogColor.reset}) {
 /// Save cache to /cache folder in root of this project
 void saveCacheLog(String html, bool debug) {
   if (!debug) return;
+  String rootPath = findRootDirectory(Directory.current.path);
   try {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
-    String rootPath = findRootDirectory(Directory.current.path);
 
     File cache = File('$rootPath/cache/cache.html');
     String cacheHtml = cache.readAsStringSync();
@@ -37,7 +37,7 @@ void saveCacheLog(String html, bool debug) {
     cache.writeAsStringSync(html, mode: FileMode.write);
   } catch (e) {
     printLog(
-      'Unable to save file to /cache folder',
+      'Unable to save file to $rootPath/cache folder',
       debug,
       color: LogColor.red,
     );

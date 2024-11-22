@@ -31,6 +31,8 @@ class WebScraper {
     bool debug = false,
     Document? html,
     Map<String, String>? cookies,
+    Map<String, String>? headers,
+    String? userAgent,
     bool concurrentParsing = false,
   }) async {
     /// Fetch config and target
@@ -55,6 +57,8 @@ class WebScraper {
       debug: debug,
       config: config,
       cookies: cookies,
+      headers: headers,
+      userAgent: userAgent,
       proxyUrl: proxyUrl,
     );
 

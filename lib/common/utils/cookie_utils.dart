@@ -6,7 +6,7 @@ String mapToCookie(Map<String, String> cookies) {
   cookies.forEach((key, value) {
     cookieList.add('$key=$value');
   });
-  String cookieStr = cookieList.join(', ').trim();
+  String cookieStr = cookieList.join('; ').trim();
   if (cookieStr != "") {
     return cookieStr;
   } else {
