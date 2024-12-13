@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
-/// Used to print logs in console
+/// Print logs using stdout on IO platforms
 void printLog(String message, bool debug, {LogColor color = LogColor.reset}) {
   if (!debug) return;
 
@@ -21,9 +21,10 @@ void printLog(String message, bool debug, {LogColor color = LogColor.reset}) {
   stdout.write('${colors[color]}$message\n${colors[LogColor.reset]}');
 }
 
-/// Save cache to /cache folder in root of this project
 void saveCacheLog(String html, bool debug) {
   if (!debug) return;
+
+  // Ensure findRootDirectory is defined somewhere accessible
   String rootPath = findRootDirectory(Directory.current.path);
   try {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -36,10 +37,7 @@ void saveCacheLog(String html, bool debug) {
 
     cache.writeAsStringSync(html, mode: FileMode.write);
   } catch (e) {
-    printLog(
-      'Unable to save file to $rootPath/cache folder',
-      debug,
-      color: LogColor.red,
-    );
+    printLog('Unable to save file to $rootPath/cache folder', debug,
+        color: LogColor.red);
   }
 }

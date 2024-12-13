@@ -1,3 +1,7 @@
+## 0.1.3
+
+- Support for Web Platform.
+
 ## 0.1.2
 
 - Minor changes and fixes.

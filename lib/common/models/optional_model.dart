@@ -508,7 +508,9 @@ class Optional {
   /// Transformation: replace
   Object? _replace(Object data, bool debug) {
     if ((replaceFirst == null && replaceAll == null) ||
-        data is! String && data is! List) return null;
+        data is! String && data is! List) {
+      return null;
+    }
 
     if (data is String) {
       return _replaceInString(data);

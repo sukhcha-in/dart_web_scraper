@@ -51,7 +51,8 @@ class Scraper {
         debug,
         color: LogColor.blue,
       );
-      headersMerged[HttpHeaders.userAgentHeader] = randomUserAgent(config.userAgent);
+      headersMerged[HttpHeaders.userAgentHeader] =
+          randomUserAgent(config.userAgent);
     }
 
     /// Cookie

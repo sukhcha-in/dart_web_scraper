@@ -2,7 +2,7 @@ import 'package:dart_web_scraper/dart_web_scraper.dart';
 
 /// Target to target specific type of URL.
 class UrlTarget {
-  /// Name of our target, [parsers] in [Config] should contain this value.
+  /// Name of our target, parsers in [Config] should contain this value.
   String name;
 
   /// List of parts of URL to target.
