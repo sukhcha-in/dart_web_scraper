@@ -3,7 +3,7 @@
 [![Pub Points](https://img.shields.io/pub/points/dart_web_scraper)](https://pub.dev/packages/dart_web_scraper)
 [![Pub Popularity](https://img.shields.io/pub/popularity/dart_web_scraper)](https://pub.dev/packages/dart_web_scraper)
 
-Config-based, reusable web scraper for web and API scraping. Scrape multiple pages or APIs without writing parsers or scraping logic, using simple configurations for efficient scraping.
+Config-based, reusable web scraper for web and API scraping. Scrape, parse web pages or APIs without writing parsers or scraping logic, using simple key/value based configs.
 
 #### Why need this package?
 
