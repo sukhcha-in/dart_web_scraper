@@ -378,8 +378,6 @@ class WebParser {
           parentData: parentData,
           debug: debug,
         );
-      default:
-        return null;
     }
   }
 }

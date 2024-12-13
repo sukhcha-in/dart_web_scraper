@@ -501,9 +501,6 @@ class Optional {
           return data.values.toList();
         }
         break;
-      // Add more ApplyMethod cases as needed
-      default:
-        break;
     }
     return null;
   }

@@ -1,4 +1,4 @@
-library dart_web_scraper;
+library;
 
 /// Base
 export 'dart_web_scraper/scraper.dart';
