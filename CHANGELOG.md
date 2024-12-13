@@ -1,3 +1,7 @@
+## 0.1.2
+
+- Minor changes and fixes.
+
 ## 0.1.1
 
 - Add Regex support for `UrlTarget`'s `where` property.
