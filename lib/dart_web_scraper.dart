@@ -18,6 +18,5 @@ export 'common/models/data_model.dart';
 export 'common/enums.dart';
 
 /// Utils
-export 'common/utils/path.dart';
 export 'common/utils/webscraper_utils.dart';
 export 'common/utils/debug/logger.dart';

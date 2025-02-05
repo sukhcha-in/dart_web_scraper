@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dart_web_scraper/dart_web_scraper.dart';
+import 'package:path/path.dart' as path;
 
 /// Print logs using stdout on IO platforms
 void printLog(String message, bool debug, {LogColor color = LogColor.reset}) {
@@ -40,4 +41,12 @@ void saveCacheLog(String html, bool debug) {
     printLog('Unable to save file to $rootPath/cache folder', debug,
         color: LogColor.red);
   }
+}
+
+/// Find root directory of this project
+String findRootDirectory(String currentPath) {
+  while (!File(path.join(currentPath, 'pubspec.yaml')).existsSync()) {
+    currentPath = path.dirname(currentPath);
+  }
+  return currentPath;
 }

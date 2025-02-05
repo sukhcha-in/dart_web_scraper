@@ -1,3 +1,8 @@
+## 0.1.4
+
+- Update all dependencies.
+- Add ProxyAPI and ProxyUrlParam name instead of ProxyUrl.
+
 ## 0.1.3
 
 - Support for Web Platform.

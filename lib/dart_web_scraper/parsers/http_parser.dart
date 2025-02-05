@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:dart_web_scraper/common/utils/cookie_utils.dart';
 import 'package:dart_web_scraper/common/utils/http.dart';
 import 'package:dart_web_scraper/common/utils/random.dart';
@@ -10,7 +9,8 @@ Future<Data?> httpParser({
   required Parser parser,
   required Data parentData,
   required Map<String, Object> allData,
-  required Uri? proxyUrl,
+  required Uri? proxyAPI,
+  required String? proxyUrlParam,
   required Map<String, String>? cookies,
   required bool debug,
 }) async {
@@ -39,10 +39,9 @@ Future<Data?> httpParser({
       });
     }
 
-    if (!headers.containsKey("user-agent") &&
+    if (!headers.containsKey("User-Agent") &&
         parser.optional!.userAgent != null) {
-      headers[HttpHeaders.userAgentHeader] =
-          randomUserAgent(parser.optional!.userAgent!);
+      headers['User-Agent'] = randomUserAgent(parser.optional!.userAgent!);
     }
 
     //Inject data to headers
@@ -56,7 +55,7 @@ Future<Data?> httpParser({
 
     //Set optional cookies
     if (cookies != null) {
-      headers[HttpHeaders.cookieHeader] = mapToCookie(cookies);
+      headers['Cookie'] = mapToCookie(cookies);
     }
     printLog("HTTP Parser URL: $url", debug, color: LogColor.magenta);
     printLog("HTTP Parser Method: $method", debug, color: LogColor.magenta);
@@ -97,7 +96,8 @@ Future<Data?> httpParser({
       Uri.parse(url),
       headers: headers,
       debug: debug,
-      proxyUrl: parser.optional!.usePassedProxy ? proxyUrl : null,
+      proxyAPI: parser.optional!.usePassedProxy ? proxyAPI : null,
+      proxyUrlParam: parser.optional!.usePassedProxy ? proxyUrlParam : null,
       cacheResponse: parser.optional!.cacheResponse,
     );
   } else if (method == HttpMethod.post) {
@@ -106,8 +106,8 @@ Future<Data?> httpParser({
       headers: headers,
       body: payLoad,
       debug: debug,
-      proxyUrl: parser.optional!.usePassedProxy ? proxyUrl : null,
-      cacheResponse: parser.optional!.cacheResponse,
+      proxyAPI: parser.optional!.usePassedProxy ? proxyAPI : null,
+      proxyUrlParam: parser.optional!.usePassedProxy ? proxyUrlParam : null,
     );
   } else {
     printLog("HTTP Parser: Invalid method!", debug, color: LogColor.red);

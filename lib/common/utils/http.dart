@@ -6,25 +6,21 @@ import 'package:http/http.dart' as http;
 Future<String?> getRequest(
   Uri url, {
   Map<String, String> headers = const {},
-  bool headless = false,
   bool debug = false,
-  Uri? proxyUrl,
-  bool cacheResponse = true,
+  Uri? proxyAPI,
+  String? proxyUrlParam,
+  bool cacheResponse = false,
 }) async {
   printLog("HTTP GET: $url", debug, color: LogColor.yellow);
-  if (proxyUrl != null) {
-    if (headers.isNotEmpty && proxyUrl.host.contains("scrapingbee")) {
-      proxyUrl = addQueryParamToProxy(proxyUrl, "forward_headers_pure", "true");
-      Map<String, String> newHeaders = {};
-      headers.forEach((name, val) {
-        newHeaders["Spb-$name"] = val;
-      });
-      headers = newHeaders;
-    }
+  if (proxyAPI != null) {
     printLog("Prepending proxy URL...", debug, color: LogColor.yellow);
-    url = Uri.parse("$proxyUrl=${Uri.encodeComponent(url.toString())}");
+    url = proxyAPI.replace(queryParameters: {
+      ...proxyAPI.queryParameters,
+      proxyUrlParam ?? "url": url.toString(),
+    });
   }
   printLog("GET URL: $url", debug, color: LogColor.yellow);
+  printLog("GET URL HEADERS: $headers", debug, color: LogColor.yellow);
   try {
     var html = await http
         .get(
@@ -35,12 +31,21 @@ Future<String?> getRequest(
           Duration(seconds: 30),
         );
     String body = utf8.decode(html.bodyBytes);
-    printLog("HTTP Response: ${html.statusCode}", debug,
-        color: LogColor.yellow);
-    printLog("HTTP Response body.length ${body.length}", debug,
-        color: LogColor.yellow);
-    printLog("HTTP Response html.headers ${html.headers.toString()}", debug,
-        color: LogColor.yellow);
+    printLog(
+      "HTTP Response: ${html.statusCode}",
+      debug,
+      color: LogColor.yellow,
+    );
+    printLog(
+      "HTTP Response body.length ${body.length}",
+      debug,
+      color: LogColor.yellow,
+    );
+    printLog(
+      "HTTP Response html.headers ${html.headers.toString()}",
+      debug,
+      color: LogColor.yellow,
+    );
     if (cacheResponse) {
       saveCacheLog(body, debug);
     }
@@ -57,22 +62,16 @@ Future<String?> postRequest(
   Object? body,
   Map<String, String> headers = const {},
   bool debug = false,
-  Uri? proxyUrl,
-  bool? cacheResponse,
+  Uri? proxyAPI,
+  String? proxyUrlParam,
 }) async {
   printLog("HTTP POST URL: $url", debug, color: LogColor.magenta);
-  if (proxyUrl != null) {
-    printLog("Using proxy", debug);
-    if (headers.isNotEmpty && proxyUrl.host.contains("scrapingbee")) {
-      proxyUrl = addQueryParamToProxy(proxyUrl, "forward_headers_pure", "true");
-      Map<String, String> newHeaders = {};
-      headers.forEach((name, val) {
-        newHeaders["Spb-$name"] = val;
-      });
-      headers = newHeaders;
-    }
+  if (proxyAPI != null) {
     printLog("Prepending proxy URL...", debug, color: LogColor.yellow);
-    url = Uri.parse("$proxyUrl=${Uri.encodeComponent(url.toString())}");
+    url = proxyAPI.replace(queryParameters: {
+      ...proxyAPI.queryParameters,
+      proxyUrlParam ?? "url": url.toString(),
+    });
   }
 
   printLog("HTTP Parser Headers: $headers", debug, color: LogColor.magenta);
@@ -91,13 +90,4 @@ Future<String?> postRequest(
   } catch (e) {
     return null;
   }
-}
-
-Uri addQueryParamToProxy(Uri uri, String key, String value) {
-  var qP = Map<String, String>.from(uri.queryParameters);
-  qP.remove("url");
-  qP[key] = value;
-  qP["url"] = "";
-  uri = uri.replace(queryParameters: qP);
-  return uri;
 }

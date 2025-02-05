@@ -27,7 +27,8 @@ class WebScraper {
     required Uri url,
     required Map<String, List<Config>> configMap,
     int configIndex = 0,
-    Uri? proxyUrl,
+    Uri? proxyAPI,
+    String? proxyUrlParam,
     bool debug = false,
     Document? html,
     Map<String, String>? cookies,
@@ -59,7 +60,8 @@ class WebScraper {
       cookies: cookies,
       headers: headers,
       userAgent: userAgent,
-      proxyUrl: proxyUrl,
+      proxyAPI: proxyAPI,
+      proxyUrlParam: proxyUrlParam,
     );
 
     /// Parse HTML
@@ -67,7 +69,8 @@ class WebScraper {
     Map<String, Object> parsedData = await webParser.parse(
       scrapedData: scrapedData,
       config: config,
-      proxyUrl: proxyUrl,
+      proxyAPI: proxyAPI,
+      proxyUrlParam: proxyUrlParam,
       cookies: cookies,
       debug: debug,
       concurrentParsing: concurrentParsing,

@@ -9,7 +9,8 @@ class WebParser {
   Future<Map<String, Object>> parse({
     required Data scrapedData,
     required Config config,
-    Uri? proxyUrl,
+    Uri? proxyAPI,
+    String? proxyUrlParam,
     Map<String, String>? cookies,
     bool debug = false,
     bool concurrentParsing = false,
@@ -46,7 +47,8 @@ class WebParser {
       parentToChildren: parentToChildren,
       parsers: rootParsers,
       parentData: scrapedData,
-      proxyUrl: proxyUrl,
+      proxyAPI: proxyAPI,
+      proxyUrlParam: proxyUrlParam,
       cookies: cookies,
       debug: debug,
       concurrent: concurrentParsing,
@@ -84,7 +86,8 @@ class WebParser {
     required Map<String, List<Parser>> parentToChildren,
     required List<Parser> parsers,
     required Data parentData,
-    required Uri? proxyUrl,
+    required Uri? proxyAPI,
+    required String? proxyUrlParam,
     Map<String, String>? cookies,
     required bool debug,
     required bool concurrent,
@@ -108,7 +111,8 @@ class WebParser {
         final Data? data = await _runParserAndExecuteOptional(
           parser: parser,
           parentData: parentData,
-          proxyUrl: proxyUrl,
+          proxyAPI: proxyAPI,
+          proxyUrlParam: proxyUrlParam,
           cookies: cookies,
           debug: debug,
         );
@@ -143,7 +147,8 @@ class WebParser {
                     parentToChildren: parentToChildren,
                     parsers: childParsers,
                     parentData: Data(data.url, singleData),
-                    proxyUrl: proxyUrl,
+                    proxyAPI: proxyAPI,
+                    proxyUrlParam: proxyUrlParam,
                     cookies: cookies,
                     debug: debug,
                     concurrent: concurrent,
@@ -170,7 +175,8 @@ class WebParser {
                 parentToChildren: parentToChildren,
                 parsers: childParsers,
                 parentData: data,
-                proxyUrl: proxyUrl,
+                proxyAPI: proxyAPI,
+                proxyUrlParam: proxyUrlParam,
                 cookies: cookies,
                 debug: debug,
                 concurrent: concurrent,
@@ -210,14 +216,16 @@ class WebParser {
   Future<Data?> _runParserAndExecuteOptional({
     required Parser parser,
     required Data parentData,
-    required Uri? proxyUrl,
+    required Uri? proxyAPI,
+    required String? proxyUrlParam,
     Map<String, String>? cookies,
     required bool debug,
   }) async {
     final Data? parsed = await _runParser(
       parser: parser,
       parentData: parentData,
-      proxyUrl: proxyUrl,
+      proxyAPI: proxyAPI,
+      proxyUrlParam: proxyUrlParam,
       cookies: cookies,
       debug: debug,
     );
@@ -264,7 +272,8 @@ class WebParser {
   Future<Data?> _runParser({
     required Parser parser,
     required Data parentData,
-    required Uri? proxyUrl,
+    required Uri? proxyAPI,
+    required String? proxyUrlParam,
     Map<String, String>? cookies,
     required bool debug,
   }) async {
@@ -316,7 +325,8 @@ class WebParser {
           parser: parser,
           parentData: parentData,
           allData: extractedData,
-          proxyUrl: proxyUrl,
+          proxyAPI: proxyAPI,
+          proxyUrlParam: proxyUrlParam,
           cookies: cookies,
           debug: debug,
         );

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:dart_web_scraper/common/utils/cookie_utils.dart';
 import 'package:dart_web_scraper/common/utils/http.dart';
 import 'package:dart_web_scraper/common/utils/random.dart';
@@ -15,7 +14,8 @@ class Scraper {
     Map<String, String>? cookies,
     String? userAgent,
     Map<String, Object>? headers,
-    Uri? proxyUrl,
+    Uri? proxyAPI,
+    String? proxyUrlParam,
     bool debug = false,
   }) async {
     /// Fetch target
@@ -41,18 +41,17 @@ class Scraper {
         debug,
         color: LogColor.blue,
       );
-      headersMerged[HttpHeaders.userAgentHeader] = userAgent;
+      headersMerged['User-Agent'] = userAgent;
     }
 
     /// If `userAgent` is not defined, let's generate one based on our config
-    if (!headersMerged.containsKey("user-agent")) {
+    if (!headersMerged.containsKey("User-Agent")) {
       printLog(
         'Scraper: Generating random User-Agent...',
         debug,
         color: LogColor.blue,
       );
-      headersMerged[HttpHeaders.userAgentHeader] =
-          randomUserAgent(config.userAgent);
+      headersMerged['User-Agent'] = randomUserAgent(config.userAgent);
     }
 
     /// Cookie
@@ -63,7 +62,7 @@ class Scraper {
         debug,
         color: LogColor.blue,
       );
-      headersMerged[HttpHeaders.cookieHeader] = mapToCookie(cookies);
+      headersMerged['Cookie'] = mapToCookie(cookies);
     }
 
     if (headers != null) {
@@ -99,7 +98,8 @@ class Scraper {
           url,
           headers: headersMerged,
           debug: debug,
-          proxyUrl: proxyUrl,
+          proxyAPI: proxyAPI,
+          proxyUrlParam: proxyUrlParam,
         );
       } else if (config.usePassedHtml && html != null && html.hasContent()) {
         printLog(
@@ -114,7 +114,8 @@ class Scraper {
           url,
           headers: headersMerged,
           debug: debug,
-          proxyUrl: proxyUrl,
+          proxyAPI: proxyAPI,
+          proxyUrlParam: proxyUrlParam,
         );
       }
       if (dom.obj != "") {

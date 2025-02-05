@@ -11,6 +11,7 @@ Map<String, List<Config>> configMap = {
 List<Config> quotesConfig = [
   /// We can have multiple configs for same domain and use `configIndex` in `WebScraper.scrape` to switch between them
   Config(
+    usePassedUserAgent: true,
     parsers: {
       /// We can have set of parsers for different UrlTargets
       "main": [

@@ -22,7 +22,7 @@ Config-based, reusable web scraper for web and API scraping. Scrape, parse web p
 - **Table**: Extracts data from HTML/JSON table as a `Map`.
 - **Attribute**: Extracts `attribute` value from an HTML element.
 - **Data Injection**: Inject previously parsed data by parser `selector` using `<slot>`.
-- **URL based proxy**: Use URL based proxy for HTTP requests.
+- **API Proxy**: Use API based proxy for HTTP requests.
 
 ## Getting Started
 
