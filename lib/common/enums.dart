@@ -49,3 +49,6 @@ enum LogColor {
   white,
   orange
 }
+
+/// HTTP Client types supported
+enum HttpClientType { consoleClient, curlClient, browserClient }
