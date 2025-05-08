@@ -41,9 +41,9 @@ Future<String?> getRequest(
   String? proxyUrlParam,
   bool cacheResponse = false,
   String? userAgent,
+  HttpClientType clientType = HttpClientType.browserClient,
   ConsoleClientOptions consoleClientOptions = const ConsoleClientOptions(),
   CurlClientOptions curlClientOptions = const CurlClientOptions(),
-  HttpClientType clientType = HttpClientType.browserClient,
 }) async {
   printLog("HTTP GET: $url", debug, color: LogColor.yellow);
 
@@ -61,9 +61,9 @@ Future<String?> getRequest(
   base.Client? client;
   try {
     client = createHttpClient(
-      clientType: clientType,
       headers: headers,
       userAgent: userAgent,
+      clientType: clientType,
       socksProxy: curlClientOptions.socksProxy,
       socksProxyType: curlClientOptions.socksProxyType,
       proxy: consoleClientOptions.proxy,
@@ -116,9 +116,9 @@ Future<String?> postRequest(
   Uri? proxyAPI,
   String? proxyUrlParam,
   String? userAgent,
+  HttpClientType clientType = HttpClientType.browserClient,
   ConsoleClientOptions consoleClientOptions = const ConsoleClientOptions(),
   CurlClientOptions curlClientOptions = const CurlClientOptions(),
-  HttpClientType clientType = HttpClientType.browserClient,
 }) async {
   printLog("HTTP POST URL: $url", debug, color: LogColor.magenta);
 
@@ -136,9 +136,9 @@ Future<String?> postRequest(
   base.Client? client;
   try {
     client = createHttpClient(
-      clientType: clientType,
       headers: headers,
       userAgent: userAgent,
+      clientType: clientType,
       socksProxy: curlClientOptions.socksProxy,
       socksProxyType: curlClientOptions.socksProxyType,
       proxy: consoleClientOptions.proxy,

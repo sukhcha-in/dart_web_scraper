@@ -1,4 +1,5 @@
 import 'package:dart_web_scraper/dart_web_scraper.dart';
+import 'package:dart_web_scraper/common/utils/http.dart';
 import 'package:html/dom.dart';
 
 /// Combines scraping and parsing
@@ -35,6 +36,9 @@ class WebScraper {
     Map<String, String>? headers,
     String? userAgent,
     bool concurrentParsing = false,
+    HttpClientType clientType = HttpClientType.browserClient,
+    ConsoleClientOptions consoleClientOptions = const ConsoleClientOptions(),
+    CurlClientOptions curlClientOptions = const CurlClientOptions(),
   }) async {
     /// Fetch config and target
     Config? config = getConfig(
@@ -74,6 +78,9 @@ class WebScraper {
       cookies: cookies,
       debug: debug,
       concurrentParsing: concurrentParsing,
+      clientType: clientType,
+      consoleClientOptions: consoleClientOptions,
+      curlClientOptions: curlClientOptions,
     );
 
     return parsedData;

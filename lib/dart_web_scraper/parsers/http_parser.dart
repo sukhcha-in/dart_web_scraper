@@ -13,6 +13,7 @@ Future<Data?> httpParser({
   required String? proxyUrlParam,
   required Map<String, String>? cookies,
   required bool debug,
+  HttpClientType clientType = HttpClientType.browserClient,
   ConsoleClientOptions consoleClientOptions = const ConsoleClientOptions(),
   CurlClientOptions curlClientOptions = const CurlClientOptions(),
 }) async {
@@ -23,30 +24,30 @@ Future<Data?> httpParser({
   Object? payLoad;
   HttpPayload payloadType = HttpPayload.string;
   Map<String, String> headers = {};
-  //Set from optional
+  // Set from optional
   if (parser.optional != null) {
-    if (parser.optional!.url != null) {
+    if (parser.optional?.url != null) {
       url = parser.optional!.url!;
     } else {
       url = parentData.url.toString();
     }
-    if (parser.optional!.method != null) {
+    if (parser.optional?.method != null) {
       method = parser.optional!.method!;
     }
 
-    //Set optional headers
-    if (parser.optional!.headers != null) {
+    // Set optional headers
+    if (parser.optional?.headers != null) {
       parser.optional!.headers!.forEach((k, v) {
         headers[k.toString()] = v.toString();
       });
     }
 
     if (!headers.containsKey("User-Agent") &&
-        parser.optional!.userAgent != null) {
+        parser.optional?.userAgent != null) {
       headers['User-Agent'] = randomUserAgent(parser.optional!.userAgent!);
     }
 
-    //Inject data to headers
+    // Inject data to headers
     String encodedHeaders = jsonEncode(headers);
     encodedHeaders = inject("slot", allData, encodedHeaders);
     Object decodedHeaders = jsonDecode(encodedHeaders);
@@ -55,21 +56,20 @@ Future<Data?> httpParser({
       headers[key] = value.toString();
     });
 
-    //Set optional cookies
+    // Set optional cookies
     if (cookies != null) {
       headers['Cookie'] = mapToCookie(cookies);
     }
     printLog("HTTP Parser URL: $url", debug, color: LogColor.magenta);
     printLog("HTTP Parser Method: $method", debug, color: LogColor.magenta);
     printLog("HTTP Parser Cookies: $cookies", debug, color: LogColor.magenta);
+    printLog("HTTP Parser Client Type: ${parser.optional?.clientType ?? clientType}", debug, color: LogColor.magenta);
 
-    //Set default payloadType
-    if (parser.optional!.payloadType != null) {
-      payloadType = parser.optional!.payloadType!;
-    }
+    // Set default payloadType if specified
+    payloadType = parser.optional?.payloadType ?? payloadType;
 
-    //Inject data to payLoad
-    if (parser.optional!.payLoad != null) {
+    // Inject data to payLoad
+    if (parser.optional?.payLoad != null) {
       payLoad = parser.optional!.payLoad!;
       if (payloadType == HttpPayload.json) {
         payLoad = jsonEncode(payLoad);
@@ -82,7 +82,7 @@ Future<Data?> httpParser({
     url = parentData.url.toString();
   }
 
-  //If url contains slot
+  // If url contains slot
   url = inject("slot", allData, url);
 
   printLog(
@@ -91,17 +91,22 @@ Future<Data?> httpParser({
     color: LogColor.magenta,
   );
 
-  //Declare empty result
+  // Extract optional parameters with safe defaults
+  final bool usePassedProxy = parser.optional?.usePassedProxy ?? false;
+  final bool cacheResponse = parser.optional?.cacheResponse ?? false;
+  final HttpClientType actualClientType = parser.optional?.clientType ?? clientType;
+
+  // Declare empty result
   Object? result;
   if (method == HttpMethod.get) {
     result = await getRequest(
       Uri.parse(url),
       headers: headers,
       debug: debug,
-      proxyAPI: parser.optional!.usePassedProxy ? proxyAPI : null,
-      proxyUrlParam: parser.optional!.usePassedProxy ? proxyUrlParam : null,
-      cacheResponse: parser.optional!.cacheResponse,
-      clientType: parser.optional!.clientType,
+      proxyAPI: usePassedProxy ? proxyAPI : null,
+      proxyUrlParam: usePassedProxy ? proxyUrlParam : null,
+      cacheResponse: cacheResponse,
+      clientType: actualClientType,
       consoleClientOptions: consoleClientOptions,
       curlClientOptions: curlClientOptions,
     );
@@ -111,9 +116,9 @@ Future<Data?> httpParser({
       headers: headers,
       body: payLoad,
       debug: debug,
-      proxyAPI: parser.optional!.usePassedProxy ? proxyAPI : null,
-      proxyUrlParam: parser.optional!.usePassedProxy ? proxyUrlParam : null,
-      clientType: parser.optional!.clientType,
+      proxyAPI: usePassedProxy ? proxyAPI : null,
+      proxyUrlParam: usePassedProxy ? proxyUrlParam : null,
+      clientType: actualClientType,
       consoleClientOptions: consoleClientOptions,
       curlClientOptions: curlClientOptions,
     );
@@ -122,11 +127,13 @@ Future<Data?> httpParser({
     return null;
   }
 
-  //If result is there
+  // If result is there
   if (result != null && result.toString().trim() != "") {
-    if (parser.optional != null && parser.optional!.responseType != null) {
+    final HttpResponseType? responseType = parser.optional?.responseType;
+    
+    if (responseType != null) {
       try {
-        switch (parser.optional!.responseType!) {
+        switch (responseType) {
           case HttpResponseType.json:
             return Data(parentData.url, jsonDecode(result.toString().trim()));
           case HttpResponseType.text:

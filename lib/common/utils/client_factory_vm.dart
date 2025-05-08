@@ -4,9 +4,9 @@ import 'package:http_client/curl.dart';
 import '../enums.dart';
 
 base.Client createHttpClient({
-  HttpClientType clientType = HttpClientType.consoleClient,
   Map<String, String>? headers,
   String? userAgent,
+  HttpClientType clientType = HttpClientType.browserClient,
   String? socksProxy,
   CurlSocksProxyType socksProxyType = CurlSocksProxyType.socks5,
   String? proxy,
@@ -35,6 +35,16 @@ base.Client createHttpClient({
         ignoreBadCertificates: ignoreBadCertificates,
       );
     case HttpClientType.browserClient:
-      throw UnsupportedError('BrowserClient is only available in the browser.');
+      // Fall back to console client when browser client is requested in VM
+      return console.ConsoleClient(
+        proxy: proxy,
+        proxyFn: proxyFn,
+        headers: headers,
+        idleTimeout: idleTimeout,
+        maxConnectionsPerHost: maxConnectionsPerHost,
+        autoUncompress: autoUncompress,
+        userAgent: userAgent,
+        ignoreBadCertificates: ignoreBadCertificates,
+      );
   }
 }

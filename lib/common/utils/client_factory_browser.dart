@@ -3,9 +3,9 @@ import 'package:http_client/browser.dart' as browser;
 import '../enums.dart';
 
 base.Client createHttpClient({
-  HttpClientType clientType = HttpClientType.browserClient,
   Map<String, String>? headers,
   String? userAgent,
+  HttpClientType clientType = HttpClientType.browserClient,
   String? socksProxy,
   dynamic socksProxyType,
   String? proxy,
