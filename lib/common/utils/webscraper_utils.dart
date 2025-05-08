@@ -7,14 +7,29 @@ Config? getConfig(
   int configIndex = 0,
 }) {
   for (final i in configs.keys) {
-    if (url.host.contains(i)) {
+    // Wildcard: match any host
+    if (i == '*') {
       Config? config = configs[i]!.firstWhereIndexedOrNull(
         (i, _) => i == configIndex,
       );
-      if (config == null) {
-        return configs[i]![0];
+      return config ?? configs[i]![0];
+    }
+    // Regex: key starts and ends with '/'
+    else if (i.length > 2 && i.startsWith('/') && i.endsWith('/')) {
+      final pattern = RegExp(i.substring(1, i.length - 1));
+      if (pattern.hasMatch(url.host)) {
+        Config? config = configs[i]!.firstWhereIndexedOrNull(
+          (i, _) => i == configIndex,
+        );
+        return config ?? configs[i]![0];
       }
-      return config;
+    }
+    // Legacy: substring match
+    else if (url.host.contains(i)) {
+      Config? config = configs[i]!.firstWhereIndexedOrNull(
+        (i, _) => i == configIndex,
+      );
+      return config ?? configs[i]![0];
     }
   }
   return null;
