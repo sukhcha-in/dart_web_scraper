@@ -13,6 +13,8 @@ Future<Data?> httpParser({
   required String? proxyUrlParam,
   required Map<String, String>? cookies,
   required bool debug,
+  ConsoleClientOptions consoleClientOptions = const ConsoleClientOptions(),
+  CurlClientOptions curlClientOptions = const CurlClientOptions(),
 }) async {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog("ID: ${parser.id} Parser: HTTP", debug, color: LogColor.cyan);
@@ -99,6 +101,9 @@ Future<Data?> httpParser({
       proxyAPI: parser.optional!.usePassedProxy ? proxyAPI : null,
       proxyUrlParam: parser.optional!.usePassedProxy ? proxyUrlParam : null,
       cacheResponse: parser.optional!.cacheResponse,
+      clientType: parser.optional!.clientType,
+      consoleClientOptions: consoleClientOptions,
+      curlClientOptions: curlClientOptions,
     );
   } else if (method == HttpMethod.post) {
     result = await postRequest(
@@ -108,6 +113,9 @@ Future<Data?> httpParser({
       debug: debug,
       proxyAPI: parser.optional!.usePassedProxy ? proxyAPI : null,
       proxyUrlParam: parser.optional!.usePassedProxy ? proxyUrlParam : null,
+      clientType: parser.optional!.clientType,
+      consoleClientOptions: consoleClientOptions,
+      curlClientOptions: curlClientOptions,
     );
   } else {
     printLog("HTTP Parser: Invalid method!", debug, color: LogColor.red);

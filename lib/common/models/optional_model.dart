@@ -41,6 +41,7 @@ class Optional {
   final HttpPayload? payloadType;
   final bool usePassedProxy;
   final bool cacheResponse;
+  final HttpClientType clientType;
 
   // StrBetween-specific fields
   final String? start;
