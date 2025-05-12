@@ -27,6 +27,9 @@ Data? elementParser({
   }
 
   for (final sel in parser.selector) {
+    if (sel == '_self') {
+      return Data(parentData.url, document);
+    }
     printLog("Element Selector: $sel", debug, color: LogColor.cyan);
     String selector;
     if (sel.contains("<slot>")) {
