@@ -14,4 +14,28 @@ class UrlCleaner {
     this.blacklistParams,
     this.appendParams,
   });
+
+  /// Creates a UrlCleaner instance from a JSON map.
+  factory UrlCleaner.fromJson(Map<String, dynamic> json) {
+    return UrlCleaner(
+      whitelistParams: json['whitelistParams'] != null
+          ? List<String>.from(json['whitelistParams'])
+          : null,
+      blacklistParams: json['blacklistParams'] != null
+          ? List<String>.from(json['blacklistParams'])
+          : null,
+      appendParams: json['appendParams'] != null
+          ? Map<String, String>.from(json['appendParams'])
+          : null,
+    );
+  }
+
+  /// Converts the UrlCleaner instance to a JSON map.
+  Map<String, dynamic> toJson() {
+    return {
+      'whitelistParams': whitelistParams,
+      'blacklistParams': blacklistParams,
+      'appendParams': appendParams,
+    };
+  }
 }

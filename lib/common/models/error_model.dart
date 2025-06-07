@@ -8,4 +8,16 @@ class WebScraperError implements Exception {
   String toString() {
     return 'Error: $message';
   }
+
+  /// Creates a WebScraperError instance from a JSON map.
+  factory WebScraperError.fromJson(Map<String, dynamic> json) {
+    return WebScraperError(json['message']);
+  }
+
+  /// Converts the WebScraperError instance to a JSON map.
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+    };
+  }
 }

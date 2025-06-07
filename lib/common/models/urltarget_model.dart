@@ -20,4 +20,26 @@ class UrlTarget {
     this.needsHtml = true,
     this.urlCleaner,
   });
+
+  /// Creates a UrlTarget instance from a JSON map.
+  factory UrlTarget.fromJson(Map<String, dynamic> json) {
+    return UrlTarget(
+      name: json['name'],
+      where: List<String>.from(json['where']),
+      needsHtml: json['needsHtml'] ?? true,
+      urlCleaner: json['urlCleaner'] != null
+          ? UrlCleaner.fromJson(json['urlCleaner'])
+          : null,
+    );
+  }
+
+  /// Converts the UrlTarget instance to a JSON map.
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'where': where,
+      'needsHtml': needsHtml,
+      'urlCleaner': urlCleaner?.toJson(),
+    };
+  }
 }

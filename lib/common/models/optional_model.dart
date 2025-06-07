@@ -658,4 +658,120 @@ class Optional {
     }
     return false;
   }
+
+  /// Creates an Optional instance from a JSON map.
+  factory Optional.fromJson(Map<String, dynamic> json) {
+    return Optional._(
+      apply: json['apply'] != null
+          ? ApplyMethod.values.firstWhere(
+              (e) => e.toString() == 'ApplyMethod.${json['apply']}',
+            )
+          : null,
+      regex: json['regex'],
+      regexGroup: json['regexGroup'],
+      regexReplace: json['regexReplace'],
+      regexReplaceWith: json['regexReplaceWith'],
+      replaceFirst: json['replaceFirst'] != null
+          ? Map<String, String>.from(json['replaceFirst'])
+          : null,
+      replaceAll: json['replaceAll'] != null
+          ? Map<String, String>.from(json['replaceAll'])
+          : null,
+      cropStart: json['cropStart'],
+      cropEnd: json['cropEnd'],
+      prepend: json['prepend'],
+      append: json['append'],
+      match: json['match'] != null ? List<Object>.from(json['match']) : null,
+      nth: json['nth'],
+      splitBy: json['splitBy'],
+      url: json['url'],
+      method: json['method'] != null
+          ? HttpMethod.values.firstWhere(
+              (e) => e.toString() == 'HttpMethod.${json['method']}',
+            )
+          : null,
+      headers: json['headers'] != null
+          ? Map<String, Object>.from(json['headers'])
+          : null,
+      userAgent: json['userAgent'] != null
+          ? UserAgentDevice.values.firstWhere(
+              (e) => e.toString() == 'UserAgentDevice.${json['userAgent']}',
+            )
+          : null,
+      responseType: json['responseType'] != null
+          ? HttpResponseType.values.firstWhere(
+              (e) => e.toString() == 'HttpResponseType.${json['responseType']}',
+            )
+          : null,
+      payLoad: json['payLoad'],
+      payloadType: json['payloadType'] != null
+          ? HttpPayload.values.firstWhere(
+              (e) => e.toString() == 'HttpPayload.${json['payloadType']}',
+            )
+          : null,
+      usePassedProxy: json['usePassedProxy'] ?? false,
+      cacheResponse: json['cacheResponse'] ?? false,
+      start: json['start'],
+      end: json['end'],
+      where: json['where'] != null ? List<String>.from(json['where']) : null,
+      siblingDirection: json['siblingDirection'] != null
+          ? SiblingDirection.values.firstWhere(
+              (e) => e.toString() == 'SiblingDirection.${json['siblingDirection']}',
+            )
+          : null,
+      keys: json['keys'],
+      values: json['values'],
+      strVal: json['strVal'],
+      mapVal: json['mapVal'] != null
+          ? Map<String, Object>.from(json['mapVal'])
+          : null,
+      transformationOrder: json['transformationOrder'] != null
+          ? (json['transformationOrder'] as List)
+              .map((e) => TransformationType.values.firstWhere(
+                    (t) => t.toString() == 'TransformationType.$e',
+                  ))
+              .toList()
+          : null,
+    );
+  }
+
+  /// Converts the Optional instance to a JSON map.
+  Map<String, dynamic> toJson() {
+    return {
+      'apply': apply?.toString().split('.').last,
+      'regex': regex,
+      'regexGroup': regexGroup,
+      'regexReplace': regexReplace,
+      'regexReplaceWith': regexReplaceWith,
+      'replaceFirst': replaceFirst,
+      'replaceAll': replaceAll,
+      'cropStart': cropStart,
+      'cropEnd': cropEnd,
+      'prepend': prepend,
+      'append': append,
+      'match': match,
+      'nth': nth,
+      'splitBy': splitBy,
+      'url': url,
+      'method': method?.toString().split('.').last,
+      'headers': headers,
+      'userAgent': userAgent?.toString().split('.').last,
+      'responseType': responseType?.toString().split('.').last,
+      'payLoad': payLoad,
+      'payloadType': payloadType?.toString().split('.').last,
+      'usePassedProxy': usePassedProxy,
+      'cacheResponse': cacheResponse,
+      'start': start,
+      'end': end,
+      'where': where,
+      'siblingDirection': siblingDirection?.toString().split('.').last,
+      'keys': keys,
+      'values': values,
+      'strVal': strVal,
+      'mapVal': mapVal,
+      'transformationOrder': transformationOrder
+          ?.map((e) => e.toString().split('.').last)
+          .toList(),
+    };
+  }
 }

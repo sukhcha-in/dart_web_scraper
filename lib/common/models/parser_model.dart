@@ -38,4 +38,34 @@ class Parser {
     this.optional,
     this.cleaner,
   });
+
+  /// Creates a Parser instance from a JSON map.
+  factory Parser.fromJson(Map<String, dynamic> json) {
+    return Parser(
+      id: json['id'],
+      parent: List<String>.from(json['parent']),
+      type: ParserType.values.firstWhere(
+        (e) => e.toString() == 'ParserType.${json['type']}',
+      ),
+      selector: json['selector'] != null ? List<String>.from(json['selector']) : const [],
+      isPrivate: json['isPrivate'] ?? false,
+      multiple: json['multiple'] ?? false,
+      optional: json['optional'] != null ? Optional.fromJson(json['optional']) : null,
+      // Note: cleaner function cannot be serialized from JSON
+    );
+  }
+
+  /// Converts the Parser instance to a JSON map.
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'parent': parent,
+      'type': type.toString().split('.').last,
+      'selector': selector,
+      'isPrivate': isPrivate,
+      'multiple': multiple,
+      'optional': optional?.toJson(),
+      // Note: cleaner function cannot be serialized to JSON
+    };
+  }
 }
