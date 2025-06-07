@@ -1,4 +1,5 @@
 import 'package:dart_web_scraper/dart_web_scraper.dart';
+import '../utils/cleaner_utils.dart';
 
 typedef CleanerFunction = Object? Function(Data data, bool debug);
 
@@ -28,6 +29,9 @@ class Parser {
   //Cleaner function called once data is scraped
   CleanerFunction? cleaner;
 
+  /// Name of the registered cleaner function for serialization
+  String? cleanerName;
+
   Parser({
     required this.id,
     required this.parent,
@@ -37,7 +41,26 @@ class Parser {
     this.multiple = false,
     this.optional,
     this.cleaner,
+    this.cleanerName,
   });
+
+  /// Named constructor with cleaner name (for serialization)
+  Parser.withCleanerName({
+    required this.id,
+    required this.parent,
+    required this.type,
+    required String cleanerName,
+    this.selector = const [],
+    this.isPrivate = false,
+    this.multiple = false,
+    this.optional,
+  }) : cleanerName = cleanerName,
+       cleaner = null; // Will be resolved from registry when needed
+
+  /// Get the cleaner function from registry if cleanerName is set
+  CleanerFunction? get resolvedCleaner {
+    return CleanerUtils.resolveCleanerForParser(this);
+  }
 
   /// Creates a Parser instance from a JSON map.
   factory Parser.fromJson(Map<String, dynamic> json) {
@@ -51,7 +74,8 @@ class Parser {
       isPrivate: json['isPrivate'] ?? false,
       multiple: json['multiple'] ?? false,
       optional: json['optional'] != null ? Optional.fromJson(json['optional']) : null,
-      // Note: cleaner function cannot be serialized from JSON
+      cleanerName: json['cleanerName'],
+      // Note: cleaner function will be resolved from registry using cleanerName
     );
   }
 
@@ -65,7 +89,8 @@ class Parser {
       'isPrivate': isPrivate,
       'multiple': multiple,
       'optional': optional?.toJson(),
-      // Note: cleaner function cannot be serialized to JSON
+      'cleanerName': cleanerName,
+      // Note: cleaner function is serialized via cleanerName reference
     };
   }
 }
