@@ -1,7 +1,7 @@
 [![Pub version](https://img.shields.io/pub/v/dart_web_scraper?logo=dart&style=plastic)](https://pub.dev/packages/dart_web_scraper)
 [![Pub Likes](https://img.shields.io/pub/likes/dart_web_scraper)](https://pub.dev/packages/dart_web_scraper)
 [![Pub Points](https://img.shields.io/pub/points/dart_web_scraper)](https://pub.dev/packages/dart_web_scraper)
-[![Pub Popularity](https://img.shields.io/pub/popularity/dart_web_scraper)](https://pub.dev/packages/dart_web_scraper)
+[![Pub Monthly Downloads](https://img.shields.io/pub/dm/dart_web_scraper)](https://pub.dev/packages/dart_web_scraper)
 
 Config-based, reusable web scraper for web and API scraping. Scrape, parse web pages or APIs without writing parsers or scraping logic, using simple key/value based configs.
 
@@ -355,3 +355,5 @@ Optional.staticVal({
 
 [json_path](https://pub.dev/packages/json_path) - JSON path selector\
 [json5](https://pub.dev/packages/json5) - JSON5 syntax decoder
+
+<img src="https://profile-counter.deno.dev/dart_web_scraper/count.svg" alt="Visitor's Count" />
