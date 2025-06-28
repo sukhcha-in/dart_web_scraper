@@ -10,3 +10,4 @@ pubspec.lock
 **/.DS_Store
 
 testing/
+test/
