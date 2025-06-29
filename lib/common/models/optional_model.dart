@@ -478,6 +478,7 @@ class Optional {
   /// Transformation: nth
   Object? _nth(Object data, bool debug) {
     if (nth == null || data is! List) return null;
+    if (nth == -1) return data.isNotEmpty ? data.last : null;
     if (nth! < 0 || nth! >= data.length) return null;
     return data[nth!];
   }
