@@ -573,10 +573,22 @@ class Optional {
 
   /// Transformation: regexMatch
   Object? _regexMatch(Object data, bool debug) {
-    if (_regex == null || data is! String) return null;
-    return _regex!.hasMatch(data)
-        ? _regex!.firstMatch(data)!.group(regexGroup ?? 0)
-        : null;
+    if (_regex == null) return null;
+
+    String? extractMatch(String s) =>
+        _regex!.firstMatch(s)?.group(regexGroup ?? 0);
+
+    if (data is String) {
+      return extractMatch(data);
+    } else if (data is List) {
+      final results = <String?>[];
+      for (final item in data) {
+        final result = extractMatch(item.toString());
+        if (result != null) results.add(result);
+      }
+      return results;
+    }
+    return null;
   }
 
   /// Transformation: cropStart
