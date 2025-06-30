@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
 enum TransformationType {
@@ -661,5 +663,132 @@ class Optional {
       }
     }
     return false;
+  }
+
+  /// Creates an Optional instance from Map.
+  factory Optional.fromMap(Map<String, dynamic> map) {
+    return Optional._(
+      apply: map['apply'] != null
+          ? ApplyMethod.values.firstWhere(
+              (e) => e.toString() == 'ApplyMethod.${map['apply']}',
+            )
+          : null,
+      regex: map['regex'],
+      regexGroup: map['regexGroup'],
+      regexReplace: map['regexReplace'],
+      regexReplaceWith: map['regexReplaceWith'],
+      replaceFirst: map['replaceFirst'] != null
+          ? Map<String, String>.from(map['replaceFirst'])
+          : null,
+      replaceAll: map['replaceAll'] != null
+          ? Map<String, String>.from(map['replaceAll'])
+          : null,
+      cropStart: map['cropStart'],
+      cropEnd: map['cropEnd'],
+      prepend: map['prepend'],
+      append: map['append'],
+      match: map['match'] != null ? List<Object>.from(map['match']) : null,
+      nth: map['nth'],
+      splitBy: map['splitBy'],
+      url: map['url'],
+      method: map['method'] != null
+          ? HttpMethod.values.firstWhere(
+              (e) => e.toString() == 'HttpMethod.${map['method']}',
+            )
+          : null,
+      headers: map['headers'] != null
+          ? Map<String, Object>.from(map['headers'])
+          : null,
+      userAgent: map['userAgent'] != null
+          ? UserAgentDevice.values.firstWhere(
+              (e) => e.toString() == 'UserAgentDevice.${map['userAgent']}',
+            )
+          : null,
+      responseType: map['responseType'] != null
+          ? HttpResponseType.values.firstWhere(
+              (e) => e.toString() == 'HttpResponseType.${map['responseType']}',
+            )
+          : null,
+      payLoad: map['payLoad'],
+      payloadType: map['payloadType'] != null
+          ? HttpPayload.values.firstWhere(
+              (e) => e.toString() == 'HttpPayload.${map['payloadType']}',
+            )
+          : null,
+      usePassedProxy: map['usePassedProxy'] ?? false,
+      cacheResponse: map['cacheResponse'] ?? false,
+      start: map['start'],
+      end: map['end'],
+      where: map['where'] != null ? List<String>.from(map['where']) : null,
+      siblingDirection: map['siblingDirection'] != null
+          ? SiblingDirection.values.firstWhere(
+              (e) =>
+                  e.toString() == 'SiblingDirection.${map['siblingDirection']}',
+            )
+          : null,
+      keys: map['keys'],
+      values: map['values'],
+      strVal: map['strVal'],
+      mapVal: map['mapVal'] != null
+          ? Map<String, Object>.from(map['mapVal'])
+          : null,
+      transformationOrder: map['transformationOrder'] != null
+          ? (map['transformationOrder'] as List)
+              .map((e) => TransformationType.values.firstWhere(
+                    (t) => t.toString() == 'TransformationType.$e',
+                  ))
+              .toList()
+          : null,
+    );
+  }
+
+  /// Converts the Optional instance to Map.
+  Map<String, dynamic> toMap() {
+    return {
+      'apply': apply?.toString().split('.').last,
+      'regex': regex,
+      'regexGroup': regexGroup,
+      'regexReplace': regexReplace,
+      'regexReplaceWith': regexReplaceWith,
+      'replaceFirst': replaceFirst,
+      'replaceAll': replaceAll,
+      'cropStart': cropStart,
+      'cropEnd': cropEnd,
+      'prepend': prepend,
+      'append': append,
+      'match': match,
+      'nth': nth,
+      'splitBy': splitBy,
+      'url': url,
+      'method': method?.toString().split('.').last,
+      'headers': headers,
+      'userAgent': userAgent?.toString().split('.').last,
+      'responseType': responseType?.toString().split('.').last,
+      'payLoad': payLoad,
+      'payloadType': payloadType?.toString().split('.').last,
+      'usePassedProxy': usePassedProxy,
+      'cacheResponse': cacheResponse,
+      'start': start,
+      'end': end,
+      'where': where,
+      'siblingDirection': siblingDirection?.toString().split('.').last,
+      'keys': keys,
+      'values': values,
+      'strVal': strVal,
+      'mapVal': mapVal,
+      'transformationOrder': transformationOrder
+          ?.map((e) => e.toString().split('.').last)
+          .toList(),
+    };
+  }
+
+  /// Creates an Optional instance from a JSON string.
+  factory Optional.fromJson(String json) {
+    return Optional.fromMap(jsonDecode(json));
+  }
+
+  /// Converts the Optional instance to JSON string.
+  String toJson() {
+    return jsonEncode(toMap());
   }
 }
