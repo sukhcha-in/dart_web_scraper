@@ -176,6 +176,10 @@ Parser Parser({
   Optional? optional,
   // Custom cleaner function, clean the data and return data.
   Object? Function(Data, bool)? cleaner,
+  // If you plan to create configs from JSON, you can pass cleaner name here.
+  // This cleaner should be registered in `CleanerRegistry`.
+  // If you pass cleaner along with cleanerName, cleanerName function will be ignored.
+  String? cleanerName;
 })
 ```
 
@@ -262,7 +266,7 @@ Optional.any({
   String? append,
   // Converts final result to boolean if data matches with one of the `match` object
   List<Object>? match,
-  // Select nth child from a list
+  // Select nth child from a list, can be negative integer to select from last
   int? nth,
   // Split a string by something
   String? splitBy,
@@ -351,9 +355,38 @@ Optional.staticVal({
 })
 ```
 
+## Creating configs from JSON
+
+You can now create configs from JSON string using `Config.fromJson` method.
+
+## Cleaner Registry for parsers created using JSON
+
+You can register cleaners using `CleanerRegistry.registerCleaner` method. This is useful when you want to create configs from JSON and want to use custom cleaner for `Parser`.
+
+For example:
+
+```dart
+CleanerRegistry.register('formatPrice', (data, debug) {
+  return '$${data.obj}';
+});
+```
+
+then pass the cleaner name in `Parser`:
+
+```dart
+Parser(
+  //...
+  cleanerName: 'formatPrice',
+  //...
+)
+```
+
+```dart
+
 ## Credits
 
 [json_path](https://pub.dev/packages/json_path) - JSON path selector\
 [json5](https://pub.dev/packages/json5) - JSON5 syntax decoder
 
 <img src="https://profile-counter.deno.dev/dart_web_scraper/count.svg" alt="Visitor's Count" />
+```

@@ -1,3 +1,9 @@
+## 0.1.5
+
+- Create configs using JSON
+- Create `CleanerRegistry` to register cleaners
+- Update all dependencies.
+
 ## 0.1.4
 
 - Update all dependencies.
