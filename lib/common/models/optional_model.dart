@@ -373,8 +373,7 @@ class Optional {
   }
 
   /// Applies the relevant transformations based on the set fields and specified order
-  Object applyTransformations(Object data, bool debug) {
-    // Use specified transformation order or default order if not provided
+  Object? applyTransformations(Object data, bool debug) {
     final List<TransformationType> order = transformationOrder ??
         [
           if (nth != null) TransformationType.nth,
@@ -397,79 +396,68 @@ class Optional {
       switch (transformation) {
         case TransformationType.nth:
           final result = _nth(data, debug);
-          if (result != null) {
-            data = result;
-          }
+          if (result == null) return null;
+          data = result;
           break;
 
         case TransformationType.splitBy:
           final result = _splitBy(data, debug);
-          if (result != null) {
-            data = result;
-          }
+          if (result == null) return null;
+          data = result;
           break;
 
         case TransformationType.apply:
           final result = _apply(data, debug);
-          if (result != null) {
-            data = result;
-          }
+          if (result == null) return null;
+          data = result;
           break;
 
         case TransformationType.replace:
           final result = _replace(data, debug);
-          if (result != null) {
-            data = result;
-          }
+          if (result == null) return null;
+          data = result;
           break;
 
         case TransformationType.regexReplace:
           final result = _regexReplace(data, debug);
-          if (result != null) {
-            data = result;
-          }
+          if (result == null) return null;
+          data = result;
           break;
 
         case TransformationType.regexMatch:
           final result = _regexMatch(data, debug);
-          if (result != null) {
-            data = result;
-          }
+          if (result == null) return null;
+          data = result;
           break;
 
         case TransformationType.cropStart:
           final result = _cropStart(data, debug);
-          if (result != null) {
-            data = result;
-          }
+          if (result == null) return null;
+          data = result;
           break;
 
         case TransformationType.cropEnd:
           final result = _cropEnd(data, debug);
-          if (result != null) {
-            data = result;
-          }
+          if (result == null) return null;
+          data = result;
           break;
 
         case TransformationType.prepend:
           final result = _prepend(data, debug);
-          if (result != null) {
-            data = result;
-          }
+          if (result == null) return null;
+          data = result;
           break;
 
         case TransformationType.append:
           final result = _append(data, debug);
-          if (result != null) {
-            data = result;
-          }
+          if (result == null) return null;
+          data = result;
           break;
 
         case TransformationType.match:
           final result = _match(data, debug);
-          if (result != null) {
-            data = result;
-          }
+          if (result == null) return null;
+          data = result;
           break;
       }
     }
@@ -591,10 +579,22 @@ class Optional {
 
   /// Transformation: regexMatch
   Object? _regexMatch(Object data, bool debug) {
-    if (_regex == null || data is! String) return null;
-    return _regex!.hasMatch(data)
-        ? _regex!.firstMatch(data)!.group(regexGroup ?? 0)
-        : null;
+    if (_regex == null) return null;
+
+    String? extractMatch(String s) =>
+        _regex!.firstMatch(s)?.group(regexGroup ?? 0);
+
+    if (data is String) {
+      return extractMatch(data);
+    } else if (data is List) {
+      final results = <String?>[];
+      for (final item in data) {
+        final result = extractMatch(item.toString());
+        if (result != null) results.add(result);
+      }
+      return results;
+    }
+    return null;
   }
 
   /// Transformation: cropStart
