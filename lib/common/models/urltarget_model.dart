@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
 /// Target to target specific type of URL.
@@ -21,25 +23,35 @@ class UrlTarget {
     this.urlCleaner,
   });
 
-  /// Creates a UrlTarget instance from a JSON map.
-  factory UrlTarget.fromJson(Map<String, dynamic> json) {
+  /// Creates a UrlTarget instance from Map.
+  factory UrlTarget.fromMap(Map<String, dynamic> map) {
     return UrlTarget(
-      name: json['name'],
-      where: List<String>.from(json['where']),
-      needsHtml: json['needsHtml'] ?? true,
-      urlCleaner: json['urlCleaner'] != null
-          ? UrlCleaner.fromJson(json['urlCleaner'])
+      name: map['name'],
+      where: List<String>.from(map['where']),
+      needsHtml: map['needsHtml'] ?? true,
+      urlCleaner: map['urlCleaner'] != null
+          ? UrlCleaner.fromMap(map['urlCleaner'])
           : null,
     );
   }
 
-  /// Converts the UrlTarget instance to a JSON map.
-  Map<String, dynamic> toJson() {
+  /// Converts the UrlTarget instance to Map.
+  Map<String, dynamic> toMap() {
     return {
       'name': name,
       'where': where,
       'needsHtml': needsHtml,
-      'urlCleaner': urlCleaner?.toJson(),
+      'urlCleaner': urlCleaner?.toMap(),
     };
+  }
+
+  /// Creates a Parser instance from a JSON string.
+  factory UrlTarget.fromJson(String json) {
+    return UrlTarget.fromMap(jsonDecode(json));
+  }
+
+  /// Converts the Parser instance to a JSON string.
+  String toJson() {
+    return jsonEncode(toMap());
   }
 }

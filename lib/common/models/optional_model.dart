@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
 enum TransformationType {
@@ -659,74 +661,75 @@ class Optional {
     return false;
   }
 
-  /// Creates an Optional instance from a JSON map.
-  factory Optional.fromJson(Map<String, dynamic> json) {
+  /// Creates an Optional instance from Map.
+  factory Optional.fromMap(Map<String, dynamic> map) {
     return Optional._(
-      apply: json['apply'] != null
+      apply: map['apply'] != null
           ? ApplyMethod.values.firstWhere(
-              (e) => e.toString() == 'ApplyMethod.${json['apply']}',
+              (e) => e.toString() == 'ApplyMethod.${map['apply']}',
             )
           : null,
-      regex: json['regex'],
-      regexGroup: json['regexGroup'],
-      regexReplace: json['regexReplace'],
-      regexReplaceWith: json['regexReplaceWith'],
-      replaceFirst: json['replaceFirst'] != null
-          ? Map<String, String>.from(json['replaceFirst'])
+      regex: map['regex'],
+      regexGroup: map['regexGroup'],
+      regexReplace: map['regexReplace'],
+      regexReplaceWith: map['regexReplaceWith'],
+      replaceFirst: map['replaceFirst'] != null
+          ? Map<String, String>.from(map['replaceFirst'])
           : null,
-      replaceAll: json['replaceAll'] != null
-          ? Map<String, String>.from(json['replaceAll'])
+      replaceAll: map['replaceAll'] != null
+          ? Map<String, String>.from(map['replaceAll'])
           : null,
-      cropStart: json['cropStart'],
-      cropEnd: json['cropEnd'],
-      prepend: json['prepend'],
-      append: json['append'],
-      match: json['match'] != null ? List<Object>.from(json['match']) : null,
-      nth: json['nth'],
-      splitBy: json['splitBy'],
-      url: json['url'],
-      method: json['method'] != null
+      cropStart: map['cropStart'],
+      cropEnd: map['cropEnd'],
+      prepend: map['prepend'],
+      append: map['append'],
+      match: map['match'] != null ? List<Object>.from(map['match']) : null,
+      nth: map['nth'],
+      splitBy: map['splitBy'],
+      url: map['url'],
+      method: map['method'] != null
           ? HttpMethod.values.firstWhere(
-              (e) => e.toString() == 'HttpMethod.${json['method']}',
+              (e) => e.toString() == 'HttpMethod.${map['method']}',
             )
           : null,
-      headers: json['headers'] != null
-          ? Map<String, Object>.from(json['headers'])
+      headers: map['headers'] != null
+          ? Map<String, Object>.from(map['headers'])
           : null,
-      userAgent: json['userAgent'] != null
+      userAgent: map['userAgent'] != null
           ? UserAgentDevice.values.firstWhere(
-              (e) => e.toString() == 'UserAgentDevice.${json['userAgent']}',
+              (e) => e.toString() == 'UserAgentDevice.${map['userAgent']}',
             )
           : null,
-      responseType: json['responseType'] != null
+      responseType: map['responseType'] != null
           ? HttpResponseType.values.firstWhere(
-              (e) => e.toString() == 'HttpResponseType.${json['responseType']}',
+              (e) => e.toString() == 'HttpResponseType.${map['responseType']}',
             )
           : null,
-      payLoad: json['payLoad'],
-      payloadType: json['payloadType'] != null
+      payLoad: map['payLoad'],
+      payloadType: map['payloadType'] != null
           ? HttpPayload.values.firstWhere(
-              (e) => e.toString() == 'HttpPayload.${json['payloadType']}',
+              (e) => e.toString() == 'HttpPayload.${map['payloadType']}',
             )
           : null,
-      usePassedProxy: json['usePassedProxy'] ?? false,
-      cacheResponse: json['cacheResponse'] ?? false,
-      start: json['start'],
-      end: json['end'],
-      where: json['where'] != null ? List<String>.from(json['where']) : null,
-      siblingDirection: json['siblingDirection'] != null
+      usePassedProxy: map['usePassedProxy'] ?? false,
+      cacheResponse: map['cacheResponse'] ?? false,
+      start: map['start'],
+      end: map['end'],
+      where: map['where'] != null ? List<String>.from(map['where']) : null,
+      siblingDirection: map['siblingDirection'] != null
           ? SiblingDirection.values.firstWhere(
-              (e) => e.toString() == 'SiblingDirection.${json['siblingDirection']}',
+              (e) =>
+                  e.toString() == 'SiblingDirection.${map['siblingDirection']}',
             )
           : null,
-      keys: json['keys'],
-      values: json['values'],
-      strVal: json['strVal'],
-      mapVal: json['mapVal'] != null
-          ? Map<String, Object>.from(json['mapVal'])
+      keys: map['keys'],
+      values: map['values'],
+      strVal: map['strVal'],
+      mapVal: map['mapVal'] != null
+          ? Map<String, Object>.from(map['mapVal'])
           : null,
-      transformationOrder: json['transformationOrder'] != null
-          ? (json['transformationOrder'] as List)
+      transformationOrder: map['transformationOrder'] != null
+          ? (map['transformationOrder'] as List)
               .map((e) => TransformationType.values.firstWhere(
                     (t) => t.toString() == 'TransformationType.$e',
                   ))
@@ -735,8 +738,8 @@ class Optional {
     );
   }
 
-  /// Converts the Optional instance to a JSON map.
-  Map<String, dynamic> toJson() {
+  /// Converts the Optional instance to Map.
+  Map<String, dynamic> toMap() {
     return {
       'apply': apply?.toString().split('.').last,
       'regex': regex,
@@ -773,5 +776,15 @@ class Optional {
           ?.map((e) => e.toString().split('.').last)
           .toList(),
     };
+  }
+
+  /// Creates an Optional instance from a JSON string.
+  factory Optional.fromJson(String json) {
+    return Optional.fromMap(jsonDecode(json));
+  }
+
+  /// Converts the Optional instance to JSON string.
+  String toJson() {
+    return jsonEncode(toMap());
   }
 }

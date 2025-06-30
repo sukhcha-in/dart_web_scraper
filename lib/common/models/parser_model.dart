@@ -1,7 +1,6 @@
-import 'package:dart_web_scraper/dart_web_scraper.dart';
-import '../utils/cleaner_utils.dart';
+import 'dart:convert';
 
-typedef CleanerFunction = Object? Function(Data data, bool debug);
+import 'package:dart_web_scraper/dart_web_scraper.dart';
 
 /// A block in the list of parsers
 class Parser {
@@ -42,45 +41,35 @@ class Parser {
     this.optional,
     this.cleaner,
     this.cleanerName,
-  });
-
-  /// Named constructor with cleaner name (for serialization)
-  Parser.withCleanerName({
-    required this.id,
-    required this.parent,
-    required this.type,
-    required String cleanerName,
-    this.selector = const [],
-    this.isPrivate = false,
-    this.multiple = false,
-    this.optional,
-  }) : cleanerName = cleanerName,
-       cleaner = null; // Will be resolved from registry when needed
-
-  /// Get the cleaner function from registry if cleanerName is set
-  CleanerFunction? get resolvedCleaner {
-    return CleanerUtils.resolveCleanerForParser(this);
+  }) {
+    // If cleanerName is provided, resolve the cleaner function from registry
+    if (cleanerName != null) {
+      cleaner = CleanerRegistry.resolve(cleanerName);
+    }
   }
 
-  /// Creates a Parser instance from a JSON map.
-  factory Parser.fromJson(Map<String, dynamic> json) {
+  /// Creates a Parser instance from Map.
+  factory Parser.fromMap(Map<String, dynamic> map) {
     return Parser(
-      id: json['id'],
-      parent: List<String>.from(json['parent']),
+      id: map['id'],
+      parent: List<String>.from(map['parent']),
       type: ParserType.values.firstWhere(
-        (e) => e.toString() == 'ParserType.${json['type']}',
+        (e) => e.toString() == 'ParserType.${map['type']}',
       ),
-      selector: json['selector'] != null ? List<String>.from(json['selector']) : const [],
-      isPrivate: json['isPrivate'] ?? false,
-      multiple: json['multiple'] ?? false,
-      optional: json['optional'] != null ? Optional.fromJson(json['optional']) : null,
-      cleanerName: json['cleanerName'],
+      selector: map['selector'] != null
+          ? List<String>.from(map['selector'])
+          : const [],
+      isPrivate: map['isPrivate'] ?? false,
+      multiple: map['multiple'] ?? false,
+      optional:
+          map['optional'] != null ? Optional.fromMap(map['optional']) : null,
+      cleanerName: map['cleanerName'],
       // Note: cleaner function will be resolved from registry using cleanerName
     );
   }
 
-  /// Converts the Parser instance to a JSON map.
-  Map<String, dynamic> toJson() {
+  /// Converts the Parser instance to Map.
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'parent': parent,
@@ -88,9 +77,19 @@ class Parser {
       'selector': selector,
       'isPrivate': isPrivate,
       'multiple': multiple,
-      'optional': optional?.toJson(),
+      'optional': optional?.toMap(),
       'cleanerName': cleanerName,
       // Note: cleaner function is serialized via cleanerName reference
     };
+  }
+
+  /// Creates a Parser instance from a JSON string.
+  factory Parser.fromJson(String json) {
+    return Parser.fromMap(jsonDecode(json));
+  }
+
+  /// Converts the Parser instance to a JSON string.
+  String toJson() {
+    return jsonEncode(toMap());
   }
 }

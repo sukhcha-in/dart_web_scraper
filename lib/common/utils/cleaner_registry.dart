@@ -1,5 +1,7 @@
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
+typedef CleanerFunction<T> = T Function(Data data, bool debug);
+
 /// Registry for cleaner functions that can be referenced by name
 class CleanerRegistry {
   static final Map<String, CleanerFunction> _cleaners = {};
@@ -10,7 +12,10 @@ class CleanerRegistry {
   }
 
   /// Get a cleaner function by name
-  static CleanerFunction? get(String name) {
+  static CleanerFunction? resolve(String? name) {
+    if (name == null || !has(name)) {
+      return null;
+    }
     return _cleaners[name];
   }
 

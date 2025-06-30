@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
 /// Config for a domain
@@ -32,32 +34,32 @@ class Config {
     required this.urlTargets,
   });
 
-  /// Creates a Config instance from a JSON map.
-  factory Config.fromJson(Map<String, dynamic> json) {
+  /// Creates a Config instance from Map.
+  factory Config.fromMap(Map<String, dynamic> map) {
     return Config(
-      forceFetch: json['forceFetch'] ?? false,
-      userAgent: json['userAgent'] != null
+      forceFetch: map['forceFetch'] ?? false,
+      userAgent: map['userAgent'] != null
           ? UserAgentDevice.values.firstWhere(
-              (e) => e.toString() == 'UserAgentDevice.${json['userAgent']}',
+              (e) => e.toString() == 'UserAgentDevice.${map['userAgent']}',
               orElse: () => UserAgentDevice.mobile,
             )
           : UserAgentDevice.mobile,
-      usePassedHtml: json['usePassedHtml'] ?? true,
-      usePassedUserAgent: json['usePassedUserAgent'] ?? false,
-      parsers: (json['parsers'] as Map<String, dynamic>).map(
+      usePassedHtml: map['usePassedHtml'] ?? true,
+      usePassedUserAgent: map['usePassedUserAgent'] ?? false,
+      parsers: (map['parsers'] as Map<String, dynamic>).map(
         (key, value) => MapEntry(
           key,
-          (value as List).map((p) => Parser.fromJson(p)).toList(),
+          (value as List).map((p) => Parser.fromMap(p)).toList(),
         ),
       ),
-      urlTargets: (json['urlTargets'] as List)
-          .map((target) => UrlTarget.fromJson(target))
+      urlTargets: (map['urlTargets'] as List)
+          .map((target) => UrlTarget.fromMap(target))
           .toList(),
     );
   }
 
-  /// Converts the Config instance to a JSON map.
-  Map<String, dynamic> toJson() {
+  /// Converts the Config instance to Map.
+  Map<String, dynamic> toMap() {
     return {
       'forceFetch': forceFetch,
       'userAgent': userAgent.toString().split('.').last,
@@ -66,10 +68,20 @@ class Config {
       'parsers': parsers.map(
         (key, value) => MapEntry(
           key,
-          value.map((parser) => parser.toJson()).toList(),
+          value.map((parser) => parser.toMap()).toList(),
         ),
       ),
-      'urlTargets': urlTargets.map((target) => target.toJson()).toList(),
+      'urlTargets': urlTargets.map((target) => target.toMap()).toList(),
     };
+  }
+
+  /// Creates a Config instance from a JSON string.
+  factory Config.fromJson(String json) {
+    return Config.fromMap(jsonDecode(json));
+  }
+
+  /// Converts the Config instance to a JSON string.
+  String toJson() {
+    return jsonEncode(toMap());
   }
 }
