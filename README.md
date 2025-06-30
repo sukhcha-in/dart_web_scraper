@@ -381,12 +381,9 @@ Parser(
 )
 ```
 
-```dart
-
 ## Credits
 
 [json_path](https://pub.dev/packages/json_path) - JSON path selector\
 [json5](https://pub.dev/packages/json5) - JSON5 syntax decoder
 
 <img src="https://profile-counter.deno.dev/dart_web_scraper/count.svg" alt="Visitor's Count" />
-```
