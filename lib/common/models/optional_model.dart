@@ -478,9 +478,12 @@ class Optional {
   /// Transformation: nth
   Object? _nth(Object data, bool debug) {
     if (nth == null || data is! List) return null;
-    if (nth == -1) return data.isNotEmpty ? data.last : null;
-    if (nth! < 0 || nth! >= data.length) return null;
-    return data[nth!];
+
+    int index = nth!;
+    int len = data.length;
+    index = index < 0 ? len + index : index;
+
+    return (index >= 0 && index < len) ? data[index] : null;
   }
 
   /// Transformation: splitBy
