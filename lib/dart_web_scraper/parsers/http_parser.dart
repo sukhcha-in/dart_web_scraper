@@ -20,27 +20,29 @@ Future<Data?> httpParser({
   Object? payLoad;
   HttpPayload payloadType = HttpPayload.string;
   Map<String, String> headers = {};
-  //Set from optional
-  if (parser.optional != null) {
-    if (parser.optional!.url != null) {
-      url = parser.optional!.url!;
+
+  //Set from parserOptions
+  if (parser.parserOptions?.http != null) {
+    if (parser.parserOptions!.http!.url != null) {
+      url = parser.parserOptions!.http!.url!;
     } else {
       url = parentData.url.toString();
     }
-    if (parser.optional!.method != null) {
-      method = parser.optional!.method!;
+    if (parser.parserOptions!.http!.method != null) {
+      method = parser.parserOptions!.http!.method!;
     }
 
-    //Set optional headers
-    if (parser.optional!.headers != null) {
-      parser.optional!.headers!.forEach((k, v) {
+    //Set parserOptions headers
+    if (parser.parserOptions!.http!.headers != null) {
+      parser.parserOptions!.http!.headers!.forEach((k, v) {
         headers[k.toString()] = v.toString();
       });
     }
 
     if (!headers.containsKey("User-Agent") &&
-        parser.optional!.userAgent != null) {
-      headers['User-Agent'] = randomUserAgent(parser.optional!.userAgent!);
+        parser.parserOptions!.http!.userAgent != null) {
+      headers['User-Agent'] =
+          randomUserAgent(parser.parserOptions!.http!.userAgent!);
     }
 
     //Inject data to headers
@@ -52,7 +54,7 @@ Future<Data?> httpParser({
       headers[key] = value.toString();
     });
 
-    //Set optional cookies
+    //Set parserOptions cookies
     if (cookies != null) {
       headers['Cookie'] = mapToCookie(cookies);
     }
@@ -61,13 +63,13 @@ Future<Data?> httpParser({
     printLog("HTTP Parser Cookies: $cookies", debug, color: LogColor.magenta);
 
     //Set default payloadType
-    if (parser.optional!.payloadType != null) {
-      payloadType = parser.optional!.payloadType!;
+    if (parser.parserOptions!.http!.payloadType != null) {
+      payloadType = parser.parserOptions!.http!.payloadType!;
     }
 
     //Inject data to payLoad
-    if (parser.optional!.payLoad != null) {
-      payLoad = parser.optional!.payLoad!;
+    if (parser.parserOptions!.http!.payload != null) {
+      payLoad = parser.parserOptions!.http!.payload!;
       if (payloadType == HttpPayload.json) {
         payLoad = jsonEncode(payLoad);
       } else {
@@ -90,13 +92,15 @@ Future<Data?> httpParser({
 
   //Declare empty result
   Object? result;
+  final useProxy = parser.parserOptions?.http?.useProxy ?? false;
+  final cacheResponse = parser.parserOptions?.http?.dumpResponse ?? false;
   if (method == HttpMethod.get) {
     result = await getRequest(
       Uri.parse(url),
       headers: headers,
       debug: debug,
-      proxyAPIConfig: parser.optional!.usePassedProxy ? proxyAPIConfig : null,
-      cacheResponse: parser.optional!.cacheResponse,
+      proxyAPIConfig: useProxy ? proxyAPIConfig : null,
+      cacheResponse: cacheResponse,
     );
   } else if (method == HttpMethod.post) {
     result = await postRequest(
@@ -104,7 +108,7 @@ Future<Data?> httpParser({
       headers: headers,
       body: payLoad,
       debug: debug,
-      proxyAPIConfig: parser.optional!.usePassedProxy ? proxyAPIConfig : null,
+      proxyAPIConfig: useProxy ? proxyAPIConfig : null,
     );
   } else {
     printLog("HTTP Parser: Invalid method!", debug, color: LogColor.red);
@@ -113,9 +117,9 @@ Future<Data?> httpParser({
 
   //If result is there
   if (result != null && result.toString().trim() != "") {
-    if (parser.optional != null && parser.optional!.responseType != null) {
+    if (parser.parserOptions!.http!.responseType != null) {
       try {
-        switch (parser.optional!.responseType!) {
+        switch (parser.parserOptions!.http!.responseType!) {
           case HttpResponseType.json:
             return Data(parentData.url, jsonDecode(result.toString().trim()));
           case HttpResponseType.text:

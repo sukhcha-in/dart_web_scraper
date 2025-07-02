@@ -17,10 +17,10 @@ Data? urlParamParser({
   try {
     Uri uri = Uri.parse(document);
     String selector;
-    if (parser.selector.first.contains("<slot>")) {
-      selector = inject("slot", allData, parser.selector.first);
+    if (parser.selectors.first.contains("<slot>")) {
+      selector = inject("slot", allData, parser.selectors.first);
     } else {
-      selector = parser.selector.first;
+      selector = parser.selectors.first;
     }
     if (uri.queryParameters.containsKey(selector)) {
       return Data(parentData.url, uri.queryParameters[selector]!);

@@ -26,7 +26,7 @@ Data? attributeParser({
     throw UnimplementedError("Multiple elements not supported");
   }
 
-  for (final sel in parser.selector) {
+  for (final sel in parser.selectors) {
     printLog("Attribute Selector: $sel", debug, color: LogColor.cyan);
     String selector;
     if (sel.contains("<slot>")) {

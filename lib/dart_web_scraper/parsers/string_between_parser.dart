@@ -32,8 +32,8 @@ Data? stringBetweenParser({
   String source = document.outerHtml;
 
   String tmp;
-  String start = parser.optional?.start ?? "";
-  String end = parser.optional?.end ?? "";
+  String start = parser.parserOptions?.stringBetween?.start ?? "";
+  String end = parser.parserOptions?.stringBetween?.end ?? "";
   final startIndex = source.indexOf(start);
   if (startIndex == -1) {
     printLog(

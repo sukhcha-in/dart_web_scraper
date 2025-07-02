@@ -13,7 +13,16 @@ Data? jsonTableParser({
   Object? json = getJsonObject(parentData, debug);
   json ??= getStringObject(parentData);
 
-  // try {
+  if (parser.parserOptions?.table?.keys == null ||
+      parser.parserOptions?.table?.values == null) {
+    printLog(
+      "JSON Table Parser: Keys or values are not set!",
+      debug,
+      color: LogColor.red,
+    );
+    return null;
+  }
+
   Map<String, Object> result = {};
   Data? parsed = jsonParser(
     parser: parser,
@@ -26,9 +35,9 @@ Data? jsonTableParser({
       Data? keyData = jsonParser(
         parser: Parser(
           id: "key",
-          parent: ["parent"],
+          parents: ["parent"],
           type: ParserType.json,
-          selector: [parser.optional!.keys!],
+          selectors: [parser.parserOptions!.table!.keys],
         ),
         parentData: Data(parentData.url, p),
         allData: allData,
@@ -37,9 +46,9 @@ Data? jsonTableParser({
       Data? valData = jsonParser(
         parser: Parser(
           id: "val",
-          parent: ["parent"],
+          parents: ["parent"],
           type: ParserType.json,
-          selector: [parser.optional!.values!],
+          selectors: [parser.parserOptions!.table!.values!],
         ),
         parentData: Data(parentData.url, p),
         allData: allData,
@@ -68,8 +77,4 @@ Data? jsonTableParser({
     color: LogColor.orange,
   );
   return null;
-  // } catch (e) {
-  //   printLog("Error in json_table_parser: $e", true, color: LogColor.red);
-  //   return null;
-  // }
 }

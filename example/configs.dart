@@ -17,59 +17,59 @@ List<Config> quotesConfig = [
       "main": [
         Parser(
           id: "quotes",
-          parent: ["_root"],
+          parents: ["_root"],
 
           /// _root is default parent
           type: ParserType.element,
-          selector: [
+          selectors: [
             ".quote",
           ],
           multiple: true,
         ),
         Parser(
           id: "quote",
-          parent: ["quotes"],
+          parents: ["quotes"],
           type: ParserType.text,
-          selector: [
+          selectors: [
             "span.text",
           ],
         ),
         Parser(
           id: "author",
-          parent: ["quotes"],
+          parents: ["quotes"],
           type: ParserType.text,
-          selector: [
+          selectors: [
             "small.author",
           ],
         ),
         Parser(
           id: "tags",
-          parent: ["quotes"],
+          parents: ["quotes"],
           type: ParserType.text,
-          selector: [
+          selectors: [
             "a.tag",
           ],
           multiple: true,
         ),
         Parser(
           id: "top10tags",
-          parent: ["_root"],
+          parents: ["_root"],
           type: ParserType.text,
-          selector: [
+          selectors: [
             "span.tag-item",
           ],
           multiple: true,
         ),
         Parser(
           id: "nextPage",
-          parent: ["_root"],
+          parents: ["_root"],
           type: ParserType.url,
-          selector: [
+          selectors: [
             "li.next a",
           ],
 
           /// Simple functions can be performed using optional parameters
-          optional: Optional.any(
+          transformationOptions: TransformationOptions(
             prepend: "https://quotes.toscrape.com",
           ),
 

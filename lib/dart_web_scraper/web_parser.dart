@@ -72,7 +72,7 @@ class WebParser {
   Map<String, List<Parser>> _buildParentToChildrenMap(List<Parser> allParsers) {
     final Map<String, List<Parser>> map = {};
     for (final parser in allParsers) {
-      for (final parent in parser.parent) {
+      for (final parent in parser.parents) {
         map.putIfAbsent(parent, () => []).add(parser);
       }
     }
@@ -226,8 +226,8 @@ class WebParser {
       Object? data = parsed.obj;
 
       // Apply optional transformations
-      if (parser.optional != null) {
-        data = parser.optional!.applyTransformations(data, debug);
+      if (parser.transformationOptions != null) {
+        data = parser.transformationOptions!.applyTransformations(data, debug);
       }
       if (data == null) {
         return null;

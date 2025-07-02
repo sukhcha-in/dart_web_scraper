@@ -26,7 +26,7 @@ Data? urlParser({
   } else {
     throw UnimplementedError("Multiple elements not supported");
   }
-  for (final sel in parser.selector) {
+  for (final sel in parser.selectors) {
     printLog("URL Parser Selector: $sel", debug, color: LogColor.cyan);
     String selector;
     if (sel.contains("<slot>")) {

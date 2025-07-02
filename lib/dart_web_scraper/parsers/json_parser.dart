@@ -11,7 +11,7 @@ Data? jsonParser({
 }) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog("ID: ${parser.id} Parser: JSON", debug, color: LogColor.cyan);
-  if (parser.selector.isEmpty) {
+  if (parser.selectors.isEmpty) {
     printLog("No Selector! Decoding JSON...", debug, color: LogColor.cyan);
     Object? json = getJsonObject(parentData, debug);
     if (json != null) {
@@ -32,7 +32,7 @@ Data? jsonParser({
     return null;
   }
 
-  for (final s in parser.selector) {
+  for (final s in parser.selectors) {
     printLog("JSON Selector: $s", debug, color: LogColor.cyan);
     String selector;
     if (s.contains("<slot>")) {

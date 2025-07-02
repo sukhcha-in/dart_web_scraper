@@ -27,28 +27,29 @@ Data? siblingParser({
   }
 
   String selector;
-  if (parser.selector.first.contains("<slot>")) {
-    selector = inject("slot", allData, parser.selector.first);
+  if (parser.selectors.first.contains("<slot>")) {
+    selector = inject("slot", allData, parser.selectors.first);
     printLog(
       "Sibling Selector Modified: $selector",
       debug,
       color: LogColor.green,
     );
   } else {
-    selector = parser.selector.first;
+    selector = parser.selectors.first;
   }
   List<Element> elements = document.querySelectorAll(selector);
   if (selector.isNotEmpty) {
     for (final element in elements) {
-      if (parser.optional != null) {
+      if (parser.parserOptions?.sibling != null) {
         Element? sib;
-        if (parser.optional!.siblingDirection == SiblingDirection.previous) {
+        if (parser.parserOptions!.sibling!.direction ==
+            SiblingDirection.previous) {
           sib = element.previousElementSibling;
         } else {
           sib = element.nextElementSibling;
         }
-        if (parser.optional!.where != null) {
-          List<String> where = parser.optional!.where!;
+        if (parser.parserOptions!.sibling!.where != null) {
+          List<String> where = parser.parserOptions!.sibling!.where!;
           String selectorText = element.text.toString().trim();
           for (final w in where) {
             if (selectorText.contains(w)) {

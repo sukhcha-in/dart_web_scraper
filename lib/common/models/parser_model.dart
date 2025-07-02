@@ -8,7 +8,7 @@ class Parser {
   String id;
 
   /// List of parent IDs to tell parser when to trigger, base value is _root.
-  List<String> parent;
+  List<String> parents;
 
   /// Keep result of this parser private, just for internal use.
   bool isPrivate = true;
@@ -17,13 +17,16 @@ class Parser {
   ParserType type;
 
   /// CSS Selector for this parser.
-  List<String> selector;
+  List<String> selectors;
 
   /// If result can contain multiple results as a List. Default is false.
   bool multiple = false;
 
-  /// Optional parameters.
-  Optional? optional;
+  /// Parser options.
+  ParserOptions? parserOptions;
+
+  /// Transformation options.
+  TransformationOptions? transformationOptions;
 
   //Cleaner function called once data is scraped
   CleanerFunction? cleaner;
@@ -33,12 +36,13 @@ class Parser {
 
   Parser({
     required this.id,
-    required this.parent,
+    required this.parents,
     required this.type,
-    this.selector = const [],
+    this.selectors = const [],
     this.isPrivate = false,
     this.multiple = false,
-    this.optional,
+    this.parserOptions,
+    this.transformationOptions,
     this.cleaner,
     this.cleanerName,
   }) {
@@ -52,17 +56,21 @@ class Parser {
   factory Parser.fromMap(Map<String, dynamic> map) {
     return Parser(
       id: map['id'],
-      parent: List<String>.from(map['parent']),
+      parents: List<String>.from(map['parents']),
       type: ParserType.values.firstWhere(
         (e) => e.toString() == 'ParserType.${map['type']}',
       ),
-      selector: map['selector'] != null
-          ? List<String>.from(map['selector'])
+      selectors: map['selectors'] != null
+          ? List<String>.from(map['selectors'])
           : const [],
       isPrivate: map['isPrivate'] ?? false,
       multiple: map['multiple'] ?? false,
-      optional:
-          map['optional'] != null ? Optional.fromMap(map['optional']) : null,
+      parserOptions: map['parserOptions'] != null
+          ? ParserOptions.fromMap(map['parserOptions'])
+          : null,
+      transformationOptions: map['transformationOptions'] != null
+          ? TransformationOptions.fromMap(map['transformationOptions'])
+          : null,
       cleanerName: map['cleanerName'],
       // Note: cleaner function will be resolved from registry using cleanerName
     );
@@ -72,12 +80,13 @@ class Parser {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'parent': parent,
+      'parents': parents,
       'type': type.toString().split('.').last,
-      'selector': selector,
+      'selectors': selectors,
       'isPrivate': isPrivate,
       'multiple': multiple,
-      'optional': optional?.toMap(),
+      'parserOptions': parserOptions?.toMap(),
+      'transformationOptions': transformationOptions?.toMap(),
       'cleanerName': cleanerName,
       // Note: cleaner function is serialized via cleanerName reference
     };

@@ -28,7 +28,7 @@ Data? textParser({
     throw UnimplementedError("Multiple elements not supported");
   }
 
-  for (final sel in parser.selector) {
+  for (final sel in parser.selectors) {
     if (sel == '_self') {
       return Data(parentData.url, document.text);
     }

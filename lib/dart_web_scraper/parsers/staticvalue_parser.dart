@@ -11,10 +11,11 @@ Data? staticValueParser({
     debug,
     color: LogColor.cyan,
   );
-  if (parser.optional?.strVal != null) {
-    return Data(parentData.url, parser.optional!.strVal!);
-  } else if (parser.optional?.mapVal != null) {
-    return Data(parentData.url, parser.optional!.mapVal!);
+  if (parser.parserOptions?.staticValue?.stringValue != null) {
+    return Data(
+        parentData.url, parser.parserOptions!.staticValue!.stringValue!);
+  } else if (parser.parserOptions?.staticValue?.mapValue != null) {
+    return Data(parentData.url, parser.parserOptions!.staticValue!.mapValue!);
   } else {
     printLog(
       "Static Value Parser: No data found!",

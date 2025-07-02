@@ -26,7 +26,7 @@ Data? tableParser({
     throw UnimplementedError("Multiple elements not supported");
   }
 
-  for (final sel in parser.selector) {
+  for (final sel in parser.selectors) {
     printLog("Table Selector: $sel", debug, color: LogColor.cyan);
     String selector;
     if (sel.contains("<slot>")) {
@@ -46,12 +46,15 @@ Data? tableParser({
     Map<String, String> result = {};
     if (elements.isNotEmpty) {
       for (final element in elements) {
-        if (parser.optional != null && parser.optional!.keys != null) {
-          Element? keySelector = element.querySelector(parser.optional!.keys!);
+        if (parser.parserOptions?.table?.keys != null) {
+          Element? keySelector =
+              element.querySelector(parser.parserOptions!.table!.keys);
           String? key = keySelector?.text;
           String? value;
-          if (parser.optional!.values != null) {
-            value = element.querySelector(parser.optional!.values!)?.text;
+          if (parser.parserOptions?.table?.values != null) {
+            value = element
+                .querySelector(parser.parserOptions!.table!.values!)
+                ?.text;
           } else {
             value = keySelector?.nextElementSibling?.text;
           }

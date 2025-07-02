@@ -27,7 +27,7 @@ Data? imageParser({
     throw UnimplementedError("Multiple elements not supported");
   }
 
-  for (final sel in parser.selector) {
+  for (final sel in parser.selectors) {
     printLog("Image Selector: $sel", debug, color: LogColor.cyan);
     String selector;
     if (sel.contains("<slot>")) {
