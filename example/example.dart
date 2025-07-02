@@ -9,9 +9,7 @@ void main() async {
       parsers: [
         Parser(
           id: "quotes",
-          parents: ["_root"],
-
-          /// _root is default parent
+          parents: ["_root"], // _root is default parent
           type: ParserType.element,
           selectors: [
             ".quote",
