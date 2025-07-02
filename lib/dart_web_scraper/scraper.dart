@@ -14,8 +14,7 @@ class Scraper {
     Map<String, String>? cookies,
     String? userAgent,
     Map<String, Object>? headers,
-    Uri? proxyAPI,
-    String? proxyUrlParam,
+    ProxyAPIConfig? proxyAPIConfig,
     bool debug = false,
   }) async {
     /// Fetch target
@@ -98,8 +97,7 @@ class Scraper {
           url,
           headers: headersMerged,
           debug: debug,
-          proxyAPI: proxyAPI,
-          proxyUrlParam: proxyUrlParam,
+          proxyAPIConfig: proxyAPIConfig,
         );
       } else if (config.usePassedHtml && html != null && html.hasContent()) {
         printLog(
@@ -114,8 +112,7 @@ class Scraper {
           url,
           headers: headersMerged,
           debug: debug,
-          proxyAPI: proxyAPI,
-          proxyUrlParam: proxyUrlParam,
+          proxyAPIConfig: proxyAPIConfig,
         );
       }
       if (dom.obj != "") {

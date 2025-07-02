@@ -13,6 +13,7 @@ export 'common/models/optional_model.dart';
 export 'common/models/parser_model.dart';
 export 'common/models/urltarget_model.dart';
 export 'common/models/data_model.dart';
+export 'common/models/proxy_api_model.dart';
 
 /// Enums
 export 'common/enums.dart';

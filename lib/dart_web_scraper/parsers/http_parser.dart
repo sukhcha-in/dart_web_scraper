@@ -9,8 +9,7 @@ Future<Data?> httpParser({
   required Parser parser,
   required Data parentData,
   required Map<String, Object> allData,
-  required Uri? proxyAPI,
-  required String? proxyUrlParam,
+  required ProxyAPIConfig? proxyAPIConfig,
   required Map<String, String>? cookies,
   required bool debug,
 }) async {
@@ -96,8 +95,7 @@ Future<Data?> httpParser({
       Uri.parse(url),
       headers: headers,
       debug: debug,
-      proxyAPI: parser.optional!.usePassedProxy ? proxyAPI : null,
-      proxyUrlParam: parser.optional!.usePassedProxy ? proxyUrlParam : null,
+      proxyAPIConfig: parser.optional!.usePassedProxy ? proxyAPIConfig : null,
       cacheResponse: parser.optional!.cacheResponse,
     );
   } else if (method == HttpMethod.post) {
@@ -106,8 +104,7 @@ Future<Data?> httpParser({
       headers: headers,
       body: payLoad,
       debug: debug,
-      proxyAPI: parser.optional!.usePassedProxy ? proxyAPI : null,
-      proxyUrlParam: parser.optional!.usePassedProxy ? proxyUrlParam : null,
+      proxyAPIConfig: parser.optional!.usePassedProxy ? proxyAPIConfig : null,
     );
   } else {
     printLog("HTTP Parser: Invalid method!", debug, color: LogColor.red);

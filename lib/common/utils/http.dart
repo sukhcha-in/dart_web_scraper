@@ -7,17 +7,14 @@ Future<String?> getRequest(
   Uri url, {
   Map<String, String> headers = const {},
   bool debug = false,
-  Uri? proxyAPI,
+  ProxyAPIConfig? proxyAPIConfig,
   String? proxyUrlParam,
   bool cacheResponse = false,
 }) async {
   printLog("HTTP GET: $url", debug, color: LogColor.yellow);
-  if (proxyAPI != null) {
+  if (proxyAPIConfig != null) {
     printLog("Prepending proxy URL...", debug, color: LogColor.yellow);
-    url = proxyAPI.replace(queryParameters: {
-      ...proxyAPI.queryParameters,
-      proxyUrlParam ?? "url": url.toString(),
-    });
+    url = proxyAPIConfig.generateUrl(url);
   }
   printLog("GET URL: $url", debug, color: LogColor.yellow);
   printLog("GET URL HEADERS: $headers", debug, color: LogColor.yellow);
@@ -62,16 +59,13 @@ Future<String?> postRequest(
   Object? body,
   Map<String, String> headers = const {},
   bool debug = false,
-  Uri? proxyAPI,
+  ProxyAPIConfig? proxyAPIConfig,
   String? proxyUrlParam,
 }) async {
   printLog("HTTP POST URL: $url", debug, color: LogColor.magenta);
-  if (proxyAPI != null) {
+  if (proxyAPIConfig != null) {
     printLog("Prepending proxy URL...", debug, color: LogColor.yellow);
-    url = proxyAPI.replace(queryParameters: {
-      ...proxyAPI.queryParameters,
-      proxyUrlParam ?? "url": url.toString(),
-    });
+    url = proxyAPIConfig.generateUrl(url);
   }
 
   printLog("HTTP Parser Headers: $headers", debug, color: LogColor.magenta);
