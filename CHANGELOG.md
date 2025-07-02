@@ -1,3 +1,10 @@
+## 0.2.0
+
+- Simplify the codebase.
+- Enhance the documentation.
+- `ScraperConfig` replaces `Config` and `UrlTarget`
+- `ParserOptions` and `TransformationOptions` replaces `Optional` for better readability.
+
 ## 0.1.6
 
 - README fix

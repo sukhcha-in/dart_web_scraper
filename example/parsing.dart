@@ -8,9 +8,9 @@ void main() async {
   Uri url = Uri.parse("https://quotes.toscrape.com");
 
   /// Fetch config
-  Config? config = getConfig(
-    url,
-    configs: configMap,
+  ScraperConfig? config = findScraperConfig(
+    url: url,
+    scraperConfigMap: configMap,
   );
   if (config == null) {
     print("Unsupported URL");
@@ -26,7 +26,7 @@ void main() async {
       url,
       parse(scrapedData),
     ),
-    config: config,
+    scraperConfig: config,
     debug: true,
   );
 

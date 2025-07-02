@@ -5,46 +5,55 @@ import 'package:dart_web_scraper/common/utils/random.dart';
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 import 'package:html/parser.dart';
 
+/// Makes HTTP requests and processes responses
+/// Returns Data object with response content or null if failed
 Future<Data?> httpParser({
   required Parser parser,
   required Data parentData,
   required Map<String, Object> allData,
-  required Uri? proxyAPI,
-  required String? proxyUrlParam,
+  required ProxyAPIConfig? proxyAPIConfig,
   required Map<String, String>? cookies,
   required bool debug,
 }) async {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog("ID: ${parser.id} Parser: HTTP", debug, color: LogColor.cyan);
+
+  // Initialize request parameters
   String url;
   HttpMethod method = HttpMethod.get;
   Object? payLoad;
   HttpPayload payloadType = HttpPayload.string;
   Map<String, String> headers = {};
-  //Set from optional
-  if (parser.optional != null) {
-    if (parser.optional!.url != null) {
-      url = parser.optional!.url!;
+
+  // Configure request from parser options
+  if (parser.parserOptions?.http != null) {
+    // Set URL (use parent URL if not specified)
+    if (parser.parserOptions!.http!.url != null) {
+      url = parser.parserOptions!.http!.url!;
     } else {
       url = parentData.url.toString();
     }
-    if (parser.optional!.method != null) {
-      method = parser.optional!.method!;
+
+    // Set HTTP method
+    if (parser.parserOptions!.http!.method != null) {
+      method = parser.parserOptions!.http!.method!;
     }
 
-    //Set optional headers
-    if (parser.optional!.headers != null) {
-      parser.optional!.headers!.forEach((k, v) {
+    // Set headers from parser options
+    if (parser.parserOptions!.http!.headers != null) {
+      parser.parserOptions!.http!.headers!.forEach((k, v) {
         headers[k.toString()] = v.toString();
       });
     }
 
+    // Set random user agent if specified
     if (!headers.containsKey("User-Agent") &&
-        parser.optional!.userAgent != null) {
-      headers['User-Agent'] = randomUserAgent(parser.optional!.userAgent!);
+        parser.parserOptions!.http!.userAgent != null) {
+      headers['User-Agent'] =
+          randomUserAgent(parser.parserOptions!.http!.userAgent!);
     }
 
-    //Inject data to headers
+    // Inject dynamic data into headers
     String encodedHeaders = jsonEncode(headers);
     encodedHeaders = inject("slot", allData, encodedHeaders);
     Object decodedHeaders = jsonDecode(encodedHeaders);
@@ -53,7 +62,7 @@ Future<Data?> httpParser({
       headers[key] = value.toString();
     });
 
-    //Set optional cookies
+    // Set cookies if provided
     if (cookies != null) {
       headers['Cookie'] = mapToCookie(cookies);
     }
@@ -61,14 +70,14 @@ Future<Data?> httpParser({
     printLog("HTTP Parser Method: $method", debug, color: LogColor.magenta);
     printLog("HTTP Parser Cookies: $cookies", debug, color: LogColor.magenta);
 
-    //Set default payloadType
-    if (parser.optional!.payloadType != null) {
-      payloadType = parser.optional!.payloadType!;
+    // Set payload type and prepare payload
+    if (parser.parserOptions!.http!.payloadType != null) {
+      payloadType = parser.parserOptions!.http!.payloadType!;
     }
 
-    //Inject data to payLoad
-    if (parser.optional!.payLoad != null) {
-      payLoad = parser.optional!.payLoad!;
+    // Inject dynamic data into payload
+    if (parser.parserOptions!.http!.payload != null) {
+      payLoad = parser.parserOptions!.http!.payload!;
       if (payloadType == HttpPayload.json) {
         payLoad = jsonEncode(payLoad);
       } else {
@@ -80,7 +89,7 @@ Future<Data?> httpParser({
     url = parentData.url.toString();
   }
 
-  //If url contains slot
+  // Inject dynamic data into URL
   url = inject("slot", allData, url);
 
   printLog(
@@ -89,16 +98,17 @@ Future<Data?> httpParser({
     color: LogColor.magenta,
   );
 
-  //Declare empty result
+  // Make HTTP request based on method
   Object? result;
+  final useProxy = parser.parserOptions?.http?.useProxy ?? false;
+  final dumpResponse = parser.parserOptions?.http?.dumpResponse ?? false;
   if (method == HttpMethod.get) {
     result = await getRequest(
       Uri.parse(url),
       headers: headers,
       debug: debug,
-      proxyAPI: parser.optional!.usePassedProxy ? proxyAPI : null,
-      proxyUrlParam: parser.optional!.usePassedProxy ? proxyUrlParam : null,
-      cacheResponse: parser.optional!.cacheResponse,
+      proxyAPIConfig: useProxy ? proxyAPIConfig : null,
+      dumpResponse: dumpResponse,
     );
   } else if (method == HttpMethod.post) {
     result = await postRequest(
@@ -106,19 +116,18 @@ Future<Data?> httpParser({
       headers: headers,
       body: payLoad,
       debug: debug,
-      proxyAPI: parser.optional!.usePassedProxy ? proxyAPI : null,
-      proxyUrlParam: parser.optional!.usePassedProxy ? proxyUrlParam : null,
+      proxyAPIConfig: useProxy ? proxyAPIConfig : null,
     );
   } else {
     printLog("HTTP Parser: Invalid method!", debug, color: LogColor.red);
     return null;
   }
 
-  //If result is there
+  // Process response based on response type
   if (result != null && result.toString().trim() != "") {
-    if (parser.optional != null && parser.optional!.responseType != null) {
+    if (parser.parserOptions!.http!.responseType != null) {
       try {
-        switch (parser.optional!.responseType!) {
+        switch (parser.parserOptions!.http!.responseType!) {
           case HttpResponseType.json:
             return Data(parentData.url, jsonDecode(result.toString().trim()));
           case HttpResponseType.text:

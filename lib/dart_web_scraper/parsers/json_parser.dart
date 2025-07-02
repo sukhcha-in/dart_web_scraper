@@ -3,6 +3,8 @@ import 'package:dart_web_scraper/dart_web_scraper.dart';
 import 'package:json_path/json_path.dart';
 import 'package:json_path/fun_extra.dart';
 
+/// Extracts data from JSON using JSONPath selectors
+/// Returns Data object with extracted JSON data or null if not found
 Data? jsonParser({
   required Parser parser,
   required Data parentData,
@@ -11,7 +13,9 @@ Data? jsonParser({
 }) {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog("ID: ${parser.id} Parser: JSON", debug, color: LogColor.cyan);
-  if (parser.selector.isEmpty) {
+
+  // Handle case with no selectors - return decoded JSON
+  if (parser.selectors.isEmpty) {
     printLog("No Selector! Decoding JSON...", debug, color: LogColor.cyan);
     Object? json = getJsonObject(parentData, debug);
     if (json != null) {
@@ -22,6 +26,7 @@ Data? jsonParser({
     return null;
   }
 
+  // Get JSON data from parent
   Object? json = getJsonObject(parentData, debug);
   if (json == null) {
     printLog(
@@ -32,9 +37,12 @@ Data? jsonParser({
     return null;
   }
 
-  for (final s in parser.selector) {
+  // Try each JSONPath selector until data is found
+  for (final s in parser.selectors) {
     printLog("JSON Selector: $s", debug, color: LogColor.cyan);
     String selector;
+
+    // Handle dynamic selectors with slot injection
     if (s.contains("<slot>")) {
       selector = inject("slot", allData, s);
       printLog(
@@ -46,6 +54,7 @@ Data? jsonParser({
       selector = s;
     }
 
+    // Parse JSONPath with custom functions if needed
     JsonPath? jsonPath;
     if (selector.contains("key(@)")) {
       JsonPathParser parser = JsonPathParser(functions: [const Key()]);
@@ -54,8 +63,10 @@ Data? jsonParser({
 
     jsonPath ??= JsonPath(selector);
 
+    // Extract data using JSONPath
     Iterable<Object?> data = jsonPath.readValues(json);
     if (parser.multiple) {
+      // Return all matching values
       if (data.isNotEmpty) {
         if (data.first is List) {
           return Data(parentData.url, data.first as List);
@@ -64,6 +75,7 @@ Data? jsonParser({
         }
       }
     } else {
+      // Return first matching value
       if (data.isNotEmpty) {
         Object? first = data.first;
         if (first != null) {
