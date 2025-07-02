@@ -9,7 +9,7 @@ import 'package:html/parser.dart';
 class Scraper {
   Future<Data> scrape({
     required Uri url,
-    required Config config,
+    required ScraperConfig scraperConfig,
     Document? html,
     Map<String, String>? cookies,
     String? userAgent,
@@ -17,15 +17,6 @@ class Scraper {
     ProxyAPIConfig? proxyAPIConfig,
     bool debug = false,
   }) async {
-    /// Fetch target
-    UrlTarget? target = fetchTarget(config.urlTargets, url);
-    if (target == null) {
-      printLog('Scraper: Target not found!', debug, color: LogColor.red);
-      throw WebScraperError('Unsupported URL');
-    } else {
-      printLog('Scraper: Target found!', debug, color: LogColor.green);
-    }
-
     /// Build headers
     printLog('Scraper: Building headers...', debug, color: LogColor.blue);
     Map<String, String> headersMerged = {
@@ -33,8 +24,8 @@ class Scraper {
     };
 
     /// User-Agent
-    /// If `userAgent` is defined and config allows passing custom userAgent
-    if (userAgent != null && config.usePassedUserAgent) {
+    /// If `userAgent` is defined
+    if (userAgent != null) {
       printLog(
         'Scraper: Using user-passed User-Agent...',
         debug,
@@ -50,7 +41,7 @@ class Scraper {
         debug,
         color: LogColor.blue,
       );
-      headersMerged['User-Agent'] = randomUserAgent(config.userAgent);
+      headersMerged['User-Agent'] = randomUserAgent(scraperConfig.userAgent);
     }
 
     /// Cookie
@@ -75,7 +66,7 @@ class Scraper {
 
     /// Clean the URL based on cleaner defined in config
     printLog('Scraper: Cleaning URL...', debug, color: LogColor.blue);
-    url = cleanConfigUrl(url, target.urlCleaner);
+    url = cleanScraperConfigUrl(url, scraperConfig.urlCleaner);
     printLog("Scraper: Cleaned URL :) $url", debug, color: LogColor.green);
 
     Data dom = Data(url, "");
@@ -84,10 +75,10 @@ class Scraper {
       debug,
       color: LogColor.blue,
     );
-    if (target.needsHtml) {
+    if (scraperConfig.requiresHtml) {
       printLog('Scraper: Target needs html!!!', debug, color: LogColor.blue);
       String? requestData;
-      if (config.forceFetch) {
+      if (scraperConfig.forceRefresh) {
         printLog(
           'Scraper: Forcing http request for new html!!!',
           debug,
@@ -99,7 +90,7 @@ class Scraper {
           debug: debug,
           proxyAPIConfig: proxyAPIConfig,
         );
-      } else if (config.usePassedHtml && html != null && html.hasContent()) {
+      } else if (html != null && html.hasContent()) {
         printLog(
           'Scraper: Using user-passed html :)',
           debug,

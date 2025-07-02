@@ -6,12 +6,10 @@ export 'dart_web_scraper/web_parser.dart';
 export 'dart_web_scraper/web_scraper.dart';
 
 /// Models
+export 'common/models/scraper_config_model.dart';
 export 'common/models/error_model.dart';
 export 'common/models/url_cleaner_model.dart';
-export 'common/models/config_model.dart';
-export 'common/models/optional_model.dart';
 export 'common/models/parser_model.dart';
-export 'common/models/urltarget_model.dart';
 export 'common/models/data_model.dart';
 export 'common/models/proxy_api_model.dart';
 export 'common/models/parser_options_model.dart';

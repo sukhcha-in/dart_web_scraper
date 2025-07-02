@@ -8,7 +8,7 @@ class WebParser {
   /// Entrypoint
   Future<Map<String, Object>> parse({
     required Data scrapedData,
-    required Config config,
+    required ScraperConfig scraperConfig,
     ProxyAPIConfig? proxyAPIConfig,
     Map<String, String>? cookies,
     bool debug = false,
@@ -17,19 +17,8 @@ class WebParser {
     /// Start the stopwatch
     final Stopwatch stopwatch = Stopwatch()..start();
 
-    printLog('Parser: Fetching target...', debug, color: LogColor.blue);
-
-    /// Fetch target based on URL
-    final UrlTarget? target = fetchTarget(config.urlTargets, scrapedData.url);
-    if (target == null) {
-      printLog('Parser: Target not found!', debug, color: LogColor.red);
-      throw WebScraperError('Unsupported URL');
-    } else {
-      printLog('Parser: Target found!', debug, color: LogColor.green);
-    }
-
     /// Retrieve all parsers for the target
-    final List<Parser> allParsers = config.parsers[target.name]?.toList() ?? [];
+    final List<Parser> allParsers = scraperConfig.parsers;
 
     /// Build a parent-to-children map
     final Map<String, List<Parser>> parentToChildren =

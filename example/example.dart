@@ -10,8 +10,7 @@ void main() async {
   /// Scrape website based on configMap
   Map<String, Object> result = await webScraper.scrape(
     url: Uri.parse("https://quotes.toscrape.com"),
-    configMap: configMap,
-    configIndex: 0,
+    scraperConfigMap: configMap,
     cookies: {
       "foo": "bar",
     },

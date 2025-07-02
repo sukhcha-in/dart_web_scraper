@@ -1,6 +1,3 @@
-/// Apply methods using Optional
-enum ApplyMethod { urldecode, mapToList }
-
 /// Used for Http Parser
 enum HttpResponseType { json, html, text }
 

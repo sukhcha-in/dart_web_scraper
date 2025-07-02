@@ -61,7 +61,6 @@ WebScraper webScraper = WebScraper();
 Map<String, Object> result = await webScraper.scrape(
   url: Uri.parse("https://quotes.toscrape.com"),
   configMap: configMap,
-  configIndex: 0,
   debug: true,
 );
 

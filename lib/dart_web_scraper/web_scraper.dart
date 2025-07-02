@@ -3,30 +3,20 @@ import 'package:html/dom.dart';
 
 /// Combines scraping and parsing
 class WebScraper {
-  bool isUrlSupported({
+  bool canScrape({
     required Uri url,
-    required Map<String, List<Config>> configMap,
-    int configIndex = 0,
+    required Map<String, List<ScraperConfig>> scraperConfigMap,
   }) {
-    Config? config = getConfig(
-      url,
-      configs: configMap,
-      configIndex: configIndex,
+    ScraperConfig? scraperConfig = findScraperConfig(
+      url: url,
+      scraperConfigMap: scraperConfigMap,
     );
-    UrlTarget? urlTarget;
-    if (config != null) {
-      urlTarget = fetchTarget(config.urlTargets, url);
-    }
-    if (config == null || urlTarget == null) {
-      return false;
-    }
-    return true;
+    return scraperConfig != null;
   }
 
   Future<Map<String, Object>> scrape({
     required Uri url,
-    required Map<String, List<Config>> configMap,
-    int configIndex = 0,
+    required Map<String, List<ScraperConfig>> scraperConfigMap,
     ProxyAPIConfig? proxyAPIConfig,
     bool debug = false,
     Document? html,
@@ -35,17 +25,12 @@ class WebScraper {
     String? userAgent,
     bool concurrentParsing = false,
   }) async {
-    /// Fetch config and target
-    Config? config = getConfig(
-      url,
-      configs: configMap,
-      configIndex: configIndex,
+    /// Find the appropriate scraper configuration for this URL
+    ScraperConfig? scraperConfig = findScraperConfig(
+      url: url,
+      scraperConfigMap: scraperConfigMap,
     );
-    UrlTarget? urlTarget;
-    if (config != null) {
-      urlTarget = fetchTarget(config.urlTargets, url);
-    }
-    if (config == null || urlTarget == null) {
+    if (scraperConfig == null) {
       throw WebScraperError('Unsupported URL');
     }
 
@@ -55,7 +40,7 @@ class WebScraper {
       url: url,
       html: html,
       debug: debug,
-      config: config,
+      scraperConfig: scraperConfig,
       cookies: cookies,
       headers: headers,
       userAgent: userAgent,
@@ -66,7 +51,7 @@ class WebScraper {
     WebParser webParser = WebParser();
     Map<String, Object> parsedData = await webParser.parse(
       scrapedData: scrapedData,
-      config: config,
+      scraperConfig: scraperConfig,
       proxyAPIConfig: proxyAPIConfig,
       cookies: cookies,
       debug: debug,
