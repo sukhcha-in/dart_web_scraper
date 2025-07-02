@@ -5,8 +5,41 @@ import 'package:dart_web_scraper/dart_web_scraper.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 
-/// Used for scraping HTML data from the web.
+/// Handles HTTP requests and HTML fetching for web scraping operations.
+///
+/// This class is responsible for:
+/// - Building HTTP headers with appropriate user agents and cookies
+/// - Cleaning URLs based on configuration
+/// - Fetching HTML content from web pages
+/// - Handling proxy requests when configured
+/// - Managing HTML parsing and document creation
+///
+/// The scraper can work with pre-fetched HTML or fetch it automatically
+/// based on the scraper configuration settings.
 class Scraper {
+  /// Fetches HTML content from a URL or uses provided HTML document.
+  ///
+  /// This method orchestrates the entire HTML fetching process:
+  /// 1. Builds HTTP headers with user agent, cookies, and custom headers
+  /// 2. Cleans the URL using configured URL cleaners
+  /// 3. Fetches HTML content (if required by configuration)
+  /// 4. Parses HTML into a Document object
+  ///
+  /// Parameters:
+  /// - [url]: The target URL to scrape
+  /// - [scraperConfig]: Configuration defining scraping behavior
+  /// - [html]: Pre-fetched HTML document (optional, avoids HTTP request)
+  /// - [cookies]: Custom cookies to include in HTTP requests
+  /// - [userAgent]: Custom user agent string (overrides config setting)
+  /// - [headers]: Additional HTTP headers to include
+  /// - [proxyAPIConfig]: Proxy API URL for routing requests through a proxy
+  /// - [debug]: Enable debug logging for troubleshooting
+  ///
+  /// Returns:
+  /// - [Data] object containing the URL and parsed HTML document
+  ///
+  /// Throws:
+  /// - [WebScraperError] if HTML fetching fails
   Future<Data> scrape({
     required Uri url,
     required ScraperConfig scraperConfig,
@@ -17,14 +50,13 @@ class Scraper {
     ProxyAPIConfig? proxyAPIConfig,
     bool debug = false,
   }) async {
-    /// Build headers
+    /// Build HTTP headers with appropriate defaults and custom settings
     printLog('Scraper: Building headers...', debug, color: LogColor.blue);
     Map<String, String> headersMerged = {
       "Accept-Language": "en-US,en",
     };
 
-    /// User-Agent
-    /// If `userAgent` is defined
+    /// Set User-Agent header based on configuration or custom value
     if (userAgent != null) {
       printLog(
         'Scraper: Using user-passed User-Agent...',
@@ -34,7 +66,7 @@ class Scraper {
       headersMerged['User-Agent'] = userAgent;
     }
 
-    /// If `userAgent` is not defined, let's generate one based on our config
+    /// Generate random User-Agent if not provided by user
     if (!headersMerged.containsKey("User-Agent")) {
       printLog(
         'Scraper: Generating random User-Agent...',
@@ -44,8 +76,7 @@ class Scraper {
       headersMerged['User-Agent'] = randomUserAgent(scraperConfig.userAgent);
     }
 
-    /// Cookie
-    /// If `cookies` variable is defined
+    /// Add cookies to headers if provided
     if (cookies != null) {
       printLog(
         'Scraper: Using user-passed cookies...',
@@ -55,29 +86,35 @@ class Scraper {
       headersMerged['Cookie'] = mapToCookie(cookies);
     }
 
+    /// Merge any additional custom headers
     if (headers != null) {
       headers.forEach((key, value) {
         headersMerged[key] = value.toString();
       });
     }
 
-    /// Print headers
+    /// Log the final headers for debugging
     printLog('Scraper: Headers: $headersMerged', debug, color: LogColor.blue);
 
-    /// Clean the URL based on cleaner defined in config
+    /// Clean the URL using configured URL cleaners
     printLog('Scraper: Cleaning URL...', debug, color: LogColor.blue);
     url = cleanScraperConfigUrl(url, scraperConfig.urlCleaner);
     printLog("Scraper: Cleaned URL :) $url", debug, color: LogColor.green);
 
+    /// Initialize data container
     Data dom = Data(url, "");
     printLog(
-      'Scraper: Checking if target needs html...',
+      'Scraper: Checking if target requires html...',
       debug,
       color: LogColor.blue,
     );
+
+    /// Handle HTML fetching based on configuration and available data
     if (scraperConfig.requiresHtml) {
-      printLog('Scraper: Target needs html!!!', debug, color: LogColor.blue);
+      printLog('Scraper: Target requires html!!!', debug, color: LogColor.blue);
       String? requestData;
+
+      /// Force HTTP request for fresh HTML content
       if (scraperConfig.forceRefresh) {
         printLog(
           'Scraper: Forcing http request for new html!!!',
@@ -90,14 +127,20 @@ class Scraper {
           debug: debug,
           proxyAPIConfig: proxyAPIConfig,
         );
-      } else if (html != null && html.hasContent()) {
+      }
+
+      /// Use provided HTML if available and has content
+      else if (html != null && html.hasContent()) {
         printLog(
           'Scraper: Using user-passed html :)',
           debug,
           color: LogColor.orange,
         );
         dom = Data(url, html);
-      } else {
+      }
+
+      /// Fetch HTML from URL
+      else {
         printLog('Scraper: Fetching html...', debug, color: LogColor.blue);
         requestData = await getRequest(
           url,
@@ -106,6 +149,8 @@ class Scraper {
           proxyAPIConfig: proxyAPIConfig,
         );
       }
+
+      /// Process fetched HTML data
       if (dom.obj != "") {
         printLog('Scraper: HTML fetched :)', debug, color: LogColor.green);
       } else if (requestData != null) {
@@ -120,6 +165,7 @@ class Scraper {
         throw WebScraperError('Unable to fetch data!');
       }
     } else {
+      /// Skip HTML fetching if not required by configuration
       printLog(
         'Scraper: Target does not need html. Skipping...',
         debug,

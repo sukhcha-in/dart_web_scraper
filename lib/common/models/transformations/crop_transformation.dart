@@ -1,7 +1,23 @@
 import 'dart:convert';
 
+/// Configuration options for trimming data from the beginning or end.
+///
+/// Removes specified portions from strings, lists, or other sequential data.
+/// Similar to string trim but with configurable start/end positions.
+///
+/// Example usage:
+/// ```dart
+/// // Remove first 10 characters/items
+/// CropTransformationOptions(cropStart: 10)
+///
+/// // Remove last 20 characters/items
+/// CropTransformationOptions(cropEnd: 20)
+/// ```
 class CropTransformationOptions {
+  /// The starting position for cropping (0-based index).
   final int? cropStart;
+
+  /// The ending position for cropping (0-based index).
   final int? cropEnd;
 
   CropTransformationOptions({

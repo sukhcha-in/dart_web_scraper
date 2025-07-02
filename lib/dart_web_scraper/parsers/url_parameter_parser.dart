@@ -1,6 +1,8 @@
 import 'package:dart_web_scraper/common/utils/data_extraction.dart';
 import 'package:dart_web_scraper/dart_web_scraper.dart';
 
+/// Extracts URL parameters from a URL string
+/// Returns Data object with parameter value or null if not found
 Data? urlParamParser({
   required Parser parser,
   required Data parentData,
@@ -13,15 +15,23 @@ Data? urlParamParser({
     debug,
     color: LogColor.cyan,
   );
+
+  // Get URL string from parent data
   String document = getStringObject(parentData);
   try {
+    // Parse URL to extract query parameters
     Uri uri = Uri.parse(document);
     String selector;
-    if (parser.selectors.first.contains("<slot>")) {
-      selector = inject("slot", allData, parser.selectors.first);
+    String paramName = parser.parserOptions?.urlParam?.paramName ?? "";
+
+    // Handle dynamic parameter names with slot injection
+    if (paramName.contains("<slot>")) {
+      selector = inject("slot", allData, paramName);
     } else {
-      selector = parser.selectors.first;
+      selector = paramName;
     }
+
+    // Return parameter value if found
     if (uri.queryParameters.containsKey(selector)) {
       return Data(parentData.url, uri.queryParameters[selector]!);
     }
@@ -33,6 +43,7 @@ Data? urlParamParser({
     );
     return null;
   }
+
   printLog(
     "URL Parameter Parser: No data found!",
     debug,

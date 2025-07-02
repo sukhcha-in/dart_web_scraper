@@ -9,7 +9,7 @@ Future<String?> getRequest(
   bool debug = false,
   ProxyAPIConfig? proxyAPIConfig,
   String? proxyUrlParam,
-  bool cacheResponse = false,
+  bool dumpResponse = false,
 }) async {
   printLog("HTTP GET: $url", debug, color: LogColor.yellow);
   if (proxyAPIConfig != null) {
@@ -43,8 +43,8 @@ Future<String?> getRequest(
       debug,
       color: LogColor.yellow,
     );
-    if (cacheResponse) {
-      saveCacheLog(body, debug);
+    if (dumpResponse) {
+      dumpResponseToFile(body, debug);
     }
     return body;
   } catch (e) {

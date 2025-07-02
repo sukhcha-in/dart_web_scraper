@@ -76,7 +76,7 @@ class ScraperConfig {
   /// - [forceRefresh]: Force fresh HTTP requests (default: false)
   /// - [userAgent]: User agent device type (default: mobile)
   ScraperConfig({
-    required this.pathPatterns,
+    this.pathPatterns = const [],
     this.requiresHtml = true,
     this.urlCleaner,
     required this.parsers,

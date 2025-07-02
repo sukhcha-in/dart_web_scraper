@@ -1,25 +1,34 @@
-import 'dart:convert';
-
 import 'package:dart_web_scraper/dart_web_scraper.dart';
-import 'configs.dart';
 
 void main() async {
-  /// Initialize WebScraper
   WebScraper webScraper = WebScraper();
 
-  /// Scrape website based on configMap
   Map<String, Object> result = await webScraper.scrape(
     url: Uri.parse("https://quotes.toscrape.com"),
-    scraperConfigMap: configMap,
-    cookies: {
-      "foo": "bar",
-    },
-    userAgent: "DartWebScraper/0.1",
-    debug: true,
-    concurrentParsing: false,
-    // proxyAPI: Uri.parse("https://api.exampleproxy.com/scrape?key=API_KEY"),
-    // proxyUrlParam: "url", // The query parameter name for the URL to scrape
+    scraperConfig: ScraperConfig(
+      parsers: [
+        Parser(
+          id: "quotes",
+          parents: ["_root"],
+
+          /// _root is default parent
+          type: ParserType.element,
+          selectors: [
+            ".quote",
+          ],
+          multiple: true,
+        ),
+        Parser(
+          id: "quote",
+          parents: ["quotes"],
+          type: ParserType.text,
+          selectors: [
+            "span.text",
+          ],
+        ),
+      ],
+    ),
   );
 
-  print(jsonEncode(result));
+  print(result);
 }

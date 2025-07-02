@@ -14,6 +14,7 @@ import 'package:dart_web_scraper/dart_web_scraper.dart';
 /// - [ParserOptions.sibling] for sibling parsers
 /// - [ParserOptions.staticValue] for static value parsers
 /// - [ParserOptions.stringBetween] for string between parsers
+/// - [ParserOptions.urlParam] for url parameter parsers
 class ParserOptions {
   /// HTTP request configuration options
   HttpParserOptions? http;
@@ -30,13 +31,17 @@ class ParserOptions {
   /// String between configuration options
   StringBetweenParserOptions? stringBetween;
 
+  /// URL parameter configuration options
+  UrlParamParserOptions? urlParam;
+
   /// Creates ParserOptions for HTTP parser configuration
   ParserOptions.http(HttpParserOptions options)
       : http = options,
         table = null,
         sibling = null,
         staticValue = null,
-        stringBetween = null;
+        stringBetween = null,
+        urlParam = null;
 
   /// Creates ParserOptions for table parser configuration
   ParserOptions.table(TableParserOptions options)
@@ -44,7 +49,8 @@ class ParserOptions {
         table = options,
         sibling = null,
         staticValue = null,
-        stringBetween = null;
+        stringBetween = null,
+        urlParam = null;
 
   /// Creates ParserOptions for sibling parser configuration
   ParserOptions.sibling(SiblingParserOptions options)
@@ -52,7 +58,8 @@ class ParserOptions {
         table = null,
         sibling = options,
         staticValue = null,
-        stringBetween = null;
+        stringBetween = null,
+        urlParam = null;
 
   /// Creates ParserOptions for static value parser configuration
   ParserOptions.staticValue(StaticValueParserOptions options)
@@ -60,7 +67,8 @@ class ParserOptions {
         table = null,
         sibling = null,
         staticValue = options,
-        stringBetween = null;
+        stringBetween = null,
+        urlParam = null;
 
   /// Creates ParserOptions for string between parser configuration
   ParserOptions.stringBetween(StringBetweenParserOptions options)
@@ -68,7 +76,17 @@ class ParserOptions {
         table = null,
         sibling = null,
         staticValue = null,
-        stringBetween = options;
+        stringBetween = options,
+        urlParam = null;
+
+  /// Creates ParserOptions for url parameter parser configuration
+  ParserOptions.urlParam(UrlParamParserOptions options)
+      : http = null,
+        table = null,
+        sibling = null,
+        staticValue = null,
+        stringBetween = null,
+        urlParam = options;
 
   /// Creates a ParserOptions instance from a Map.
   ///
@@ -94,6 +112,9 @@ class ParserOptions {
     } else if (map['stringBetween'] != null) {
       return ParserOptions.stringBetween(
           StringBetweenParserOptions.fromMap(map['stringBetween']));
+    } else if (map['urlParam'] != null) {
+      return ParserOptions.urlParam(
+          UrlParamParserOptions.fromMap(map['urlParam']));
     } else {
       throw ArgumentError('Invalid parser options map: no valid type found');
     }
@@ -113,6 +134,7 @@ class ParserOptions {
       'sibling': sibling?.toMap(),
       'staticValue': staticValue?.toMap(),
       'stringBetween': stringBetween?.toMap(),
+      'urlParam': urlParam?.toMap(),
     };
   }
 

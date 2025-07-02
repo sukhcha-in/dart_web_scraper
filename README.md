@@ -5,133 +5,116 @@
 
 Config-based, reusable web scraper for web and API scraping. Scrape, parse web pages or APIs without writing parsers or scraping logic, using simple key/value based configs.
 
-#### Why need this package?
+## Features
 
-- **Built-in parsers**: This package have built-in parsers for most common scraping tasks.
-- **Config-based**: No need to write parsing logic from scratch for each page.
-- **Data cleaning**: Clean the data before it's added to the final result.
-- **Concurrency**: Parse multiple parsers concurrently using concurrency mode.
-- **CSS Selctors**: Use `CSS selectors` to extract data from HTML.
-- **API scraping**: Fetch data using `HTTP requests`.
-- **Pass cookies**: Pass `cookies` to the scraper or HTTP parsers.
-- **JSON parsing**: Decode `JSON` string or extract data using `Json path`.
-- **JSON-LD**: Extract all `ld+json` objects and places them into a list.
-- **JSON5**: Decode `JSON5` syntax.
-- **StrBetween**: Extracts the `string between` two strings.
-- **Sibling**: Used when target element doesn't have a valid selector but sibling does.
-- **Table**: Extracts data from HTML/JSON table as a `Map`.
-- **Attribute**: Extracts `attribute` value from an HTML element.
-- **Data Injection**: Inject previously parsed data by parser `selector` using `<slot>`.
-- **API Proxy**: Use API based proxy for HTTP requests.
+- Config-based, reusable web scraper for web and API scraping.
+- Scrape, parse web pages or APIs without writing parsers or scraping logic, using simple key/value based configs.
+- 15+ Built-in parsers.
+- Data cleaning and transformations.
 
 ## Getting Started
 
-Add `dart_web_scraper` as dependencies in your `pubspec.yaml`:
-
-```yaml
-dependencies:
-  dart_web_scraper:
-```
-
-Or install it with a flutter command:
+Install it with a `flutter` command:
 
 ```bash
 $ flutter pub add dart_web_scraper
 ```
 
-Or install it with a dart command:
+Install it with a `dart` command:
 
 ```bash
 $ dart pub add dart_web_scraper
 ```
 
-Import the package:
+## Usage
+
+This is the most basic example of scraping quotes from quotes.toscrape.com
 
 ```dart
 import 'package:dart_web_scraper/dart_web_scraper.dart';
-```
 
-## Usage
+void main() async {
+  WebScraper webScraper = WebScraper();
+
+  Map<String, Object> result = await webScraper.scrape(
+    url: Uri.parse("https://quotes.toscrape.com"),
+    scraperConfig: ScraperConfig(
+      parsers: [
+        Parser(
+          id: "quotes",
+          parents: ["_root"],
+
+          /// _root is default parent
+          type: ParserType.element,
+          selectors: [
+            ".quote",
+          ],
+          multiple: true,
+        ),
+        Parser(
+          id: "quote",
+          parents: ["quotes"],
+          type: ParserType.text,
+          selectors: [
+            "span.text",
+          ],
+        ),
+      ],
+    ),
+  );
+
+  print(result);
+}
+
+```
+### WebScraper `class`
+
+High-level web scraper that combines HTML fetching and data parsing.
 
 ```dart
-/// Initialize WebScraper
-WebScraper webScraper = WebScraper();
+WebScraper WebScraper()
 
-/// Scrape website based on configMap
-Map<String, Object> result = await webScraper.scrape(
-  url: Uri.parse("https://quotes.toscrape.com"),
-  configMap: configMap,
-  debug: true,
-);
-
-print(jsonEncode(result));
-```
-
-Example `configMap` for `quotes.toscrape.com` can be found [here](https://github.com/sukhcha-in/dart_web_scraper/blob/main/example/configs.dart).
-
-### Structure
-
-This is the basic structure for `configMap`:
-
-```dart
-  configMap // Map<String, List<Config>>
-  ├── quotes.toscrape.com // String
-  │   ├── Config
-  │   │   ├── parsers // Map<String, List<Parser>>
-  │   │   │   └── urltarget.name // String. Name of your UrlTarget
-  │   │   │       ├── Parser
-  │   │   │       │   ├── id // String. Add _root as entrypoint id
-  │   │   │       │   ├── parent // List<String>
-  │   │   │       │   ├── type // ParserType
-  │   │   │       └── Parser // Another Parser for same UrlTarget
-  │   │   └── urlTargets // List<UrlTarget>
-  │   │       ├── UrlTarget
-  │   │       │   ├── name // String
-  │   │       │   └── where // List<String>
-  │   │       └── UrlTarget // Another UrlTarget for a Config
-  │   └── Config // Another Config for same domain
-  └── example.com // Another domain in configMap
-```
-
-## Classes and Methods
-
-### Config `class`
-
-Config for a domain.
-
-```dart
-Config Config({
-  // Scrape the URL again even if `html` is passed to `WebScraper.scrape`. Defaults to false.
-  bool forceFetch = false,
-  // User agent device. Defaults to mobile.
-  UserAgentDevice userAgent = UserAgentDevice.mobile,
-  // Allow user passed HTML. Defaults to true.
-  bool usePassedHtml = true,
-  // Allow user passed User-Agent. Defaults to false.
-  bool usePassedUserAgent = false,
-  // Map of UrlTarget's name containing list of parsers.
-  required Map<String, List<Parser>> parsers,
-  // List of UrlTarget. More details below.
-  required List<UrlTarget> urlTargets,
+// Main scraping method
+Future<Map<String, Object>> scrape({
+  // The URL to scrape
+  required Uri url,
+  // Scraper configuration for the URL
+  ScraperConfig? scraperConfig,
+  // Map of domain names to lists of scraper configurations
+  Map<String, List<ScraperConfig>>? scraperConfigMap,
+  // Optional proxy API configuration
+  ProxyAPIConfig? proxyAPIConfig,
+  // Enable debug logging
+  bool debug = false,
+  // Pre-fetched HTML document (optional, avoids HTTP request if provided)
+  Document? html,
+  // Custom cookies to include in HTTP requests
+  Map<String, String>? cookies,
+  // Custom HTTP headers to include in requests
+  Map<String, String>? headers,
+  // Custom user agent string (overrides scraper config setting)
+  String? userAgent,
 })
 ```
 
----
+### ScraperConfig `class`
 
-### UrlTarget `class`
-
-It is used to target different sections of a website. For example you can have different set of `parsers` in a config object for `/products/foo` and `/search?q=foo`
+Configuration for targeting and scraping specific types of URLs.
 
 ```dart
-UrlTarget UrlTarget({
-  // Name of the UrlTarget
-  required String name,
-  // Set list of static paths in a url. For any path set it to "/"
-  required List<String> where,
-  // Useful if you want to use API request instead of scraping a webpage. Defaults to true.
-  bool needsHtml = true,
-  // Parameters cleaner. More details below.
+ScraperConfig ScraperConfig({
+  // List of URL path patterns that this configuration should handle
+  List<String> pathPatterns = const [],
+  // List of parsers that define how to extract data from the page
+  required List<Parser> parsers,
+  // Whether HTML content needs to be fetched from the URL
+  bool requiresHtml = true,
+  // URL preprocessing and cleaning configuration
   UrlCleaner? urlCleaner,
+  // Whether to force a fresh HTTP request even if HTML is provided
+  bool forceRefresh = false,
+  // User agent device type for HTTP requests
+  UserAgentDevice userAgent = UserAgentDevice.mobile,
 })
 ```
 
@@ -162,23 +145,27 @@ Parser Parser({
   // You can have multiple parsers with same id and same parent and will execute one by one and stop execution once data is successfully parsed by one parser.
   required String id,
   // A child can have multiple parents, it will execute once parent parser is successfully executed.
-  required List<String> parent,
+  required List<String> parents,
   // Set the parser types.
   required ParserType type,
-  // List of selectors wil execute one by one and stop execution once data is successfully parsed by one selector.
-  List<String> selector = const [],
+  // List of selectors will execute one by one and stop execution once data is successfully parsed by one selector.
+  List<String> selectors = const [],
   // Set parser for private usage. Will be not added to final result.
   bool isPrivate = false,
   // Set multiple to `true` if data is a List.
   bool multiple = false,
-  // Optional parameters explained below.
-  Optional? optional,
+  // Some parsers require additional options to work properly.
+  // You can pass these options here.
+  // For example, `ParserType.table` requires `ParserOptions.table`.
+  ParserOptions? parserOptions;
+  // Data transformation options to apply after extraction.
+  TransformationOptions? transformationOptions,
   // Custom cleaner function, clean the data and return data.
   Object? Function(Data, bool)? cleaner,
   // If you plan to create configs from JSON, you can pass cleaner name here.
-  // This cleaner should be registered in `CleanerRegistry`.
+  // This cleaner should be registered in `CleanerRegistry` to be used.
   // If you pass cleaner along with cleanerName, cleanerName function will be ignored.
-  String? cleanerName;
+  String? cleanerName,
 })
 ```
 
@@ -186,31 +173,31 @@ Parser Parser({
 
 ### Parser Types
 
-| Type                         | Description                                                              | Selector                                                                                                                                       | Optional              |
-| ---------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `ParserType.element`         | Extracts element nodes from HTML using CSS selectors.                    | CSS selector required.                                                                                                                         | `N/A`                 |
-| `ParserType.attribute`       | Extracts attribute from HTML element using CSS selectors.                | Use CSS selector to select an element and **append attribute name with `::`**. Ex: `div#myid::name` where `name` refers to the attribute name. | `Optional.any`        |
-| `ParsetType.text`            | Extracts text from HTML element using CSS selectors.                     | CSS selector required.                                                                                                                         | `Optional.any`        |
-| `ParserType.image`           | Extracts image URL from HTML element.                                    | CSS selector required. After selecting an element it tries to find `src` attribute.                                                            | `Optional.any.any`    |
-| `ParserType.url`             | Extracts URL from an HTML element                                        | CSS selector required. After selecting an element it tries to find `href` attribute.                                                           | `Optional.any`        |
-| `ParserType.urlParam`        | From an URL it extracts query parameter.                                 | Add parameter name in selector.                                                                                                                | `Optional.any`        |
-| `ParserType.table`           | Extracts data from HTML table.                                           | CSS selector required. Select table using this selector.                                                                                       | `Optional.table`      |
-| `ParserType.sibling`         | Used when target element doesn't have a valid selector but sibling does. | CSS selector is required.                                                                                                                      | `Optional.sibling`    |
-| `ParserType.strBetween`      | Extracts the string between two strings.                                 | Not required                                                                                                                                   | `Optional.strBetween` |
-| `ParserType.http`            | Get data using http request                                              | Not required                                                                                                                                   | `Optional.http`       |
-| `ParserType.json`            | Decode JSON string or extract data.                                      | [json_path](https://pub.dev/packages/json_path) syntax should be used as a selector                                                            | `Optional.any`        |
-| `ParserType.jsonld`          | Extracts all Ld+Json objects and places them into a list                 | Not required                                                                                                                                   | `N/A`                 |
-| `ParserType.jsonTable`       | Extracts data from JSON as table.                                        | [json_path](https://pub.dev/packages/json_path) syntax should be used as a selector                                                            | `Optional.table`      |
-| `ParserType.json5decode`     | Decodes JSON5 syntax                                                     | Not required                                                                                                                                   | `N/A`                 |
-| `ParserType.staticVal`       | Useful if you want to set static values to final result                  | Not required                                                                                                                                   | `Optional.staticVal`  |
-| `ParserType.returnUrlParser` | Returns URL which was passed to WebScraper                               | Not required                                                                                                                                   | `Optional.any`        |
+| Type                         | Description                                                              | Selector                                                                                                                                       | ParserOptions                 |
+| ---------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| `ParserType.element`         | Extracts element nodes from HTML using CSS selectors.                    | CSS selector required.                                                                                                                         | `-`                           |
+| `ParserType.attribute`       | Extracts attribute value from HTML element using CSS selectors.          | Use CSS selector to select an element and **append attribute name with `::`**. Ex: `div#myid::name` where `name` refers to the attribute name. | `-`                           |
+| `ParserType.text`            | Extracts text from HTML element using CSS selectors.                     | CSS selector required.                                                                                                                         | `-`                           |
+| `ParserType.image`           | Extracts image URL from HTML element.                                    | CSS selector required. After selecting an element it tries to find `src` attribute.                                                            | `-`                           |
+| `ParserType.url`             | Extracts URL from an HTML element                                        | CSS selector required. After selecting an element it tries to find `href` attribute.                                                           | `-`                           |
+| `ParserType.urlParam`        | From an URL it extracts query parameter.                                 | Add parameter name in selector.                                                                                                                | `ParserOptions.urlParam`      |
+| `ParserType.table`           | Extracts data from HTML table.                                           | CSS selector required. Select table using this selector.                                                                                       | `ParserOptions.table`         |
+| `ParserType.sibling`         | Used when target element doesn't have a valid selector but sibling does. | CSS selector is required.                                                                                                                      | `ParserOptions.sibling`       |
+| `ParserType.strBetween`      | Extracts the string between two strings.                                 | Not required                                                                                                                                   | `ParserOptions.stringBetween` |
+| `ParserType.http`            | Get data using http request                                              | Not required                                                                                                                                   | `ParserOptions.http`          |
+| `ParserType.json`            | Decode JSON string or extract data.                                      | [json_path](https://pub.dev/packages/json_path) syntax should be used as a selector                                                            | `-`                           |
+| `ParserType.jsonld`          | Extracts all Ld+Json objects and places them into a list                 | Not required                                                                                                                                   | `-`                           |
+| `ParserType.jsonTable`       | Extracts data from JSON as table.                                        | [json_path](https://pub.dev/packages/json_path) syntax should be used as a selector                                                            | `ParserOptions.table`         |
+| `ParserType.json5decode`     | Decodes JSON5 syntax                                                     | Not required                                                                                                                                   | `-`                           |
+| `ParserType.staticVal`       | Useful if you want to set static values to final result                  | Not required                                                                                                                                   | `ParserOptions.staticValue`   |
+| `ParserType.returnUrlParser` | Returns URL which was passed to WebScraper                               | Not required                                                                                                                                   | `-`                           |
 
 #### Data injection to `selector`
 
-You can inject previously parsed data by parser `selector` using `<slot>` For example:
+You can inject previously parsed data using `<slot>`. For example:
 
 ```dart
-selector: [
+selectors: [
   // for css selector
   "div#<slot>id</slot>"
   // or for json path:
@@ -218,155 +205,108 @@ selector: [
 ]
 ```
 
-You can also inject data using `slot` into `Optional.http`'s `url` field. For example:
+You can also inject data using `slot` into `ParserOptions.http`'s `url` field. For example:
 
 ```dart
 Parser(
   id: "json",
-  parent: ["product_id"],
+  parents: ["product_id"],
   type: ParserType.http,
   isPrivate: true,
-  optional: Optional.http(
-    url: "https://example.com/productdetails/<slot>product_id</slot>",
-    responseType: HttpResponseType.json,
+  parserOptions: ParserOptions.http(
+    HttpParserOptions(
+      url: "https://example.com/productdetails/<slot>product_id</slot>",
+      method: HttpMethod.get,
+      responseType: HttpResponseType.json,
+    ),
   ),
 ),
 ```
 
 ---
 
-### Optional Parameters
+### ParserOptions `class`
 
-> `Optional.any` `class`
+Parser-specific configuration options that control how individual parsers behave during data extraction.
 
-Can be used with any parser.
+Use the appropriate named constructor for the parser type you're configuring:
 
 ```dart
-Optional.any({
-  // Pre defined methods which can be applied to final result
-  ApplyMethod? apply,
-  // Regex selector and regexGroup can be used together to select data from final result
-  String? regex,
-  int? regexGroup,
-  // regexReplace something with regexReplaceWith
-  String? regexReplace,
-  String? regexReplaceWith,
-  // Replace the first occurence in a string with a string
-  Map<String, String>? replaceFirst,
-  // Replace all occurences in a string with a string
-  Map<String, String>? replaceAll,
-  // Crop string from start. If data is List it removes the elements from start.
-  int? cropStart,
-  // Crop string from end. If data is List it removes the elements from end.
-  int? cropEnd,
-  // Prepend something to a string
+// For HTTP parsers
+ParserOptions.http(HttpParserOptions(...))
+
+// For table and JSON table parsers
+ParserOptions.table(TableParserOptions(...))
+
+// For sibling parsers
+ParserOptions.sibling(SiblingParserOptions(...))
+
+// For static value parsers
+ParserOptions.staticValue(StaticValueParserOptions(...))
+
+// For string between parsers
+ParserOptions.stringBetween(StringBetweenParserOptions(...))
+
+// For URL parameter parsers
+ParserOptions.urlParam(UrlParamParserOptions(...))
+```
+
+---
+
+### TransformationOptions `class`
+
+Comprehensive data transformation system that can be applied to extracted data.
+
+```dart
+TransformationOptions TransformationOptions({
+  // Text to add to the beginning
   String? prepend,
-  // Append something to a string
+  // Text to add to the end
   String? append,
-  // Converts final result to boolean if data matches with one of the `match` object
+  // List of values to check for matches, returns boolean
   List<Object>? match,
-  // Select nth child from a list, can be negative integer to select from last
+  // Index to extract from a list (negative for reverse indexing)
   int? nth,
-  // Split a string by something
+  // Delimiter to split data by
   String? splitBy,
-})
-```
-
-> `Optional.http` `class`
-
-**Required** with `ParserType.http`
-
-```dart
-Optional.http({
-  // URL to fetch data
-  String? url,
-  // GET and POST methods are currently supported
-  HttpMethod? method,
-  // Custom headers
-  Map<String, Object>? headers,
-  // Set Useragent to mobile or desktop
-  UserAgentDevice? userAgent,
-  // Set expected response type
-  HttpResponseType? responseType,
-  // Payload for POST requests
-  Object? payload,
-  // Use proxy?
-  bool usePassedProxy = false,
-  // Set payload type for POST request
-  HttpPayload? payloadType,
-  // Used for debugging purposes only, saves file to /cache folder
-  bool cacheResponse = false,
-})
-```
-
-> `Optional.strBetween` `class`
-
-**Required** with `ParserType.strBetween`
-
-```dart
-Optional.strBetween({
-  // Starting of a string
-  String? start,
-  // Ending of a string
-  String? end
-})
-```
-
-> `Optional.sibling` `class`
-
-Used with `ParserType.sibling`
-
-```dart
-Optional.sibling({
-  // previous or next sibling, defaults to next if `Optional.sibling` is not passed
-  required SiblingDirection direction,
-  // Check if sibling.text contains some string
-  List<String>? where
-})
-```
-
-> `Optional.table` `class`
-
-Used with `ParserType.table`
-**Required** with `ParserType.jsonTable`
-
-```dart
-Optional.table({
-  // Set CSS selector for selecting keys row
-  // When using jsonTable set keys as json path selector
-  String? keys,
-  // Set CSS selector for selecting values row
-  // When using jsonTable set values as json path selector
-  String? values,
-})
-```
-
-> `Optional.staticVal` `class`
-
-**Required** with `ParserType.staticVal`
-
-```dart
-Optional.staticVal({
-  // Set string value to result
-  String? strVal,
-  // Set Map to result
-  Map<String, Object>? mapVal
+  // Whether to decode URL-encoded strings
+  bool? urldecode,
+  // Whether to convert map values to a list
+  bool? mapToList,
+  // Regular expression extraction options
+  RegexTransformationOptions? regexMatch,
+  // Regular expression replacement options
+  RegexReplaceTransformationOptions? regexReplace,
+  // Text replacement options
+  ReplaceTransformationOptions? replace,
+  // Text cropping options (start/end)
+  CropTransformationOptions? crop,
+  // Extract text between two strings
+  StringBetweenTransformationOptions? stringBetween,
+  // Extract sibling elements
+  SiblingTransformationOptions? sibling,
+  // Table processing options
+  TableTransformationOptions? table,
+  // Return static value options
+  StaticValueTransformationOptions? staticValue,
+  // Custom order for applying transformations
+  List<TransformationType>? transformationOrder,
 })
 ```
 
 ## Creating configs from JSON
 
-You can now create configs from JSON string using `Config.fromJson` method.
+You can now create configs from JSON string using `ScraperConfig.fromJson` method.
 
 ## Cleaner Registry for parsers created using JSON
 
-You can register cleaners using `CleanerRegistry.registerCleaner` method. This is useful when you want to create configs from JSON and want to use custom cleaner for `Parser`.
+You can register cleaners using `CleanerRegistry.register` method. This is useful when you want to create configs from JSON and want to use custom cleaner for `Parser`.
 
 For example:
 
 ```dart
 CleanerRegistry.register('formatPrice', (data, debug) {
-  return '$${data.obj}';
+  return '\$${data.obj}';
 });
 ```
 
