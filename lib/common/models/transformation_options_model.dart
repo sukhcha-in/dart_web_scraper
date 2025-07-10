@@ -5,6 +5,8 @@ import 'package:dart_web_scraper/common/models/transformations/regex_replace_tra
 import 'package:dart_web_scraper/common/models/transformations/regex_transformation.dart';
 import 'package:dart_web_scraper/common/models/transformations/replace_transformation.dart';
 
+import '../utils/webscraper_utils.dart';
+
 /// Types of transformations that can be applied to extracted data.
 ///
 /// Each transformation type represents a different way to modify or process
@@ -146,7 +148,8 @@ class TransformationOptions {
   ///
   /// Returns:
   /// - Transformed data, or null if any transformation fails
-  Object? applyTransformations(Object data, bool debug) {
+  Object? applyTransformations(
+      Object data, Map<String, Object> allData, bool debug) {
     /// Determine the order of transformations to apply
     final List<TransformationType> order = transformationOrder ??
         [
@@ -173,7 +176,7 @@ class TransformationOptions {
           break;
 
         case TransformationType.splitBy:
-          final result = _splitBy(data, debug);
+          final result = _splitBy(data, allData, debug);
           if (result == null) return null;
           data = result;
           break;
@@ -215,19 +218,19 @@ class TransformationOptions {
           break;
 
         case TransformationType.prepend:
-          final result = _prepend(data, debug);
+          final result = _prepend(data, allData, debug);
           if (result == null) return null;
           data = result;
           break;
 
         case TransformationType.append:
-          final result = _append(data, debug);
+          final result = _append(data, allData, debug);
           if (result == null) return null;
           data = result;
           break;
 
         case TransformationType.match:
-          final result = _match(data, debug);
+          final result = _match(data, allData, debug);
           if (result == null) return null;
           data = result;
           break;
@@ -265,10 +268,12 @@ class TransformationOptions {
   ///
   /// Returns:
   /// - List of split items, or null if delimiter not found
-  Object? _splitBy(Object data, bool debug) {
+  Object? _splitBy(Object data, Map<String, Object> allData, bool debug) {
     if (splitBy == null || data is! String) return null;
-    if (!data.contains(splitBy!)) return null;
-    return data.split(splitBy!);
+    final injectedsplitBy = _injectSlot(splitBy!, allData, debug);
+
+    if (!data.contains(injectedsplitBy)) return null;
+    return data.split(injectedsplitBy);
   }
 
   /// Decodes URL-encoded strings.
@@ -490,13 +495,14 @@ class TransformationOptions {
   ///
   /// Returns:
   /// - Data with text prepended, or null if prepending fails
-  Object? _prepend(Object data, bool debug) {
+  Object? _prepend(Object data, Map<String, Object> allData, bool debug) {
     if (prepend == null) return null;
+    final injectedPrepend = _injectSlot(prepend!, allData, debug);
 
     if (data is String) {
-      return prepend! + data;
+      return injectedPrepend + data;
     } else if (data is List) {
-      return data.map((item) => prepend! + item.toString()).toList();
+      return data.map((item) => injectedPrepend + item.toString()).toList();
     }
     return null;
   }
@@ -512,13 +518,14 @@ class TransformationOptions {
   ///
   /// Returns:
   /// - Data with text appended, or null if appending fails
-  Object? _append(Object data, bool debug) {
+  Object? _append(Object data, Map<String, Object> allData, bool debug) {
     if (append == null) return null;
+    final injectedAppend = _injectSlot(append!, allData, debug);
 
     if (data is String) {
-      return data + append!;
+      return data + injectedAppend;
     } else if (data is List) {
-      return data.map((item) => item.toString() + append!).toList();
+      return data.map((item) => item.toString() + injectedAppend).toList();
     }
     return null;
   }
@@ -534,15 +541,25 @@ class TransformationOptions {
   ///
   /// Returns:
   /// - True if a match is found, false otherwise, or null if checking fails
-  Object? _match(Object data, bool debug) {
+  Object? _match(Object data, Map<String, Object> allData, bool debug) {
     if (match == null || data is! String) return null;
 
     for (final m in match!) {
-      if (data.trim().contains(m.toString().trim())) {
+      final injectedMatch = _injectSlot(m.toString().trim(), allData, debug);
+      if (data.trim().contains(injectedMatch)) {
         return true;
       }
     }
     return false;
+  }
+
+  String _injectSlot(String selector, Map<String, Object> allData, bool debug) {
+    if (selector.contains("<slot>")) {
+      selector = inject("slot", allData, selector);
+    } else {
+      selector = selector;
+    }
+    return selector;
   }
 
   /// Creates a TransformationOptions instance from a Map.
