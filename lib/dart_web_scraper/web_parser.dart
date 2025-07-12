@@ -300,7 +300,8 @@ class WebParser {
 
       /// Apply transformations if configured
       if (parser.transformationOptions != null) {
-        data = parser.transformationOptions!.applyTransformations(data, debug);
+        data = parser.transformationOptions!
+            .applyTransformations(data, extractedData, debug);
       }
       if (data == null) {
         return null;
