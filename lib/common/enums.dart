@@ -25,7 +25,25 @@ enum UserAgentDevice {
   mobile,
 
   /// Desktop browser user agent string
-  desktop
+  desktop,
+
+  /// Random user agent string
+  random,
+
+  /// Android device user agent string
+  android,
+
+  /// iOS device user agent string
+  ios,
+
+  /// Windows device user agent string
+  windows,
+
+  /// Linux device user agent string
+  linux,
+
+  /// Mac device user agent string
+  mac,
 }
 
 /// Types of parsers available for data extraction.
