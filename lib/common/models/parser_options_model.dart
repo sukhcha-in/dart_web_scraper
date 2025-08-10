@@ -35,7 +35,7 @@ class ParserOptions {
   UrlParamParserOptions? urlParam;
 
   /// Creates ParserOptions for HTTP parser configuration
-  ParserOptions.http(HttpParserOptions options)
+  ParserOptions.http({required HttpParserOptions options})
       : http = options,
         table = null,
         sibling = null,
@@ -44,7 +44,7 @@ class ParserOptions {
         urlParam = null;
 
   /// Creates ParserOptions for table parser configuration
-  ParserOptions.table(TableParserOptions options)
+  ParserOptions.table({required TableParserOptions options})
       : http = null,
         table = options,
         sibling = null,
@@ -53,7 +53,7 @@ class ParserOptions {
         urlParam = null;
 
   /// Creates ParserOptions for sibling parser configuration
-  ParserOptions.sibling(SiblingParserOptions options)
+  ParserOptions.sibling({required SiblingParserOptions options})
       : http = null,
         table = null,
         sibling = options,
@@ -62,7 +62,7 @@ class ParserOptions {
         urlParam = null;
 
   /// Creates ParserOptions for static value parser configuration
-  ParserOptions.staticValue(StaticValueParserOptions options)
+  ParserOptions.staticValue({required StaticValueParserOptions options})
       : http = null,
         table = null,
         sibling = null,
@@ -71,7 +71,7 @@ class ParserOptions {
         urlParam = null;
 
   /// Creates ParserOptions for string between parser configuration
-  ParserOptions.stringBetween(StringBetweenParserOptions options)
+  ParserOptions.stringBetween({required StringBetweenParserOptions options})
       : http = null,
         table = null,
         sibling = null,
@@ -80,7 +80,7 @@ class ParserOptions {
         urlParam = null;
 
   /// Creates ParserOptions for url parameter parser configuration
-  ParserOptions.urlParam(UrlParamParserOptions options)
+  ParserOptions.urlParam({required UrlParamParserOptions options})
       : http = null,
         table = null,
         sibling = null,
@@ -100,21 +100,23 @@ class ParserOptions {
   /// - New ParserOptions instance with data from the map
   factory ParserOptions.fromMap(Map<String, dynamic> map) {
     if (map['http'] != null) {
-      return ParserOptions.http(HttpParserOptions.fromMap(map['http']));
+      return ParserOptions.http(
+          options: HttpParserOptions.fromMap(map['http']));
     } else if (map['table'] != null) {
-      return ParserOptions.table(TableParserOptions.fromMap(map['table']));
+      return ParserOptions.table(
+          options: TableParserOptions.fromMap(map['table']));
     } else if (map['sibling'] != null) {
       return ParserOptions.sibling(
-          SiblingParserOptions.fromMap(map['sibling']));
+          options: SiblingParserOptions.fromMap(map['sibling']));
     } else if (map['staticValue'] != null) {
       return ParserOptions.staticValue(
-          StaticValueParserOptions.fromMap(map['staticValue']));
+          options: StaticValueParserOptions.fromMap(map['staticValue']));
     } else if (map['stringBetween'] != null) {
       return ParserOptions.stringBetween(
-          StringBetweenParserOptions.fromMap(map['stringBetween']));
+          options: StringBetweenParserOptions.fromMap(map['stringBetween']));
     } else if (map['urlParam'] != null) {
       return ParserOptions.urlParam(
-          UrlParamParserOptions.fromMap(map['urlParam']));
+          options: UrlParamParserOptions.fromMap(map['urlParam']));
     } else {
       throw ArgumentError('Invalid parser options map: no valid type found');
     }
