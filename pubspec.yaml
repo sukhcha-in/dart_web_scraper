@@ -1,6 +1,6 @@
 name: dart_web_scraper
-description: Config-based, reusable web scraper for web and API scraping. Scrape, parse web pages or APIs without writing parsers or scraping logic, using simple key/value based configs.
-version: 0.2.0
+description: Powerful, easy-to-use scraper for web pages and APIs. Chain parsers and transforms to extract exactly the data you need.
+version: 0.2.1
 repository: https://github.com/sukhcha-in/dart_web_scraper
 issue_tracker: https://github.com/sukhcha-in/dart_web_scraper/issues
 topics:

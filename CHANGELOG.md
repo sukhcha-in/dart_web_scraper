@@ -1,3 +1,7 @@
+## 0.2.1
+- Slot injection to transformations
+- Update ParserOptions constructors to require options parameter for improved clarity and consistency
+
 ## 0.2.0
 
 - Simplify the codebase.
