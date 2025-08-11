@@ -22,6 +22,7 @@ export 'common/models/error_model.dart';
 export 'common/models/parser_model.dart';
 export 'common/models/parser_options_model.dart';
 export 'common/models/proxy_api_model.dart';
+export 'common/models/scraper_config_map_model.dart';
 export 'common/models/scraper_config_model.dart';
 export 'common/models/transformation_options_model.dart';
 export 'common/models/url_cleaner_model.dart';

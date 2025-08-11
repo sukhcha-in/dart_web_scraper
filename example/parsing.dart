@@ -10,7 +10,7 @@ void main() async {
   /// Fetch config
   ScraperConfig? config = findScraperConfig(
     url: url,
-    scraperConfigMap: configMap,
+    scraperConfigMap: ScraperConfigMap(configs: configMap),
   );
   if (config == null) {
     print("Unsupported URL");

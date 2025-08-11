@@ -81,7 +81,7 @@ Future<Map<String, Object>> scrape({
   // Scraper configuration for the URL
   ScraperConfig? scraperConfig,
   // Map of domain names to lists of scraper configurations
-  Map<String, List<ScraperConfig>>? scraperConfigMap,
+  ScraperConfigMap? scraperConfigMap,
   // Optional proxy API configuration
   ProxyAPIConfig? proxyAPIConfig,
   // Enable debug logging
@@ -233,22 +233,22 @@ Use the appropriate named constructor for the parser type you're configuring:
 
 ```dart
 // For HTTP parsers
-ParserOptions.http(HttpParserOptions(...))
+ParserOptions.http(options: HttpParserOptions(...))
 
 // For table and JSON table parsers
-ParserOptions.table(TableParserOptions(...))
+ParserOptions.table(options: TableParserOptions(...))
 
 // For sibling parsers
-ParserOptions.sibling(SiblingParserOptions(...))
+ParserOptions.sibling(options: SiblingParserOptions(...))
 
 // For static value parsers
-ParserOptions.staticValue(StaticValueParserOptions(...))
+ParserOptions.staticValue(options: StaticValueParserOptions(...))
 
 // For string between parsers
-ParserOptions.stringBetween(StringBetweenParserOptions(...))
+ParserOptions.stringBetween(options: StringBetweenParserOptions(...))
 
 // For URL parameter parsers
-ParserOptions.urlParam(UrlParamParserOptions(...))
+ParserOptions.urlParam(options: UrlParamParserOptions(...))
 ```
 
 ---

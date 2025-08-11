@@ -1,6 +1,6 @@
 name: dart_web_scraper
 description: Powerful, easy-to-use scraper for web pages and APIs. Chain parsers and transforms to extract exactly the data you need.
-version: 0.2.2
+version: 0.2.3
 repository: https://github.com/sukhcha-in/dart_web_scraper
 issue_tracker: https://github.com/sukhcha-in/dart_web_scraper/issues
 topics:
@@ -12,10 +12,10 @@ environment:
   sdk: ^3.5.4
 
 dependencies:
-  http: ^1.4.0
+  http: ^1.5.0
   html: ^0.15.6
-  json5: ^0.8.0
-  json_path: ^0.7.6
+  json5: ^0.8.2
+  json_path: ^0.8.0
   path: ^1.9.1
 
 dev_dependencies:

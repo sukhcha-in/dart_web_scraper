@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// Configuration for routing HTTP requests through a proxy API.
 ///
 /// This class defines how to route web scraping requests through a proxy API.
@@ -49,5 +51,27 @@ class ProxyAPIConfig {
       ...apiUrl.queryParameters,
       targetUrlParameter: url.toString(),
     });
+  }
+
+  factory ProxyAPIConfig.fromMap(Map<String, dynamic> map) {
+    return ProxyAPIConfig(
+      apiUrl: Uri.parse(map['apiUrl']),
+      targetUrlParameter: map['targetUrlParameter'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'apiUrl': apiUrl.toString(),
+      'targetUrlParameter': targetUrlParameter,
+    };
+  }
+
+  factory ProxyAPIConfig.fromJson(String json) {
+    return ProxyAPIConfig.fromMap(jsonDecode(json));
+  }
+
+  String toJson() {
+    return jsonEncode(toMap());
   }
 }

@@ -5,6 +5,7 @@ void main() async {
 
   Map<String, Object> result = await webScraper.scrape(
     url: Uri.parse("https://quotes.toscrape.com"),
+    // scraperConfigMap: ScraperConfigMap(configs: configMap, useNth: 0),
     scraperConfig: ScraperConfig(
       parsers: [
         Parser(

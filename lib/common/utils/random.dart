@@ -72,7 +72,7 @@ String _iPhoneSafariUA() {
   final iosPatch = _randInt(0, 3);
   final iosToken = iosPatch > 0
       ? "${iosMajor}_${iosMinor}_$iosPatch"
-      : "${iosMajor}_${iosMinor}";
+      : "${iosMajor}_$iosMinor";
 
   const webkit = "605.1.15";
   final mobileBuilds = [

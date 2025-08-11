@@ -28,31 +28,58 @@ import 'package:dart_web_scraper/dart_web_scraper.dart';
 /// );
 /// ```
 ScraperConfig? findScraperConfig({
-  required Map<String, List<ScraperConfig>> scraperConfigMap,
+  required ScraperConfigMap scraperConfigMap,
   required Uri url,
 }) {
-  /// Check each domain in the configuration map
-  for (final i in scraperConfigMap.keys) {
-    if (url.host.contains(i)) {
-      /// Check each scraper configuration for this domain
-      for (final t in scraperConfigMap[i]!) {
-        /// Check each path pattern in the configuration
-        for (final urlPart in t.pathPatterns) {
-          if (urlPart == "/") {
-            /// Root path pattern - always matches
-            return t;
-          } else if (url.path.contains(urlPart)) {
-            /// Simple string matching for path patterns
-            return t;
-          } else {
-            /// Regex pattern matching for complex patterns
-            final pattern = RegExp(urlPart);
-            if (pattern.hasMatch(url.toString())) {
-              return t;
-            }
-          }
-        }
+  for (final host in scraperConfigMap.configs.keys) {
+    // exact or subdomain
+    final h = host.toLowerCase();
+    final u = url.host.toLowerCase();
+    final hostMatches = (u == h) || u.endsWith('.$h');
+    if (!hostMatches) continue;
+
+    final list = scraperConfigMap.configs[host];
+    if (list == null || list.isEmpty) continue;
+
+    // if useNth provided, check bounds and only test that config
+    final nth = scraperConfigMap.useNth;
+    if (nth != null) {
+      if (nth < 0 || nth >= list.length) continue;
+      final hit = _checkPathPatterns(list[nth], url);
+      if (hit != null) return hit;
+      continue;
+    }
+
+    // otherwise, try each config until one matches
+    for (final cfg in list) {
+      final hit = _checkPathPatterns(cfg, url);
+      if (hit != null) return hit;
+    }
+  }
+  return null;
+}
+
+ScraperConfig? _checkPathPatterns(ScraperConfig config, Uri url) {
+  // If no patterns means "match by host", uncomment this:
+  // if (config.pathPatterns.isEmpty) return config;
+
+  for (final patternText in config.pathPatterns) {
+    if (patternText == "/") {
+      return config; // root matches everything
+    }
+
+    if (url.path.contains(patternText)) {
+      return config; // simple contains on path
+    }
+
+    // try regex on full URL, but guard against invalid patterns
+    try {
+      final re = RegExp(patternText);
+      if (re.hasMatch(url.toString())) {
+        return config;
       }
+    } catch (_) {
+      // invalid regex: just ignore and continue
     }
   }
   return null;

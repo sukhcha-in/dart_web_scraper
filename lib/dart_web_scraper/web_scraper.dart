@@ -35,7 +35,7 @@ class WebScraper {
   /// - `false` if no matching configuration exists
   bool canScrape({
     required Uri url,
-    required Map<String, List<ScraperConfig>> scraperConfigMap,
+    required ScraperConfigMap scraperConfigMap,
   }) {
     ScraperConfig? scraperConfig = findScraperConfig(
       url: url,
@@ -73,7 +73,7 @@ class WebScraper {
   Future<Map<String, Object>> scrape({
     required Uri url,
     ScraperConfig? scraperConfig,
-    Map<String, List<ScraperConfig>>? scraperConfigMap,
+    ScraperConfigMap? scraperConfigMap,
     ProxyAPIConfig? proxyAPIConfig,
     bool debug = false,
     Document? html,
@@ -92,7 +92,7 @@ class WebScraper {
         scraperConfigMap: scraperConfigMap,
       );
     }
-    if (scraperConfig == null) {
+    if (config == null) {
       throw WebScraperError(
           'No scraper configuration provided or this url is not supported by scraperConfigMap');
     }
@@ -103,7 +103,7 @@ class WebScraper {
       url: url,
       html: html,
       debug: debug,
-      scraperConfig: config!,
+      scraperConfig: config,
       cookies: cookies,
       headers: headers,
       userAgent: userAgent,

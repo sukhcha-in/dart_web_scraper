@@ -1,3 +1,8 @@
+## 0.2.3
+- Fix config map not able to find config
+- Added `useNth` option to select nth config from list.
+- Dedicated model `ScraperConfigMap` for specifying configs.
+
 ## 0.2.2
 - Fix exports
 - Add more options for generating random user agents
