@@ -57,12 +57,6 @@ class HttpParserOptions {
   /// Useful for bypassing geo-restrictions or IP-based rate limiting.
   final bool useProxy;
 
-  /// Whether to dump the full HTTP response for debugging.
-  ///
-  /// When true, the complete response (headers, body, status) will be logged.
-  /// Useful for debugging and understanding the server response.
-  final bool dumpResponse;
-
   /// Creates a new HttpParserOptions instance.
   ///
   /// All parameters are optional and have sensible defaults.
@@ -75,7 +69,6 @@ class HttpParserOptions {
   /// [payload] - Data to send with the request
   /// [payloadType] - Format of the payload
   /// [useProxy] - Whether to use a proxy (defaults to false)
-  /// [dumpResponse] - Whether to log the full response (defaults to false)
   HttpParserOptions({
     this.url,
     this.method,
@@ -85,7 +78,6 @@ class HttpParserOptions {
     this.payload,
     this.payloadType,
     this.useProxy = false,
-    this.dumpResponse = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -98,7 +90,6 @@ class HttpParserOptions {
       'payload': payload,
       'payloadType': payloadType?.toString().split('.').last,
       'useProxy': useProxy,
-      'dumpResponse': dumpResponse,
     };
   }
 
@@ -130,7 +121,6 @@ class HttpParserOptions {
             )
           : null,
       useProxy: map['useProxy'] as bool,
-      dumpResponse: map['dumpResponse'] as bool,
     );
   }
 

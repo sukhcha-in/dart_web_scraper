@@ -66,32 +66,43 @@ void printLog(String message, bool debug, {LogColor color = LogColor.reset}) {
 /// Example:
 /// ```dart
 /// dumpResponse('<html>...</html>', debug);
-/// // Creates: dump/1234567890.html (old content)
-/// // Updates: dump/dump.html (new content)
 /// ```
-void dumpResponseToFile(String html, bool debug) {
+
+void dumpResponseToFile({required String html, required bool debug}) {
   if (!debug) return;
 
-  /// Find the project root directory
-  String rootPath = findRootDirectory(Directory.current.path);
   try {
-    /// Generate timestamp for unique filename
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
+    // Generate timestamp for unique filename
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
 
-    /// Read current dump content and save to timestamped file
-    File dump = File('$rootPath/dump/dump.html');
-    String dumpHtml = dump.readAsStringSync();
+    final currentDir = Directory.current;
 
-    /// Save old dump content to timestamped file
-    File file = File('$rootPath/dump/$timestamp.html');
-    file.writeAsStringSync(dumpHtml);
+    // Ensure dump folder exists
+    final dumpDir = Directory(path.join(currentDir.path, 'dump'));
+    if (!dumpDir.existsSync()) {
+      dumpDir.createSync(recursive: true);
+      print('Created dump folder at: ${dumpDir.path}');
+    }
 
-    /// Update dump.html with new content
-    dump.writeAsStringSync(html, mode: FileMode.write);
+    // The main dump.html file inside /dump
+    final dumpLocation = File(path.join(dumpDir.path, 'dump.html'));
+
+    String oldFileContent = '';
+    if (dumpLocation.existsSync()) {
+      // Read current dump.html
+      oldFileContent = dumpLocation.readAsStringSync();
+
+      // Save old dump content to a timestamped file inside /dump
+      final oldDump = File(path.join(dumpDir.path, '$timestamp.html'));
+      oldDump.writeAsStringSync(oldFileContent);
+    }
+
+    // Update or create dump.html with new content
+    dumpLocation.writeAsStringSync(html, mode: FileMode.write);
+
+    print('Dump saved at: ${dumpLocation.path}');
   } catch (e) {
-    /// Log error if dump saving fails
-    printLog('Unable to save file to $rootPath/dump folder', debug,
-        color: LogColor.red);
+    print('Unable to save file, error: $e');
   }
 }
 

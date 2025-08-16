@@ -41,7 +41,7 @@ void printLog(String message, bool debug, {LogColor color = LogColor.reset}) {
 /// Note: Web platforms cannot save files to the local file system due to
 /// browser security restrictions. Consider using browser storage APIs
 /// (localStorage, sessionStorage) for web-specific caching needs.
-void dumpResponseToFile(String html, bool debug) {
+void dumpResponseToFile({required String html, required bool debug}) {
   /// No file operations available on web platform
   /// This function exists for API compatibility only
 }

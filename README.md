@@ -84,7 +84,7 @@ Future<Map<String, Object>> scrape({
   ScraperConfigMap? scraperConfigMap,
   // Optional proxy API configuration
   ProxyAPIConfig? proxyAPIConfig,
-  // Enable debug logging
+  // Enable debug logging, also dumps scraped file into current path /dump folder
   bool debug = false,
   // Pre-fetched HTML document (optional, avoids HTTP request if provided)
   Document? html,

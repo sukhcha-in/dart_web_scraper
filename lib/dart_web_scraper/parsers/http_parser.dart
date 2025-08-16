@@ -101,14 +101,12 @@ Future<Data?> httpParser({
   // Make HTTP request based on method
   Object? result;
   final useProxy = parser.parserOptions?.http?.useProxy ?? false;
-  final dumpResponse = parser.parserOptions?.http?.dumpResponse ?? false;
   if (method == HttpMethod.get) {
     result = await getRequest(
       Uri.parse(url),
       headers: headers,
       debug: debug,
       proxyAPIConfig: useProxy ? proxyAPIConfig : null,
-      dumpResponse: dumpResponse,
     );
   } else if (method == HttpMethod.post) {
     result = await postRequest(

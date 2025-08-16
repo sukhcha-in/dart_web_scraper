@@ -1,3 +1,6 @@
+## 0.2.4
+- Fix debug logging functionality and update HTTP response handling in scraper utilities
+
 ## 0.2.3
 - Fix config map not able to find config
 - Added `useNth` option to select nth config from list.

@@ -31,7 +31,7 @@ class WebParser {
   /// 5. Returns the final structured data
   ///
   /// Parameters:
-  /// - [scrapedData]: The scraped HTML data to parse
+  /// - [scrapedData]: The scraped HTML data to parse as Data object containing url and Document object.
   /// - [scraperConfig]: Configuration containing parser definitions
   /// - [proxyAPIConfig]: Optional proxy API for HTTP requests during parsing
   /// - [cookies]: Cookies to include in any HTTP requests during parsing
