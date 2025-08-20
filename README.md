@@ -85,11 +85,13 @@ Future<Map<String, Object>> scrape({
   // Enable debug logging, also dumps scraped file into current path /dump folder
   bool debug = false,
   // Pre-fetched HTML document (optional, avoids HTTP request if provided)
-  Document? html,
+  String? html,
   // Custom cookies to include in HTTP requests (Overrides ScraperConfig cookies)
   Map<String, String>? overrideCookies,
   // Custom HTTP headers to include in requests (Overrides ScraperConfig headers)
   Map<String, String>? overrideHeaders,
+  // Overrides proxy config in ScraperConfig and HTTP Parser options
+  ProxyAPIConfig? overrideProxyAPIConfig,
   // Custom user agent string (overrides ScraperConfig userAgent)
   String? overrideUserAgent,
 })

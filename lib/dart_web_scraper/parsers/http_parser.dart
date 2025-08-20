@@ -12,6 +12,7 @@ Future<Data?> httpParser({
   required Data parentData,
   required Map<String, Object> allData,
   required bool debug,
+  required ProxyAPIConfig? overrideProxyAPIConfig,
 }) async {
   printLog("----------------------------------", debug, color: LogColor.yellow);
   printLog("ID: ${parser.id} Parser: HTTP", debug, color: LogColor.cyan);
@@ -107,7 +108,8 @@ Future<Data?> httpParser({
       Uri.parse(url),
       headers: headers,
       debug: debug,
-      proxyAPIConfig: parser.parserOptions?.http?.proxyAPIConfig,
+      proxyAPIConfig:
+          overrideProxyAPIConfig ?? parser.parserOptions?.http?.proxyAPIConfig,
     );
   } else if (method == HttpMethod.post) {
     result = await postRequest(
@@ -115,7 +117,8 @@ Future<Data?> httpParser({
       headers: headers,
       body: payLoad,
       debug: debug,
-      proxyAPIConfig: parser.parserOptions?.http?.proxyAPIConfig,
+      proxyAPIConfig:
+          overrideProxyAPIConfig ?? parser.parserOptions?.http?.proxyAPIConfig,
     );
   } else {
     printLog("HTTP Parser: Invalid method!", debug, color: LogColor.red);

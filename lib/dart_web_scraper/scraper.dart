@@ -32,7 +32,7 @@ class Scraper {
   /// - [overrideCookies]: Custom cookies to include in HTTP requests
   /// - [overrideUserAgent]: Custom user agent string (overrides config setting)
   /// - [overrideHeaders]: Additional HTTP headers to include
-  /// - [proxyAPIConfig]: Proxy API URL for routing requests through a proxy
+  /// - [overrideProxyAPIConfig]: Proxy API URL for routing requests through a proxy
   /// - [debug]: Enable debug logging for troubleshooting
   ///
   /// Returns:
@@ -47,7 +47,7 @@ class Scraper {
     Map<String, String>? overrideCookies,
     String? overrideUserAgent,
     Map<String, String>? overrideHeaders,
-    ProxyAPIConfig? proxyAPIConfig,
+    ProxyAPIConfig? overrideProxyAPIConfig,
     bool debug = false,
   }) async {
     /// Skip scraping if HTML is not required by configuration
@@ -151,7 +151,7 @@ class Scraper {
         url,
         headers: headersMerged,
         debug: debug,
-        proxyAPIConfig: proxyAPIConfig,
+        proxyAPIConfig: overrideProxyAPIConfig ?? scraperConfig.proxyAPIConfig,
       );
     }
 

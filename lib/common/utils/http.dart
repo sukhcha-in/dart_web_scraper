@@ -8,7 +8,6 @@ Future<String?> getRequest(
   Map<String, String> headers = const {},
   bool debug = false,
   ProxyAPIConfig? proxyAPIConfig,
-  String? proxyUrlParam,
 }) async {
   printLog("HTTP GET: $url", debug, color: LogColor.yellow);
   if (proxyAPIConfig != null) {
@@ -57,7 +56,6 @@ Future<String?> postRequest(
   Map<String, String> headers = const {},
   bool debug = false,
   ProxyAPIConfig? proxyAPIConfig,
-  String? proxyUrlParam,
 }) async {
   printLog("HTTP POST URL: $url", debug, color: LogColor.magenta);
   if (proxyAPIConfig != null) {

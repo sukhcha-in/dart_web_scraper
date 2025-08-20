@@ -34,6 +34,7 @@ class WebParser {
   /// - [scrapedData]: The scraped HTML data to parse as Data object containing url and Document object.
   /// - [scraperConfig]: Configuration containing parser definitions
   /// - [debug]: Enable debug logging for troubleshooting
+  /// - [overrideProxyAPIConfig]: Custom proxy API configuration (overrides http parser requests)
   /// - [concurrentParsing]: Enable concurrent parser execution for performance
   ///
   /// Returns:
@@ -42,6 +43,7 @@ class WebParser {
     required Data scrapedData,
     required ScraperConfig scraperConfig,
     bool debug = false,
+    ProxyAPIConfig? overrideProxyAPIConfig,
     bool concurrentParsing = false,
   }) async {
     /// Start performance monitoring
@@ -67,6 +69,7 @@ class WebParser {
       parentToChildren: parentToChildren,
       parsers: rootParsers,
       parentData: scrapedData,
+      overrideProxyAPIConfig: overrideProxyAPIConfig,
       debug: debug,
       concurrent: concurrentParsing,
     );
@@ -128,6 +131,7 @@ class WebParser {
     required Map<String, List<Parser>> parentToChildren,
     required List<Parser> parsers,
     required Data parentData,
+    required ProxyAPIConfig? overrideProxyAPIConfig,
     required bool debug,
     required bool concurrent,
   }) async {
@@ -151,6 +155,7 @@ class WebParser {
         final Data? data = await _runParserAndApplyTransformations(
           parser: parser,
           parentData: parentData,
+          overrideProxyAPIConfig: overrideProxyAPIConfig,
           debug: debug,
         );
 
@@ -184,6 +189,7 @@ class WebParser {
                     parentToChildren: parentToChildren,
                     parsers: childParsers,
                     parentData: Data(data.url, singleData),
+                    overrideProxyAPIConfig: overrideProxyAPIConfig,
                     debug: debug,
                     concurrent: concurrent,
                   );
@@ -210,6 +216,7 @@ class WebParser {
                 parentToChildren: parentToChildren,
                 parsers: childParsers,
                 parentData: data,
+                overrideProxyAPIConfig: overrideProxyAPIConfig,
                 debug: debug,
                 concurrent: concurrent,
               );
@@ -262,12 +269,14 @@ class WebParser {
   Future<Data?> _runParserAndApplyTransformations({
     required Parser parser,
     required Data parentData,
+    required ProxyAPIConfig? overrideProxyAPIConfig,
     required bool debug,
   }) async {
     /// Execute the parser based on its type
     final Data? parsed = await _runParser(
       parser: parser,
       parentData: parentData,
+      overrideProxyAPIConfig: overrideProxyAPIConfig,
       debug: debug,
     );
 
@@ -329,6 +338,7 @@ class WebParser {
   Future<Data?> _runParser({
     required Parser parser,
     required Data parentData,
+    required ProxyAPIConfig? overrideProxyAPIConfig,
     required bool debug,
   }) async {
     switch (parser.type) {
@@ -379,6 +389,7 @@ class WebParser {
           parser: parser,
           parentData: parentData,
           allData: extractedData,
+          overrideProxyAPIConfig: overrideProxyAPIConfig,
           debug: debug,
         );
       case ParserType.strBetween:
