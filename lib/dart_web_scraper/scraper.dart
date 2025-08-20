@@ -29,9 +29,9 @@ class Scraper {
   /// - [url]: The target URL to scrape
   /// - [scraperConfig]: Configuration defining scraping behavior
   /// - [html]: Pre-fetched HTML document (optional, avoids HTTP request)
-  /// - [cookies]: Custom cookies to include in HTTP requests
-  /// - [userAgent]: Custom user agent string (overrides config setting)
-  /// - [headers]: Additional HTTP headers to include
+  /// - [overrideCookies]: Custom cookies to include in HTTP requests
+  /// - [overrideUserAgent]: Custom user agent string (overrides config setting)
+  /// - [overrideHeaders]: Additional HTTP headers to include
   /// - [proxyAPIConfig]: Proxy API URL for routing requests through a proxy
   /// - [debug]: Enable debug logging for troubleshooting
   ///
@@ -44,53 +44,73 @@ class Scraper {
     required Uri url,
     required ScraperConfig scraperConfig,
     Document? html,
-    Map<String, String>? cookies,
-    String? userAgent,
-    Map<String, Object>? headers,
+    Map<String, String>? overrideCookies,
+    String? overrideUserAgent,
+    Map<String, String>? overrideHeaders,
     ProxyAPIConfig? proxyAPIConfig,
     bool debug = false,
   }) async {
+    /// Skip scraping if HTML is not required by configuration
+    if (!scraperConfig.requiresHtml) {
+      printLog(
+        'Scraper: Target does not need html. Skipping...',
+        debug,
+        color: LogColor.orange,
+      );
+      return Data(url, "");
+    }
+
     /// Build HTTP headers with appropriate defaults and custom settings
     printLog('Scraper: Building headers...', debug, color: LogColor.blue);
-    Map<String, String> headersMerged = {
-      "Accept-Language": "en-US,en",
-    };
+    Map<String, String> headersMerged = {};
+
+    /// Set headers from scraperConfig
+    if (scraperConfig.headers != null) {
+      headersMerged.addAll(scraperConfig.headers!);
+    }
+
+    /// Override with user-passed headers if provided
+    if (overrideHeaders != null) {
+      overrideHeaders.forEach((key, value) {
+        headersMerged[key] = value.toString();
+      });
+    }
 
     /// Set User-Agent header based on configuration or custom value
-    if (userAgent != null) {
+    if (overrideUserAgent != null) {
       printLog(
         'Scraper: Using user-passed User-Agent...',
         debug,
         color: LogColor.blue,
       );
-      headersMerged['User-Agent'] = userAgent;
-    }
-
-    /// Generate random User-Agent if not provided by user
-    if (!headersMerged.containsKey("User-Agent")) {
+      headersMerged['User-Agent'] = overrideUserAgent;
+    } else {
       printLog(
-        'Scraper: Generating random User-Agent...',
+        'Scraper: Using User-Agent from scraperConfig...',
         debug,
         color: LogColor.blue,
       );
       headersMerged['User-Agent'] = randomUserAgent(scraperConfig.userAgent);
     }
 
-    /// Add cookies to headers if provided
-    if (cookies != null) {
+    /// Set cookies from scraperConfig
+    if (scraperConfig.cookies != null) {
+      printLog(
+        'Scraper: Using cookies from scraperConfig...',
+        debug,
+        color: LogColor.blue,
+      );
+      headersMerged['Cookie'] = mapToCookie(scraperConfig.cookies!);
+    }
+
+    /// Override with user-passed cookies if provided
+    if (overrideCookies != null) {
       printLog(
         'Scraper: Using user-passed cookies...',
         debug,
         color: LogColor.blue,
       );
-      headersMerged['Cookie'] = mapToCookie(cookies);
-    }
-
-    /// Merge any additional custom headers
-    if (headers != null) {
-      headers.forEach((key, value) {
-        headersMerged[key] = value.toString();
-      });
+      headersMerged['Cookie'] = mapToCookie(overrideCookies);
     }
 
     /// Log the final headers for debugging
@@ -103,17 +123,19 @@ class Scraper {
 
     /// Initialize data container
     Data dom = Data(url, "");
-    printLog(
-      'Scraper: Checking if target requires html...',
-      debug,
-      color: LogColor.blue,
-    );
 
     /// Handle HTML fetching based on configuration and available data
-    if (scraperConfig.requiresHtml) {
-      printLog('Scraper: Target requires html!!!', debug, color: LogColor.blue);
-      String? requestData;
+    String? requestData;
 
+    /// If HTML is passed and forceRefresh is false, use the passed HTML
+    if (html != null && !scraperConfig.forceRefresh) {
+      printLog(
+        'Scraper: Using user-passed html :)',
+        debug,
+        color: LogColor.orange,
+      );
+      dom = Data(url, html);
+    } else {
       /// Force HTTP request for fresh HTML content
       if (scraperConfig.forceRefresh) {
         printLog(
@@ -121,56 +143,31 @@ class Scraper {
           debug,
           color: LogColor.blue,
         );
-        requestData = await getRequest(
-          url,
-          headers: headersMerged,
-          debug: debug,
-          proxyAPIConfig: proxyAPIConfig,
-        );
-      }
-
-      /// Use provided HTML if available and has content
-      else if (html != null && html.hasContent()) {
-        printLog(
-          'Scraper: Using user-passed html :)',
-          debug,
-          color: LogColor.orange,
-        );
-        dom = Data(url, html);
-      }
-
-      /// Fetch HTML from URL
-      else {
-        printLog('Scraper: Fetching html...', debug, color: LogColor.blue);
-        requestData = await getRequest(
-          url,
-          headers: headersMerged,
-          debug: debug,
-          proxyAPIConfig: proxyAPIConfig,
-        );
-      }
-
-      /// Process fetched HTML data
-      if (dom.obj != "") {
-        printLog('Scraper: HTML fetched :)', debug, color: LogColor.green);
-      } else if (requestData != null) {
-        printLog('Scraper: HTML fetched :)', debug, color: LogColor.green);
-        dom = Data(url, parse(requestData));
       } else {
-        printLog(
-          'Scraper: Unable to fetch data!',
-          debug,
-          color: LogColor.red,
-        );
-        throw WebScraperError('Unable to fetch data!');
+        printLog('Scraper: Fetching html...', debug, color: LogColor.blue);
       }
-    } else {
-      /// Skip HTML fetching if not required by configuration
-      printLog(
-        'Scraper: Target does not need html. Skipping...',
-        debug,
-        color: LogColor.orange,
+
+      requestData = await getRequest(
+        url,
+        headers: headersMerged,
+        debug: debug,
+        proxyAPIConfig: proxyAPIConfig,
       );
+    }
+
+    /// Process fetched HTML data
+    if (dom.obj != "") {
+      printLog('Scraper: HTML fetched :)', debug, color: LogColor.green);
+    } else if (requestData != null) {
+      printLog('Scraper: HTML fetched :)', debug, color: LogColor.green);
+      dom = Data(url, parse(requestData));
+    } else {
+      printLog(
+        'Scraper: Unable to fetch data!',
+        debug,
+        color: LogColor.red,
+      );
+      throw WebScraperError('Unable to fetch data!');
     }
 
     printLog('Scraper: Returning data...', debug, color: LogColor.green);

@@ -48,6 +48,24 @@ class ScraperConfig {
   /// required parameters.
   UrlCleaner? urlCleaner;
 
+  /// Proxy API configuration.
+  ///
+  /// This configuration is used to proxy the HTTP request through a proxy API.
+  /// Useful for bypassing IP bans or accessing content that is blocked in certain regions.
+  ProxyAPIConfig? proxyAPIConfig;
+
+  /// Cookies to include in the HTTP request.
+  ///
+  /// This is a map of cookies to include in the HTTP request.
+  /// Useful for bypassing IP bans or accessing content that is blocked in certain regions.
+  Map<String, String>? cookies;
+
+  /// Headers to include in the HTTP request.
+  ///
+  /// This is a map of headers to include in the HTTP request.
+  /// Useful for bypassing IP bans or accessing content that is blocked in certain regions.
+  Map<String, String>? headers;
+
   /// Whether to force a fresh HTTP request even if HTML is provided.
   ///
   /// If `true`, the scraper will always fetch fresh HTML from the URL,
@@ -73,6 +91,9 @@ class ScraperConfig {
   /// - [parsers]: List of parsers for data extraction
   /// - [requiresHtml]: Whether HTML fetching is required (default: true)
   /// - [urlCleaner]: URL preprocessing configuration (optional)
+  /// - [proxyAPIConfig]: Proxy API configuration (optional)
+  /// - [cookies]: Cookies to include in the HTTP request (optional)
+  /// - [headers]: Headers to include in the HTTP request (optional)
   /// - [forceRefresh]: Force fresh HTTP requests (default: false)
   /// - [userAgent]: User agent device type (default: mobile)
   ScraperConfig({
@@ -80,6 +101,9 @@ class ScraperConfig {
     this.requiresHtml = true,
     this.urlCleaner,
     required this.parsers,
+    this.proxyAPIConfig,
+    this.cookies,
+    this.headers,
     this.forceRefresh = false,
     this.userAgent = UserAgentDevice.mobile,
   });
@@ -104,6 +128,15 @@ class ScraperConfig {
       parsers: (map['parsers'] as List)
           .map((parser) => Parser.fromMap(parser))
           .toList(),
+      proxyAPIConfig: map['proxyAPIConfig'] != null
+          ? ProxyAPIConfig.fromMap(map['proxyAPIConfig'])
+          : null,
+      cookies: map['cookies'] != null
+          ? Map<String, String>.from(map['cookies'])
+          : null,
+      headers: map['headers'] != null
+          ? Map<String, String>.from(map['headers'])
+          : null,
       forceRefresh: map['forceRefresh'] ?? false,
       userAgent: map['userAgent'] != null
           ? UserAgentDevice.values.firstWhere(
@@ -127,6 +160,9 @@ class ScraperConfig {
       'requiresHtml': requiresHtml,
       'urlCleaner': urlCleaner?.toMap(),
       'parsers': parsers.map((parser) => parser.toMap()).toList(),
+      'proxyAPIConfig': proxyAPIConfig?.toMap(),
+      'cookies': cookies,
+      'headers': headers,
       'forceRefresh': forceRefresh,
       'userAgent': userAgent.toString().split('.').last,
     };

@@ -57,12 +57,11 @@ class WebScraper {
   /// - [url]: The URL to scrape
   /// - [scraperConfig]: Scraper configuration for the URL
   /// - [scraperConfigMap]: Map of domain names to lists of scraper configurations
-  /// - [proxyAPIConfig]: Optional proxy API URL for routing requests through a proxy
   /// - [debug]: Enable debug logging (default: false)
   /// - [html]: Pre-fetched HTML document (optional, avoids HTTP request if provided)
-  /// - [cookies]: Custom cookies to include in HTTP requests
-  /// - [headers]: Custom HTTP headers to include in requests
-  /// - [userAgent]: Custom user agent string (overrides scraper config setting)
+  /// - [overrideCookies]: Custom cookies to include in HTTP requests, will override cookies in scraper config
+  /// - [overrideHeaders]: Custom HTTP headers to include in requests, will override headers in scraper config
+  /// - [overrideUserAgent]: Custom user agent string (overrides scraper config setting)
   /// - [concurrentParsing]: Enable concurrent parsing for better performance (default: false)
   ///
   /// Returns:
@@ -74,12 +73,11 @@ class WebScraper {
     required Uri url,
     ScraperConfig? scraperConfig,
     ScraperConfigMap? scraperConfigMap,
-    ProxyAPIConfig? proxyAPIConfig,
     bool debug = false,
-    Document? html,
-    Map<String, String>? cookies,
-    Map<String, String>? headers,
-    String? userAgent,
+    String? html,
+    Map<String, String>? overrideCookies,
+    Map<String, String>? overrideHeaders,
+    String? overrideUserAgent,
     bool concurrentParsing = false,
   }) async {
     /// Find the appropriate scraper configuration for this URL
@@ -101,13 +99,12 @@ class WebScraper {
     Scraper scraping = Scraper();
     Data scrapedData = await scraping.scrape(
       url: url,
-      html: html,
+      html: html != null ? Document.html(html) : null,
       debug: debug,
       scraperConfig: config,
-      cookies: cookies,
-      headers: headers,
-      userAgent: userAgent,
-      proxyAPIConfig: proxyAPIConfig,
+      overrideCookies: overrideCookies,
+      overrideHeaders: overrideHeaders,
+      overrideUserAgent: overrideUserAgent,
     );
 
     /// Parse the HTML content using the WebParser class
@@ -115,8 +112,6 @@ class WebScraper {
     Map<String, Object> parsedData = await webParser.parse(
       scrapedData: scrapedData,
       scraperConfig: config,
-      proxyAPIConfig: proxyAPIConfig,
-      cookies: cookies,
       debug: debug,
       concurrentParsing: concurrentParsing,
     );

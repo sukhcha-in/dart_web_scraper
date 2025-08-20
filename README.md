@@ -82,18 +82,16 @@ Future<Map<String, Object>> scrape({
   ScraperConfig? scraperConfig,
   // Map of domain names to lists of scraper configurations
   ScraperConfigMap? scraperConfigMap,
-  // Optional proxy API configuration
-  ProxyAPIConfig? proxyAPIConfig,
   // Enable debug logging, also dumps scraped file into current path /dump folder
   bool debug = false,
   // Pre-fetched HTML document (optional, avoids HTTP request if provided)
   Document? html,
-  // Custom cookies to include in HTTP requests
-  Map<String, String>? cookies,
-  // Custom HTTP headers to include in requests
-  Map<String, String>? headers,
-  // Custom user agent string (overrides scraper config setting)
-  String? userAgent,
+  // Custom cookies to include in HTTP requests (Overrides ScraperConfig cookies)
+  Map<String, String>? overrideCookies,
+  // Custom HTTP headers to include in requests (Overrides ScraperConfig headers)
+  Map<String, String>? overrideHeaders,
+  // Custom user agent string (overrides ScraperConfig userAgent)
+  String? overrideUserAgent,
 })
 ```
 
@@ -111,9 +109,15 @@ ScraperConfig ScraperConfig({
   bool requiresHtml = true,
   // URL preprocessing and cleaning configuration
   UrlCleaner? urlCleaner,
+  // Proxy API config
+  ProxyAPIConfig? proxyAPIConfig;
+  // Cookies for base request
+  Map<String, String>? cookies;
+  // Headers for base request
+  Map<String, String>? headers;
   // Whether to force a fresh HTTP request even if HTML is provided
   bool forceRefresh = false,
-  // User agent device type for HTTP requests
+  // User agent device type for base request
   UserAgentDevice userAgent = UserAgentDevice.mobile,
 })
 ```

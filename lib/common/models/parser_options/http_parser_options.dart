@@ -24,7 +24,14 @@ class HttpParserOptions {
   /// These headers will be sent along with the HTTP request.
   /// Useful for authentication, content-type specification, or custom headers.
   /// Example: {'Authorization': 'Bearer token', 'Content-Type': 'application/json'}
-  final Map<String, Object>? headers;
+  final Map<String, String>? headers;
+
+  /// Cookies to include in the request.
+  ///
+  /// These cookies will be sent along with the HTTP request.
+  /// Useful for authentication, session management, or custom cookies.
+  /// Example: {'foo': 'bar', 'baz': 'qux'}
+  final Map<String, String>? cookies;
 
   /// The user agent device type to simulate.
   ///
@@ -51,11 +58,11 @@ class HttpParserOptions {
   /// This helps determine how the payload should be serialized.
   final HttpPayload? payloadType;
 
-  /// Whether to use a proxy for the HTTP request.
+  /// Proxy API configuration.
   ///
-  /// When true, the request will be routed through a proxy server.
-  /// Useful for bypassing geo-restrictions or IP-based rate limiting.
-  final bool useProxy;
+  /// This configuration is used to proxy the HTTP request through a proxy API.
+  /// Useful for bypassing IP bans or accessing content that is blocked in certain regions.
+  final ProxyAPIConfig? proxyAPIConfig;
 
   /// Creates a new HttpParserOptions instance.
   ///
@@ -64,20 +71,22 @@ class HttpParserOptions {
   /// [url] - The target URL for the request
   /// [method] - The HTTP method to use
   /// [headers] - Custom headers to include
+  /// [cookies] - Cookies to include
   /// [userAgent] - User agent device to simulate
   /// [responseType] - Expected response type
   /// [payload] - Data to send with the request
   /// [payloadType] - Format of the payload
-  /// [useProxy] - Whether to use a proxy (defaults to false)
+  /// [proxyAPIConfig] - Proxy API configuration
   HttpParserOptions({
     this.url,
     this.method,
     this.headers,
+    this.cookies,
     this.userAgent,
     this.responseType,
     this.payload,
     this.payloadType,
-    this.useProxy = false,
+    this.proxyAPIConfig,
   });
 
   Map<String, dynamic> toMap() {
@@ -85,11 +94,12 @@ class HttpParserOptions {
       'url': url,
       'method': method?.toString().split('.').last,
       'headers': headers,
+      'cookies': cookies,
       'userAgent': userAgent?.toString().split('.').last,
       'responseType': responseType?.toString().split('.').last,
       'payload': payload,
       'payloadType': payloadType?.toString().split('.').last,
-      'useProxy': useProxy,
+      'proxyAPIConfig': proxyAPIConfig?.toMap(),
     };
   }
 
@@ -102,7 +112,10 @@ class HttpParserOptions {
             )
           : null,
       headers: map['headers'] != null
-          ? Map<String, Object>.from(map['headers'] as Map)
+          ? Map<String, String>.from(map['headers'] as Map)
+          : null,
+      cookies: map['cookies'] != null
+          ? Map<String, String>.from(map['cookies'] as Map)
           : null,
       userAgent: map['userAgent'] != null
           ? UserAgentDevice.values.firstWhere(
@@ -120,7 +133,9 @@ class HttpParserOptions {
               (e) => e.toString() == 'HttpPayload.${map['payloadType']}',
             )
           : null,
-      useProxy: map['useProxy'] as bool,
+      proxyAPIConfig: map['proxyAPIConfig'] != null
+          ? ProxyAPIConfig.fromMap(map['proxyAPIConfig'])
+          : null,
     );
   }
 

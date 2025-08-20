@@ -1,3 +1,8 @@
+## 0.2.5
+- Added headers, cookies, and proxyAPIConfig options to ScraperConfig.
+- The HTTP Parser is now independent from the base request. Added proxyApiConfig and cookies options to HttpParserOptions.
+- Refactored cookies, headers, and userAgent to overrideCookies, overrideHeaders, and overrideUserAgent for greater clarity.
+
 ## 0.2.4
 - Fix debug logging functionality and update HTTP response handling in scraper utilities
 

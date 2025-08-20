@@ -33,8 +33,6 @@ class WebParser {
   /// Parameters:
   /// - [scrapedData]: The scraped HTML data to parse as Data object containing url and Document object.
   /// - [scraperConfig]: Configuration containing parser definitions
-  /// - [proxyAPIConfig]: Optional proxy API for HTTP requests during parsing
-  /// - [cookies]: Cookies to include in any HTTP requests during parsing
   /// - [debug]: Enable debug logging for troubleshooting
   /// - [concurrentParsing]: Enable concurrent parser execution for performance
   ///
@@ -43,8 +41,6 @@ class WebParser {
   Future<Map<String, Object>> parse({
     required Data scrapedData,
     required ScraperConfig scraperConfig,
-    ProxyAPIConfig? proxyAPIConfig,
-    Map<String, String>? cookies,
     bool debug = false,
     bool concurrentParsing = false,
   }) async {
@@ -71,8 +67,6 @@ class WebParser {
       parentToChildren: parentToChildren,
       parsers: rootParsers,
       parentData: scrapedData,
-      proxyAPIConfig: proxyAPIConfig,
-      cookies: cookies,
       debug: debug,
       concurrent: concurrentParsing,
     );
@@ -125,9 +119,6 @@ class WebParser {
   /// - [parentToChildren]: Map of parent IDs to their child parsers
   /// - [parsers]: List of parsers to execute at this level
   /// - [parentData]: Data from parent parser (or scraped HTML for root parsers)
-  /// - [proxyAPIConfig]: Optional proxy API for HTTP requests
-  /// - [proxyUrlParam]: Parameter name for target URL when using proxy
-  /// - [cookies]: Cookies for HTTP requests
   /// - [debug]: Enable debug logging
   /// - [concurrent]: Enable concurrent parser execution
   ///
@@ -137,8 +128,6 @@ class WebParser {
     required Map<String, List<Parser>> parentToChildren,
     required List<Parser> parsers,
     required Data parentData,
-    required ProxyAPIConfig? proxyAPIConfig,
-    Map<String, String>? cookies,
     required bool debug,
     required bool concurrent,
   }) async {
@@ -162,8 +151,6 @@ class WebParser {
         final Data? data = await _runParserAndApplyTransformations(
           parser: parser,
           parentData: parentData,
-          proxyAPIConfig: proxyAPIConfig,
-          cookies: cookies,
           debug: debug,
         );
 
@@ -197,8 +184,6 @@ class WebParser {
                     parentToChildren: parentToChildren,
                     parsers: childParsers,
                     parentData: Data(data.url, singleData),
-                    proxyAPIConfig: proxyAPIConfig,
-                    cookies: cookies,
                     debug: debug,
                     concurrent: concurrent,
                   );
@@ -225,8 +210,6 @@ class WebParser {
                 parentToChildren: parentToChildren,
                 parsers: childParsers,
                 parentData: data,
-                proxyAPIConfig: proxyAPIConfig,
-                cookies: cookies,
                 debug: debug,
                 concurrent: concurrent,
               );
@@ -272,9 +255,6 @@ class WebParser {
   /// Parameters:
   /// - [parser]: The parser configuration to execute
   /// - [parentData]: Data from parent parser or scraped HTML
-  /// - [proxyAPIConfig]: Optional proxy API for HTTP requests
-  /// - [proxyUrlParam]: Parameter name for target URL when using proxy
-  /// - [cookies]: Cookies for HTTP requests
   /// - [debug]: Enable debug logging
   ///
   /// Returns:
@@ -282,16 +262,12 @@ class WebParser {
   Future<Data?> _runParserAndApplyTransformations({
     required Parser parser,
     required Data parentData,
-    required ProxyAPIConfig? proxyAPIConfig,
-    Map<String, String>? cookies,
     required bool debug,
   }) async {
     /// Execute the parser based on its type
     final Data? parsed = await _runParser(
       parser: parser,
       parentData: parentData,
-      proxyAPIConfig: proxyAPIConfig,
-      cookies: cookies,
       debug: debug,
     );
 
@@ -346,9 +322,6 @@ class WebParser {
   /// Parameters:
   /// - [parser]: The parser configuration to execute
   /// - [parentData]: Data from parent parser or scraped HTML
-  /// - [proxyAPIConfig]: Optional proxy API for HTTP requests
-  /// - [proxyUrlParam]: Parameter name for target URL when using proxy
-  /// - [cookies]: Cookies for HTTP requests
   /// - [debug]: Enable debug logging
   ///
   /// Returns:
@@ -356,8 +329,6 @@ class WebParser {
   Future<Data?> _runParser({
     required Parser parser,
     required Data parentData,
-    required ProxyAPIConfig? proxyAPIConfig,
-    Map<String, String>? cookies,
     required bool debug,
   }) async {
     switch (parser.type) {
@@ -408,8 +379,6 @@ class WebParser {
           parser: parser,
           parentData: parentData,
           allData: extractedData,
-          proxyAPIConfig: proxyAPIConfig,
-          cookies: cookies,
           debug: debug,
         );
       case ParserType.strBetween:

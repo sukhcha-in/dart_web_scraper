@@ -11,8 +11,6 @@ Future<Data?> httpParser({
   required Parser parser,
   required Data parentData,
   required Map<String, Object> allData,
-  required ProxyAPIConfig? proxyAPIConfig,
-  required Map<String, String>? cookies,
   required bool debug,
 }) async {
   printLog("----------------------------------", debug, color: LogColor.yellow);
@@ -47,10 +45,10 @@ Future<Data?> httpParser({
     }
 
     // Set random user agent if specified
-    if (!headers.containsKey("User-Agent") &&
-        parser.parserOptions!.http!.userAgent != null) {
-      headers['User-Agent'] =
-          randomUserAgent(parser.parserOptions!.http!.userAgent!);
+    if (!headers.containsKey("User-Agent")) {
+      headers['User-Agent'] = randomUserAgent(
+        parser.parserOptions!.http!.userAgent ?? UserAgentDevice.random,
+      );
     }
 
     // Inject dynamic data into headers
@@ -63,12 +61,16 @@ Future<Data?> httpParser({
     });
 
     // Set cookies if provided
-    if (cookies != null) {
-      headers['Cookie'] = mapToCookie(cookies);
+    if (parser.parserOptions!.http!.cookies != null) {
+      headers['Cookie'] = mapToCookie(parser.parserOptions!.http!.cookies!);
     }
     printLog("HTTP Parser URL: $url", debug, color: LogColor.magenta);
     printLog("HTTP Parser Method: $method", debug, color: LogColor.magenta);
-    printLog("HTTP Parser Cookies: $cookies", debug, color: LogColor.magenta);
+    printLog(
+      "HTTP Parser Cookies: ${headers['Cookie']}",
+      debug,
+      color: LogColor.magenta,
+    );
 
     // Set payload type and prepare payload
     if (parser.parserOptions!.http!.payloadType != null) {
@@ -100,13 +102,12 @@ Future<Data?> httpParser({
 
   // Make HTTP request based on method
   Object? result;
-  final useProxy = parser.parserOptions?.http?.useProxy ?? false;
   if (method == HttpMethod.get) {
     result = await getRequest(
       Uri.parse(url),
       headers: headers,
       debug: debug,
-      proxyAPIConfig: useProxy ? proxyAPIConfig : null,
+      proxyAPIConfig: parser.parserOptions?.http?.proxyAPIConfig,
     );
   } else if (method == HttpMethod.post) {
     result = await postRequest(
@@ -114,7 +115,7 @@ Future<Data?> httpParser({
       headers: headers,
       body: payLoad,
       debug: debug,
-      proxyAPIConfig: useProxy ? proxyAPIConfig : null,
+      proxyAPIConfig: parser.parserOptions?.http?.proxyAPIConfig,
     );
   } else {
     printLog("HTTP Parser: Invalid method!", debug, color: LogColor.red);
