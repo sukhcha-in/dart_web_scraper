@@ -311,7 +311,7 @@ You can register cleaners using `CleanerRegistry.register` method. This is usefu
 For example:
 
 ```dart
-CleanerRegistry.register('formatPrice', (data, debug) {
+CleanerRegistry.register('formatPrice', (data, extractedData, debug) {
   return '\$${data.obj}';
 });
 ```

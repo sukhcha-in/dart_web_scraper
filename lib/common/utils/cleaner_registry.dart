@@ -42,7 +42,7 @@ typedef CleanerFunction<T> = T Function(
 /// Example usage:
 /// ```dart
 /// // Register a cleaner function
-/// CleanerRegistry.register('trimText', (data, debug) {
+/// CleanerRegistry.register('trimText', (data, extractedData, debug) {
 ///   if (data.obj is String) {
 ///     return (data.obj as String).trim();
 ///   }
@@ -76,7 +76,7 @@ class CleanerRegistry {
   ///
   /// Example:
   /// ```dart
-  /// CleanerRegistry.register('removeHtml', (data, debug) {
+  /// CleanerRegistry.register('removeHtml', (data, extractedData, debug) {
   ///   if (data.obj is String) {
   ///     return (data.obj as String).replaceAll(RegExp(r'<[^>]*>'), '');
   ///   }
@@ -103,7 +103,7 @@ class CleanerRegistry {
   /// ```dart
   /// CleanerFunction? cleaner = CleanerRegistry.resolve('trimText');
   /// if (cleaner != null) {
-  ///   final result = cleaner(data, debug);
+  ///   final result = cleaner(data, extractedData, debug);
   /// }
   /// ```
   static CleanerFunction? resolve(String? name) {
