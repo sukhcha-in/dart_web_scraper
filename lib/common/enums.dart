@@ -66,6 +66,7 @@ enum UserAgentDevice {
 /// - [json5decode] - Parse JSON5 format data
 /// - [staticVal] - Return static values
 /// - [returnUrlParser] - Return URL-based data
+/// - [empty] - Return empty value, helpful for using parent data as a fallback
 enum ParserType {
   /// Extract HTML elements for further processing
   element,
@@ -114,6 +115,9 @@ enum ParserType {
 
   /// Return URL-based data without making requests
   returnUrlParser,
+
+  /// Return empty value, helpful for using parent data as a fallback
+  empty,
 }
 
 /// HTTP methods for making requests in HTTP parsers.

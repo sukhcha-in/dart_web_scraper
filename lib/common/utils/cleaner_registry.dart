@@ -22,7 +22,8 @@ import 'package:dart_web_scraper/dart_web_scraper.dart';
 ///   return null;
 /// };
 /// ```
-typedef CleanerFunction<T> = T Function(Data data, bool debug);
+typedef CleanerFunction<T> = T Function(
+    Data data, Map<String, Object> extractedData, bool debug);
 
 /// Registry for managing custom cleaner functions by name.
 ///

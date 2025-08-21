@@ -1,3 +1,7 @@
+## 0.2.7
+- Update `cleaner` function signature to include `extractedData`
+- Add new `ParserType` for `empty` values
+
 ## 0.2.6
 - Add `overrideProxyAPIConfig` option to `Scraper`, `WebParser` and `WebScraper`.
 

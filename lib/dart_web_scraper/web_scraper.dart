@@ -63,7 +63,6 @@ class WebScraper {
   /// - [overrideHeaders]: Custom HTTP headers to include in requests, will override headers in scraper config
   /// - [overrideUserAgent]: Custom user agent string (overrides scraper config setting)
   /// - [overrideProxyAPIConfig]: Custom proxy API configuration (overrides scraper config setting for base requests and http parser requests)
-  /// - [concurrentParsing]: Enable concurrent parsing for better performance (default: false)
   ///
   /// Returns:
   /// - Map containing extracted data with parser IDs as keys
@@ -80,7 +79,6 @@ class WebScraper {
     Map<String, String>? overrideHeaders,
     String? overrideUserAgent,
     ProxyAPIConfig? overrideProxyAPIConfig,
-    bool concurrentParsing = false,
   }) async {
     /// Find the appropriate scraper configuration for this URL
     ScraperConfig? config;
@@ -117,7 +115,6 @@ class WebScraper {
       scraperConfig: config,
       debug: debug,
       overrideProxyAPIConfig: overrideProxyAPIConfig,
-      concurrentParsing: concurrentParsing,
     );
 
     return parsedData;

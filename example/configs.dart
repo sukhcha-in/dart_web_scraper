@@ -66,10 +66,10 @@ Map<String, List<ScraperConfig>> configMap = {
           ),
 
           /// Complex or custom functions can be performed using cleaner function
-          cleaner: (data, debug) {
+          cleaner: (Data data, Map<String, Object> extractedData, bool debug) {
             Object input = data.obj;
             printLog(
-              "Custom cleaner input: $input",
+              "Custom cleaner input: $input, allData: $extractedData",
               debug,
               color: LogColor.yellow,
             );

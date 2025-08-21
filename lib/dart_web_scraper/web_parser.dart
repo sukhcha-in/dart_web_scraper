@@ -8,7 +8,6 @@ import 'package:dart_web_scraper/dart_web_scraper/parsers/exports.dart';
 /// - Executes parsers in the correct order (root parsers first, then children)
 /// - Handles both single and multiple data extraction scenarios
 /// - Applies transformations and cleaning to extracted data
-/// - Supports concurrent parsing for improved performance
 /// - Maintains private parser data for internal processing
 ///
 /// The parser system uses a tree structure where child parsers depend on
@@ -35,7 +34,6 @@ class WebParser {
   /// - [scraperConfig]: Configuration containing parser definitions
   /// - [debug]: Enable debug logging for troubleshooting
   /// - [overrideProxyAPIConfig]: Custom proxy API configuration (overrides http parser requests)
-  /// - [concurrentParsing]: Enable concurrent parser execution for performance
   ///
   /// Returns:
   /// - Map containing extracted data with parser IDs as keys
@@ -44,7 +42,6 @@ class WebParser {
     required ScraperConfig scraperConfig,
     bool debug = false,
     ProxyAPIConfig? overrideProxyAPIConfig,
-    bool concurrentParsing = false,
   }) async {
     /// Start performance monitoring
     final Stopwatch stopwatch = Stopwatch()..start();
@@ -71,7 +68,6 @@ class WebParser {
       parentData: scrapedData,
       overrideProxyAPIConfig: overrideProxyAPIConfig,
       debug: debug,
-      concurrent: concurrentParsing,
     );
 
     /// Ensure URL is always present in the final result
@@ -114,7 +110,6 @@ class WebParser {
   /// This method handles the complex logic of:
   /// - Executing parsers in the correct order (parents before children)
   /// - Managing both single and multiple data scenarios
-  /// - Supporting concurrent parsing for performance
   /// - Handling private parsers (internal data not returned to user)
   /// - Recursively processing child parsers
   ///
@@ -123,7 +118,6 @@ class WebParser {
   /// - [parsers]: List of parsers to execute at this level
   /// - [parentData]: Data from parent parser (or scraped HTML for root parsers)
   /// - [debug]: Enable debug logging
-  /// - [concurrent]: Enable concurrent parser execution
   ///
   /// Returns:
   /// - Map containing parsed data from this level and all child levels
@@ -133,13 +127,9 @@ class WebParser {
     required Data parentData,
     required ProxyAPIConfig? overrideProxyAPIConfig,
     required bool debug,
-    required bool concurrent,
   }) async {
     final Map<String, Object> parsedData = {};
     final List<String> privateIds = [];
-
-    /// List to hold concurrent parser futures for parallel execution
-    final List<Future<void>> parserFutures = [];
 
     for (final parser in parsers) {
       final String id = parser.id;
@@ -149,98 +139,63 @@ class WebParser {
         continue;
       }
 
-      /// Define the parser execution task
-      Future<void> parserTask() async {
-        /// Execute parser and apply transformations
-        final Data? data = await _runParserAndApplyTransformations(
-          parser: parser,
-          parentData: parentData,
-          overrideProxyAPIConfig: overrideProxyAPIConfig,
-          debug: debug,
-        );
+      /// Execute parser and apply transformations
+      final Data? data = await _runParserAndApplyTransformations(
+        parser: parser,
+        parentData: parentData,
+        overrideProxyAPIConfig: overrideProxyAPIConfig,
+        debug: debug,
+      );
 
-        if (data != null) {
-          final Object obj = data.obj;
+      if (data != null) {
+        final Object obj = data.obj;
 
-          /// Track private parsers for later removal
-          if (parser.isPrivate) {
-            privateIds.add(id);
-          }
+        /// Track private parsers for later removal
+        if (parser.isPrivate) {
+          privateIds.add(id);
+        }
 
-          /// Store parsed data
-          parsedData[id] = obj;
+        /// Store parsed data
+        parsedData[id] = obj;
 
-          /// Get child parsers that depend on this parser's output
-          final List<Parser> childParsers =
-              parentToChildren[id]?.toList() ?? [];
+        /// Get child parsers that depend on this parser's output
+        final List<Parser> childParsers = parentToChildren[id]?.toList() ?? [];
 
-          if (childParsers.isNotEmpty) {
-            if (obj is Iterable && parser.multiple) {
-              /// Handle multiple data entries (e.g., list of products)
-              parsedData[id] = [];
+        if (childParsers.isNotEmpty) {
+          if (obj is Iterable && parser.multiple) {
+            /// Handle multiple data entries (e.g., list of products)
+            parsedData[id] = [];
 
-              final List<Future<void>> childFutures = [];
-
-              for (final singleData in obj) {
-                /// Define child task for each data item
-                Future<void> childTask() async {
-                  final Map<String, Object> childrenResults =
-                      await _distributeParsers(
-                    parentToChildren: parentToChildren,
-                    parsers: childParsers,
-                    parentData: Data(data.url, singleData),
-                    overrideProxyAPIConfig: overrideProxyAPIConfig,
-                    debug: debug,
-                    concurrent: concurrent,
-                  );
-
-                  if (childrenResults.isNotEmpty) {
-                    (parsedData[id] as List).add(childrenResults);
-                  }
-                }
-
-                if (concurrent) {
-                  childFutures.add(childTask());
-                } else {
-                  await childTask();
-                }
-              }
-
-              /// Wait for all child tasks to complete if running concurrently
-              if (concurrent && childFutures.isNotEmpty) {
-                await Future.wait(childFutures);
-              }
-            } else {
-              /// Handle single data entry
-              final Map<String, Object> childResult = await _distributeParsers(
+            for (final singleData in obj) {
+              final Map<String, Object> childrenResults =
+                  await _distributeParsers(
                 parentToChildren: parentToChildren,
                 parsers: childParsers,
-                parentData: data,
+                parentData: Data(data.url, singleData),
                 overrideProxyAPIConfig: overrideProxyAPIConfig,
                 debug: debug,
-                concurrent: concurrent,
               );
 
-              if (childResult.isNotEmpty) {
-                parsedData.addAll(childResult);
+              if (childrenResults.isNotEmpty) {
+                (parsedData[id] as List).add(childrenResults);
               }
+            }
+          } else {
+            /// Handle single data entry
+            final Map<String, Object> childResult = await _distributeParsers(
+              parentToChildren: parentToChildren,
+              parsers: childParsers,
+              parentData: data,
+              overrideProxyAPIConfig: overrideProxyAPIConfig,
+              debug: debug,
+            );
+
+            if (childResult.isNotEmpty) {
+              parsedData.addAll(childResult);
             }
           }
         }
       }
-
-      if (concurrent) {
-        /// Add parser task to concurrent execution list
-        parserFutures.add(parserTask());
-      } else {
-        /// Execute parser task sequentially
-        await parserTask();
-      }
-    }
-
-    /// Wait for all concurrent parser tasks to complete
-    if (concurrent && parserFutures.isNotEmpty) {
-      await Future.wait(parserFutures);
     }
 
     /// Remove private parser data from final result
@@ -296,7 +251,8 @@ class WebParser {
       if (parser.cleaner != null) {
         printLog("Cleaning ${parser.id}...", debug, color: LogColor.green);
         final CleanerFunction cleaner = parser.cleaner!;
-        final Object? cleaned = cleaner(Data(parsed.url, data), debug);
+        final Object? cleaned =
+            cleaner(Data(parsed.url, data), extractedData, debug);
         if (cleaned != null) {
           printLog(
             "Cleaning success for ${parser.id}.",
@@ -450,6 +406,8 @@ class WebParser {
           parentData: parentData,
           debug: debug,
         );
+      case ParserType.empty:
+        return Data(parentData.url, "");
     }
   }
 }
