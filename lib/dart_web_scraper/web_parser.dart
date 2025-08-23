@@ -305,6 +305,13 @@ class WebParser {
           allData: extractedData,
           debug: debug,
         );
+      case ParserType.parentElement:
+        return parentElementParser(
+          parser: parser,
+          parentData: parentData,
+          allData: extractedData,
+          debug: debug,
+        );
       case ParserType.text:
         return textParser(
           parser: parser,

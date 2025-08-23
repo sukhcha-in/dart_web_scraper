@@ -1,3 +1,6 @@
+## 0.2.9
+- New Parser: `Parent Element` allows to select parent element from a child element.
+
 ## 0.2.8
 - Handle exceptions so that if one ld+json block fails to decode, other blocks can still be decoded.
 

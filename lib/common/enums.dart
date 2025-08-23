@@ -71,6 +71,9 @@ enum ParserType {
   /// Extract HTML elements for further processing
   element,
 
+  /// Extract parent element of HTML elements
+  parentElement,
+
   /// Extract attribute values (href, src, class, etc.) from HTML elements
   attribute,
 

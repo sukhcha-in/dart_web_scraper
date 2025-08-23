@@ -14,3 +14,4 @@ export 'package:dart_web_scraper/dart_web_scraper/parsers/table_parser.dart';
 export 'package:dart_web_scraper/dart_web_scraper/parsers/text_parser.dart';
 export 'package:dart_web_scraper/dart_web_scraper/parsers/url_parameter_parser.dart';
 export 'package:dart_web_scraper/dart_web_scraper/parsers/url_parser.dart';
+export 'package:dart_web_scraper/dart_web_scraper/parsers/parent_element_parser.dart';
