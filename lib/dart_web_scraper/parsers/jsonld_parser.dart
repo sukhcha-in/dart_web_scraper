@@ -41,20 +41,29 @@ Data? jsonLdParser({
       // Clean up JSON string by removing newlines and tabs
       String innerHtml = s.innerHtml.replaceAll("\n", "");
       innerHtml = innerHtml.replaceAll("\t", "");
-      Object json = jsonDecode(innerHtml);
+      try {
+        Object json = jsonDecode(innerHtml);
 
-      // Handle different JSON-LD structures
-      if (json is Map) {
-        if (json["@graph"] != null) {
-          // Extract items from @graph array
-          results.addAll(json["@graph"]);
-        } else {
-          // Add single JSON-LD object
-          results.add(json);
+        // Handle different JSON-LD structures
+        if (json is Map) {
+          if (json["@graph"] != null) {
+            // Extract items from @graph array
+            results.addAll(json["@graph"]);
+          } else {
+            // Add single JSON-LD object
+            results.add(json);
+          }
+        } else if (json is Iterable) {
+          // Add all items from JSON array
+          results.addAll(json);
         }
-      } else if (json is Iterable) {
-        // Add all items from JSON array
-        results.addAll(json);
+      } catch (e) {
+        printLog(
+          "JSON+LD Parser: Error parsing JSON: $e",
+          debug,
+          color: LogColor.red,
+        );
+        continue;
       }
     }
     return Data(parentData.url, results);

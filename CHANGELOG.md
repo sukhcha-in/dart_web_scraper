@@ -1,3 +1,6 @@
+## 0.2.8
+- Handle exceptions so that if one ld+json block fails to decode, other blocks can still be decoded.
+
 ## 0.2.7
 - Update `cleaner` function signature to include `extractedData`
 - Add new `ParserType` for `empty` values

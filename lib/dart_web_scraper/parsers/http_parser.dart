@@ -45,7 +45,7 @@ Future<Data?> httpParser({
       });
     }
 
-    // Set random user agent if specified
+    // Set random user agent if not specified in headers
     if (!headers.containsKey("User-Agent")) {
       headers['User-Agent'] = randomUserAgent(
         parser.parserOptions!.http!.userAgent ?? UserAgentDevice.random,
