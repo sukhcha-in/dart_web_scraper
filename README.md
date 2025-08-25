@@ -12,6 +12,11 @@ Config-based, reusable web scraper for web and API scraping. Scrape, parse web p
 - 15+ Built-in parsers.
 - Data cleaning and transformations.
 
+
+
+![Comparison](dart_web_scraper.jpg)
+
+
 ## Getting Started
 
 Install it with a `flutter` command:

@@ -1,3 +1,6 @@
+## 0.2.10
+- Ignore `isPrivate` property if parser have multiple elements.
+
 ## 0.2.9
 - New Parser: `Parent Element` allows to select parent element from a child element.
 

@@ -151,7 +151,7 @@ class WebParser {
         final Object obj = data.obj;
 
         /// Track private parsers for later removal
-        if (parser.isPrivate) {
+        if (parser.isPrivate && !parser.multiple) {
           privateIds.add(id);
         }
 
