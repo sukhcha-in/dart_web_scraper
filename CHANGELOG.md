@@ -1,3 +1,6 @@
+## 0.2.11
+- Do not skip `url` id in `WebParser`
+
 ## 0.2.10
 - Ignore `isPrivate` property if parser have multiple elements.
 

@@ -135,7 +135,7 @@ class WebParser {
       final String id = parser.id;
 
       /// Skip if data for this parser ID is already parsed (except 'url')
-      if (id != 'url' && parsedData.containsKey(id)) {
+      if (parsedData.containsKey(id)) {
         continue;
       }
 

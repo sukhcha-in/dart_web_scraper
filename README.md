@@ -14,7 +14,7 @@ Config-based, reusable web scraper for web and API scraping. Scrape, parse web p
 
 
 
-![Comparison](dart_web_scraper.jpg)
+![Comparison](https://raw.githubusercontent.com/sukhcha-in/dart_web_scraper/main/dart_web_scraper.jpg)
 
 
 ## Getting Started
