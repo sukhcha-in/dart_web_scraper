@@ -41,11 +41,11 @@ ScraperConfig? findScraperConfig({
     final list = scraperConfigMap.configs[host];
     if (list == null || list.isEmpty) continue;
 
-    // if useNth provided, check bounds and only test that config
+    // if useNth provided, prefer that index; fallback to 0 when out of range
     final nth = scraperConfigMap.useNth;
     if (nth != null) {
-      if (nth < 0 || nth >= list.length) continue;
-      final hit = _checkPathPatterns(list[nth], url);
+      final safeIndex = (nth < 0 || nth >= list.length) ? 0 : nth;
+      final hit = _checkPathPatterns(list[safeIndex], url);
       if (hit != null) return hit;
       continue;
     }

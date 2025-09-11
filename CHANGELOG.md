@@ -1,3 +1,6 @@
+## 0.2.12
+- Add fallback to `0` for `useNth` property
+
 ## 0.2.11
 - Do not skip `url` id in `WebParser`
 
