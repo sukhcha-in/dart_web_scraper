@@ -15,7 +15,7 @@ dependencies:
   http: ^1.5.0
   html: ^0.15.6
   json5: ^0.8.2
-  json_path: ^0.8.0
+  json_path: ">=0.8.0 <0.10.0"
   path: ^1.9.1
 
 dev_dependencies:
