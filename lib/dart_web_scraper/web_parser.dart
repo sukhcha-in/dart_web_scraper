@@ -267,6 +267,8 @@ class WebParser {
             debug,
             color: LogColor.red,
           );
+          /// Return null so fallback parsers with same id get a chance
+          return null;
         }
       } else {
         extractedData[parser.id] = data;

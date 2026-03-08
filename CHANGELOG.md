@@ -1,3 +1,8 @@
+## 0.2.13
+- Update dependencies
+- Save response dumps for HTTP post requests
+- Return `null` so fallback parsers with same id get a chance
+
 ## 0.2.12
 - Add fallback to `0` for `useNth` property
 

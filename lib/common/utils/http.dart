@@ -75,7 +75,9 @@ Future<String?> postRequest(
         .timeout(
           Duration(seconds: 30),
         );
-    return utf8.decode(html.bodyBytes);
+    String responseBody = utf8.decode(html.bodyBytes);
+    dumpResponseToFile(html: responseBody, debug: debug);
+    return responseBody;
   } catch (e) {
     return null;
   }
