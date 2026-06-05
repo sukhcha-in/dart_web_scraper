@@ -60,6 +60,7 @@ enum UserAgentDevice {
 /// - [sibling] - Extract sibling elements
 /// - [strBetween] - Extract text between two strings
 /// - [http] - Make HTTP requests to extract data
+/// - [responseHeaders] - Make a request and extract a response header (e.g. set-cookie)
 /// - [json] - Extract and parse JSON data
 /// - [jsonld] - Extract JSON-LD structured data
 /// - [jsonTable] - Extract data from JSON table structures
@@ -100,6 +101,10 @@ enum ParserType {
 
   /// Make HTTP requests to extract data from other URLs
   http,
+
+  /// Make a request (GET or POST) and extract a value from the response headers
+  /// (e.g. pull a cookie out of the `set-cookie` header)
+  responseHeaders,
 
   /// Extract and parse JSON data from HTML or other sources
   json,

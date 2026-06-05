@@ -357,6 +357,14 @@ class WebParser {
           overrideProxyAPIConfig: overrideProxyAPIConfig,
           debug: debug,
         );
+      case ParserType.responseHeaders:
+        return await responseHeaderParser(
+          parser: parser,
+          parentData: parentData,
+          allData: extractedData,
+          overrideProxyAPIConfig: overrideProxyAPIConfig,
+          debug: debug,
+        );
       case ParserType.strBetween:
         return stringBetweenParser(
           parser: parser,

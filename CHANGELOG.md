@@ -1,3 +1,6 @@
+## 0.2.14
+- New Parser: `Response Headers` sends a GET or POST request and extracts a value from the response headers, with optional cookie extraction from the `set-cookie` header.
+
 ## 0.2.13
 - Update dependencies
 - Save response dumps for HTTP post requests

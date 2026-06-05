@@ -51,6 +51,20 @@ String? joinCookies(String? staticCookies, String? cookies) {
   return mapToCookie(mergedCookies);
 }
 
+/// Extracts a single cookie's value from a `set-cookie` (or similar) header value.
+///
+/// A `set-cookie` header looks like `name=value; Path=/; HttpOnly` and multiple
+/// cookies may be comma-joined. This finds the `[cookieName]=value` token and
+/// returns just its value (up to the next `;` or `,`), or null if not present.
+/// Unlike [parseCookies], it tolerates `=` characters inside the value (e.g.
+/// base64-encoded tokens).
+String? extractCookieFromHeader(String headerValue, String cookieName) {
+  final RegExp regex = RegExp(
+    '(?:^|[;,]\\s*)${RegExp.escape(cookieName)}=([^;,]*)',
+  );
+  return regex.firstMatch(headerValue)?.group(1);
+}
+
 /// Parses a cookie string to a map.
 Map<String, String> parseCookies(String cookieString) {
   List<String> cookieList = cookieString.split('; ');

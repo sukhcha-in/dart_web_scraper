@@ -49,6 +49,51 @@ Future<String?> getRequest(
   }
 }
 
+/// Makes a request and returns the response headers instead of the body.
+///
+/// Used by the responseHeaders parser to pull values (e.g. `set-cookie`) out of
+/// a response. Supports GET and POST. Header keys are lower-cased by the http
+/// client. Returns null on any network/timeout error.
+Future<Map<String, String>?> getResponseHeaders(
+  Uri url, {
+  HttpMethod method = HttpMethod.get,
+  Object? body,
+  Map<String, String> headers = const {},
+  bool debug = false,
+  ProxyAPIConfig? proxyAPIConfig,
+}) async {
+  printLog("HTTP ${method.name.toUpperCase()} (headers): $url", debug,
+      color: LogColor.yellow);
+  if (proxyAPIConfig != null) {
+    printLog("Prepending proxy URL...", debug, color: LogColor.yellow);
+    url = proxyAPIConfig.generateUrl(url);
+  }
+  printLog("URL: $url", debug, color: LogColor.yellow);
+  printLog("HEADERS: $headers", debug, color: LogColor.yellow);
+  try {
+    final response = await (method == HttpMethod.post
+            ? http.post(url, headers: headers, body: body)
+            : http.get(url, headers: headers))
+        .timeout(
+      Duration(seconds: 30),
+    );
+    printLog(
+      "HTTP Response: ${response.statusCode}",
+      debug,
+      color: LogColor.yellow,
+    );
+    printLog(
+      "HTTP Response headers: ${response.headers}",
+      debug,
+      color: LogColor.yellow,
+    );
+    return response.headers;
+  } catch (e) {
+    printLog(e.toString(), debug, color: LogColor.red);
+    return null;
+  }
+}
+
 /// POST request to fetch data from URL
 Future<String?> postRequest(
   Uri url, {

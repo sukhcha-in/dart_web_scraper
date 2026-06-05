@@ -35,6 +35,7 @@ export 'common/models/transformations/replace_transformation.dart';
 
 /// Parser Options
 export 'common/models/parser_options/http_parser_options.dart';
+export 'common/models/parser_options/response_header_parser_options.dart';
 export 'common/models/parser_options/sibling_parser_options.dart';
 export 'common/models/parser_options/static_value_parser_options.dart';
 export 'common/models/parser_options/string_between_parser_options.dart';

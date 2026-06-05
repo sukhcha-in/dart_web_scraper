@@ -1,5 +1,6 @@
 export 'package:dart_web_scraper/dart_web_scraper/parsers/attribute_parser.dart';
 export 'package:dart_web_scraper/dart_web_scraper/parsers/element_parser.dart';
+export 'package:dart_web_scraper/dart_web_scraper/parsers/response_header_parser.dart';
 export 'package:dart_web_scraper/dart_web_scraper/parsers/http_parser.dart';
 export 'package:dart_web_scraper/dart_web_scraper/parsers/image_parser.dart';
 export 'package:dart_web_scraper/dart_web_scraper/parsers/json5decode_parser.dart';

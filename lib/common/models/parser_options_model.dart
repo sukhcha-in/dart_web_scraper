@@ -10,6 +10,7 @@ import 'package:dart_web_scraper/dart_web_scraper.dart';
 ///
 /// Use the appropriate named constructor for the parser type you're configuring:
 /// - [ParserOptions.http] for HTTP parsers
+/// - [ParserOptions.responseHeaders] for responseHeaders parsers
 /// - [ParserOptions.table] for table and JSON table parsers
 /// - [ParserOptions.sibling] for sibling parsers
 /// - [ParserOptions.staticValue] for static value parsers
@@ -18,6 +19,9 @@ import 'package:dart_web_scraper/dart_web_scraper.dart';
 class ParserOptions {
   /// HTTP request configuration options
   HttpParserOptions? http;
+
+  /// Response header extraction configuration options
+  ResponseHeaderParserOptions? responseHeaders;
 
   /// Table processing configuration options
   TableParserOptions? table;
@@ -37,6 +41,17 @@ class ParserOptions {
   /// Creates ParserOptions for HTTP parser configuration
   ParserOptions.http({required HttpParserOptions options})
       : http = options,
+        responseHeaders = null,
+        table = null,
+        sibling = null,
+        staticValue = null,
+        stringBetween = null,
+        urlParam = null;
+
+  /// Creates ParserOptions for responseHeaders parser configuration
+  ParserOptions.responseHeaders({required ResponseHeaderParserOptions options})
+      : http = null,
+        responseHeaders = options,
         table = null,
         sibling = null,
         staticValue = null,
@@ -46,6 +61,7 @@ class ParserOptions {
   /// Creates ParserOptions for table parser configuration
   ParserOptions.table({required TableParserOptions options})
       : http = null,
+        responseHeaders = null,
         table = options,
         sibling = null,
         staticValue = null,
@@ -55,6 +71,7 @@ class ParserOptions {
   /// Creates ParserOptions for sibling parser configuration
   ParserOptions.sibling({required SiblingParserOptions options})
       : http = null,
+        responseHeaders = null,
         table = null,
         sibling = options,
         staticValue = null,
@@ -64,6 +81,7 @@ class ParserOptions {
   /// Creates ParserOptions for static value parser configuration
   ParserOptions.staticValue({required StaticValueParserOptions options})
       : http = null,
+        responseHeaders = null,
         table = null,
         sibling = null,
         staticValue = options,
@@ -73,6 +91,7 @@ class ParserOptions {
   /// Creates ParserOptions for string between parser configuration
   ParserOptions.stringBetween({required StringBetweenParserOptions options})
       : http = null,
+        responseHeaders = null,
         table = null,
         sibling = null,
         staticValue = null,
@@ -82,6 +101,7 @@ class ParserOptions {
   /// Creates ParserOptions for url parameter parser configuration
   ParserOptions.urlParam({required UrlParamParserOptions options})
       : http = null,
+        responseHeaders = null,
         table = null,
         sibling = null,
         staticValue = null,
@@ -102,6 +122,10 @@ class ParserOptions {
     if (map['http'] != null) {
       return ParserOptions.http(
           options: HttpParserOptions.fromMap(map['http']));
+    } else if (map['responseHeaders'] != null) {
+      return ParserOptions.responseHeaders(
+          options:
+              ResponseHeaderParserOptions.fromMap(map['responseHeaders']));
     } else if (map['table'] != null) {
       return ParserOptions.table(
           options: TableParserOptions.fromMap(map['table']));
@@ -132,6 +156,7 @@ class ParserOptions {
   Map<String, dynamic> toMap() {
     return {
       'http': http?.toMap(),
+      'responseHeaders': responseHeaders?.toMap(),
       'table': table?.toMap(),
       'sibling': sibling?.toMap(),
       'staticValue': staticValue?.toMap(),
