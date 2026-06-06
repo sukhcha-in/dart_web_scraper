@@ -11,6 +11,7 @@ Config-based, reusable web scraper for web and API scraping. Scrape, parse web p
 - Scrape, parse web pages or APIs without writing parsers or scraping logic, using simple key/value based configs.
 - 15+ Built-in parsers.
 - Data cleaning and transformations.
+- Automatic browser-like request headers (User-Agent + matching client hints).
 
 
 
@@ -196,6 +197,7 @@ Parser Parser({
 | `ParserType.sibling`         | Used when target element doesn't have a valid selector but sibling does. | CSS selector is required.                                                                                                                      | `ParserOptions.sibling`       |
 | `ParserType.strBetween`      | Extracts the string between two strings.                                 | Not required                                                                                                                                   | `ParserOptions.stringBetween` |
 | `ParserType.http`            | Get data using http request                                              | Not required                                                                                                                                   | `ParserOptions.http`          |
+| `ParserType.responseHeaders` | Sends a GET/POST request and extracts a value from the response headers (e.g. a cookie from `set-cookie`). | Not required                                                                              | `ParserOptions.responseHeaders` |
 | `ParserType.json`            | Decode JSON string or extract data.                                      | [json_path](https://pub.dev/packages/json_path) syntax should be used as a selector                                                            | `-`                           |
 | `ParserType.jsonld`          | Extracts all Ld+Json objects and places them into a list                 | Not required                                                                                                                                   | `-`                           |
 | `ParserType.jsonTable`       | Extracts data from JSON as table.                                        | [json_path](https://pub.dev/packages/json_path) syntax should be used as a selector                                                            | `ParserOptions.table`         |
@@ -246,6 +248,9 @@ Use the appropriate named constructor for the parser type you're configuring:
 // For HTTP parsers
 ParserOptions.http(options: HttpParserOptions(...))
 
+// For response header parsers
+ParserOptions.responseHeaders(options: ResponseHeaderParserOptions(...))
+
 // For table and JSON table parsers
 ParserOptions.table(options: TableParserOptions(...))
 
@@ -260,6 +265,30 @@ ParserOptions.stringBetween(options: StringBetweenParserOptions(...))
 
 // For URL parameter parsers
 ParserOptions.urlParam(options: UrlParamParserOptions(...))
+```
+
+#### Response Headers parser
+
+`ParserType.responseHeaders` sends a request and returns a value from the **response headers** — handy for grabbing a cookie out of `set-cookie`.
+
+```dart
+Parser(
+  id: "session",
+  parents: ["_root"],
+  type: ParserType.responseHeaders,
+  parserOptions: ParserOptions.responseHeaders(
+    options: ResponseHeaderParserOptions(
+      // Optional: defaults to the URL passed to WebScraper.scrape
+      url: "https://example.com/login",
+      // HttpMethod.get (default) or HttpMethod.post
+      method: HttpMethod.get,
+      // Response header to read (case-insensitive). Omit to return all headers as a Map.
+      headerName: "set-cookie",
+      // Optional: extract a single cookie's value from the header
+      cookieName: "at",
+    ),
+  ),
+)
 ```
 
 ---
@@ -304,6 +333,28 @@ TransformationOptions TransformationOptions({
   List<TransformationType>? transformationOrder,
 })
 ```
+
+## Error handling
+
+Scraping throws `WebScraperError`. When a request (the base fetch, or an `http` / `responseHeaders` parser) returns **404**, the error carries `statusCode: 404`, signalling the URL is no longer available:
+
+```dart
+try {
+  final result = await webScraper.scrape(url: url, scraperConfig: config);
+} on WebScraperError catch (e) {
+  if (e.statusCode == 404) {
+    // URL is gone
+  } else {
+    print(e.message);
+  }
+}
+```
+
+## Browser-like requests
+
+Every request automatically includes a coherent set of browser headers — a randomized `User-Agent` plus matching `Accept`, `Accept-Language`, `Sec-Fetch-*`, and (for Chromium User-Agents) version-aligned `Sec-CH-UA` client hints. Choose the device profile with `ScraperConfig.userAgent` (`UserAgentDevice.mobile`, `desktop`, `windows`, `mac`, `linux`, `android`, `ios`, `random`). Any headers or `overrideUserAgent` you set take precedence.
+
+> Note: this mimics **header-level** fingerprints only. TLS/JA3 and HTTP/2 fingerprints come from the Dart networking stack and can't be changed here — route through a `ProxyAPIConfig` unblocker for sites that fingerprint at those layers.
 
 ## Creating configs from JSON
 

@@ -38,19 +38,18 @@ Future<Data?> httpParser({
       method = parser.parserOptions!.http!.method!;
     }
 
-    // Set headers from parser options
+    // Build a coherent browser fingerprint (User-Agent + matching client
+    // hints, Accept, Sec-Fetch); parser-supplied headers win over defaults.
+    final Map<String, String> explicitHeaders = {};
     if (parser.parserOptions!.http!.headers != null) {
       parser.parserOptions!.http!.headers!.forEach((k, v) {
-        headers[k.toString()] = v.toString();
+        explicitHeaders[k.toString()] = v.toString();
       });
     }
-
-    // Set random user agent if not specified in headers
-    if (!headers.containsKey("User-Agent")) {
-      headers['User-Agent'] = randomUserAgent(
-        parser.parserOptions!.http!.userAgent ?? UserAgentDevice.random,
-      );
-    }
+    headers = buildBrowserHeaders(
+      parser.parserOptions!.http!.userAgent ?? UserAgentDevice.random,
+      explicit: explicitHeaders,
+    );
 
     // Inject dynamic data into headers
     String encodedHeaders = jsonEncode(headers);

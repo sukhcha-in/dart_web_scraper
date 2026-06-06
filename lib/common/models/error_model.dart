@@ -28,11 +28,19 @@ class WebScraperError implements Exception {
   /// - "Invalid selector" - CSS selector syntax error
   final String message;
 
+  /// HTTP status code associated with the error, when applicable.
+  ///
+  /// Set when the error originates from an HTTP response, e.g. `404` when a URL
+  /// is no longer available. Null for non-HTTP errors (configuration issues,
+  /// network failures, etc.).
+  final int? statusCode;
+
   /// Creates a new WebScraperError instance.
   ///
   /// Parameters:
   /// - [message]: Descriptive error message
-  WebScraperError(this.message);
+  /// - [statusCode]: Optional HTTP status code associated with the error
+  WebScraperError(this.message, {this.statusCode});
 
   /// Returns a string representation of the error.
   ///
@@ -43,6 +51,9 @@ class WebScraperError implements Exception {
   /// - Formatted error string with the error message
   @override
   String toString() {
+    if (statusCode != null) {
+      return 'Error ($statusCode): $message';
+    }
     return 'Error: $message';
   }
 
@@ -57,7 +68,10 @@ class WebScraperError implements Exception {
   /// Returns:
   /// - New WebScraperError instance with message from the map
   factory WebScraperError.fromMap(Map<String, dynamic> map) {
-    return WebScraperError(map['message']);
+    return WebScraperError(
+      map['message'],
+      statusCode: map['statusCode'] as int?,
+    );
   }
 
   /// Converts the WebScraperError instance to a Map.
@@ -70,6 +84,7 @@ class WebScraperError implements Exception {
   Map<String, dynamic> toMap() {
     return {
       'message': message,
+      'statusCode': statusCode,
     };
   }
 

@@ -25,12 +25,13 @@ Future<String?> getRequest(
         .timeout(
           Duration(seconds: 30),
         );
-    String body = utf8.decode(html.bodyBytes);
     printLog(
       "HTTP Response: ${html.statusCode}",
       debug,
       color: LogColor.yellow,
     );
+    throwIfNotFound(html.statusCode, url, debug);
+    String body = utf8.decode(html.bodyBytes);
     printLog(
       "HTTP Response body.length ${body.length}",
       debug,
@@ -43,9 +44,23 @@ Future<String?> getRequest(
     );
     dumpResponseToFile(html: body, debug: debug);
     return body;
+  } on WebScraperError {
+    rethrow;
   } catch (e) {
     printLog(e.toString(), debug, color: LogColor.red);
     return null;
+  }
+}
+
+/// Throws a [WebScraperError] with `statusCode` 404 when a response indicates
+/// the URL no longer exists. Other status codes are left to the caller.
+void throwIfNotFound(int statusCode, Uri url, bool debug) {
+  if (statusCode == 404) {
+    printLog("HTTP 404: $url is not available", debug, color: LogColor.red);
+    throw WebScraperError(
+      'URL not found (404): $url',
+      statusCode: 404,
+    );
   }
 }
 
@@ -82,12 +97,15 @@ Future<Map<String, String>?> getResponseHeaders(
       debug,
       color: LogColor.yellow,
     );
+    throwIfNotFound(response.statusCode, url, debug);
     printLog(
       "HTTP Response headers: ${response.headers}",
       debug,
       color: LogColor.yellow,
     );
     return response.headers;
+  } on WebScraperError {
+    rethrow;
   } catch (e) {
     printLog(e.toString(), debug, color: LogColor.red);
     return null;
@@ -120,10 +138,19 @@ Future<String?> postRequest(
         .timeout(
           Duration(seconds: 30),
         );
+    printLog(
+      "HTTP Response: ${html.statusCode}",
+      debug,
+      color: LogColor.magenta,
+    );
+    throwIfNotFound(html.statusCode, url, debug);
     String responseBody = utf8.decode(html.bodyBytes);
     dumpResponseToFile(html: responseBody, debug: debug);
     return responseBody;
+  } on WebScraperError {
+    rethrow;
   } catch (e) {
+    printLog(e.toString(), debug, color: LogColor.red);
     return null;
   }
 }

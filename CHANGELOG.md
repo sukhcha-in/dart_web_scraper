@@ -1,3 +1,9 @@
+## 0.2.16
+- Send a coherent browser fingerprint with every request: the generated User-Agent now comes with matching `Accept`, `Accept-Language`, `Sec-Fetch-*`, and version-aligned `Sec-CH-UA` client-hint headers (omitted for Safari). Applies to the base scraper and the `http`/`responseHeaders` parsers. Caller-supplied headers and User-Agent overrides still take precedence.
+
+## 0.2.15
+- Throw `WebScraperError` with `statusCode` 404 when a scraper or parser request returns 404, indicating the URL is no longer available.
+
 ## 0.2.14
 - New Parser: `Response Headers` sends a GET or POST request and extracts a value from the response headers, with optional cookie extraction from the `set-cookie` header.
 

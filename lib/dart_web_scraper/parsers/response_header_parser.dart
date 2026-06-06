@@ -39,20 +39,18 @@ Future<Data?> responseHeaderParser({
   // Resolve HTTP method (defaults to GET).
   final HttpMethod method = options?.method ?? HttpMethod.get;
 
-  // Build request headers.
-  Map<String, String> headers = {};
+  // Build a coherent browser fingerprint (User-Agent + matching client hints,
+  // Accept, Sec-Fetch); caller-supplied headers win over the defaults.
+  final Map<String, String> explicitHeaders = {};
   if (options?.headers != null) {
     options!.headers!.forEach((k, v) {
-      headers[k] = v.toString();
+      explicitHeaders[k] = v.toString();
     });
   }
-
-  // Set a user agent if the caller did not provide one.
-  if (!headers.containsKey("User-Agent")) {
-    headers['User-Agent'] = randomUserAgent(
-      options?.userAgent ?? UserAgentDevice.random,
-    );
-  }
+  Map<String, String> headers = buildBrowserHeaders(
+    options?.userAgent ?? UserAgentDevice.random,
+    explicit: explicitHeaders,
+  );
 
   // Inject dynamic data (slots) into headers from previously extracted data.
   String encodedHeaders = jsonEncode(headers);

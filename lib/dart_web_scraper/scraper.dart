@@ -62,36 +62,27 @@ class Scraper {
 
     /// Build HTTP headers with appropriate defaults and custom settings
     printLog('Scraper: Building headers...', debug, color: LogColor.blue);
-    Map<String, String> headersMerged = {};
 
-    /// Set headers from scraperConfig
+    /// Collect caller-supplied headers (config first, then per-request
+    /// overrides) so they take precedence over the generated browser profile.
+    final Map<String, String> explicitHeaders = {};
     if (scraperConfig.headers != null) {
-      headersMerged.addAll(scraperConfig.headers!);
+      explicitHeaders.addAll(scraperConfig.headers!);
     }
-
-    /// Override with user-passed headers if provided
     if (overrideHeaders != null) {
       overrideHeaders.forEach((key, value) {
-        headersMerged[key] = value.toString();
+        explicitHeaders[key] = value.toString();
       });
     }
 
-    /// Set User-Agent header based on configuration or custom value
-    if (overrideUserAgent != null) {
-      printLog(
-        'Scraper: Using user-passed User-Agent...',
-        debug,
-        color: LogColor.blue,
-      );
-      headersMerged['User-Agent'] = overrideUserAgent;
-    } else {
-      printLog(
-        'Scraper: Using User-Agent from scraperConfig...',
-        debug,
-        color: LogColor.blue,
-      );
-      headersMerged['User-Agent'] = randomUserAgent(scraperConfig.userAgent);
-    }
+    /// Build a coherent browser fingerprint (User-Agent + matching client
+    /// hints, Accept, and Sec-Fetch headers). Caller headers and an explicit
+    /// User-Agent override win over the generated defaults.
+    Map<String, String> headersMerged = buildBrowserHeaders(
+      scraperConfig.userAgent,
+      explicit: explicitHeaders,
+      overrideUserAgent: overrideUserAgent,
+    );
 
     /// Set cookies from scraperConfig
     if (scraperConfig.cookies != null) {
