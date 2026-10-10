@@ -5,6 +5,21 @@
 
 Config-based, reusable web scraper for web and API scraping. Scrape, parse web pages or APIs without writing parsers or scraping logic, using simple key/value based configs.
 
+---
+
+### Need mobile IPs for scraping? Try [Proxy Farms](https://proxyfarms.com/)
+
+**Your phones. Your IPs. Your proxy farm.**
+
+- HTTP and SOCKS5 endpoints on each phone's carrier IP, no root needed.
+- IP rotation: manual, timed, or triggered by an API call.
+- Per-device pricing with unlimited bandwidth.
+- 7-day free trial, no credit card required.
+
+[**Create your own mobile proxies →**](https://proxyfarms.com/)
+
+---
+
 ## Features
 
 - Config-based, reusable web scraper for web and API scraping.

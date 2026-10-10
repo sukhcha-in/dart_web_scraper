@@ -1,3 +1,6 @@
+## 0.2.17
+- README update.
+
 ## 0.2.16
 - Send a coherent browser fingerprint with every request: the generated User-Agent now comes with matching `Accept`, `Accept-Language`, `Sec-Fetch-*`, and version-aligned `Sec-CH-UA` client-hint headers (omitted for Safari). Applies to the base scraper and the `http`/`responseHeaders` parsers. Caller-supplied headers and User-Agent overrides still take precedence.
 
